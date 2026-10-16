@@ -285,11 +285,12 @@ export const MapView: React.FC<MapViewProps> = ({
     const width = props.width_m;
     const isSelected = selectedFeature?.properties?.id === props.id;
 
+    const reqW = selectedVehicle?.minClearanceWidthM ?? selectedVehicle?.min_clearance_width_m;
     const isVehicleConstrained =
-      selectedVehicle &&
+      reqW !== undefined &&
       width !== null &&
       width !== undefined &&
-      width < selectedVehicle.minClearanceWidthM;
+      width < reqW;
 
     let color = '#7d837a'; // unknown
     let dashArray: string | undefined = '4, 6';

@@ -1,13 +1,26 @@
 """FastAPI router defining core UNREACHABLE endpoints."""
 import logging
-from fastapi import APIRouter, HTTPException, status
+from typing import List, Optional
+from fastapi import APIRouter, HTTPException, Query, status
 
 from app.core.config import API_VERSION, SAMPLE_DATA_PATH
+from app.models.routing import (
+    BuildingAccessResponse,
+    RoadAccessResponse,
+    RouteRequest,
+    RouteResponse,
+)
 from app.models.schemas import (
     FeatureCollectionResponse,
     HealthResponse,
     StatsResponse,
 )
+from app.models.vehicle import (
+    SUPPORTED_VEHICLES,
+    VehicleProfile,
+    get_vehicle_profile,
+)
+from app.services.access_engine import access_engine
 from app.services.data_service import data_service
 
 logger = logging.getLogger("unreachable.api")
@@ -125,4 +138,139 @@ def get_neighbourhood() -> FeatureCollectionResponse:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to load neighbourhood data: {exc}",
+        )
+
+
+# ============================================================================
+# Vehicle Profile Endpoints
+# ============================================================================
+
+@router.get(
+    "/vehicles",
+    response_model=List[VehicleProfile],
+    summary="List supported vehicle profiles",
+    description="Returns standard emergency vehicle dimensions, clearance thresholds, and evaluation scopes.",
+)
+def list_vehicles() -> List[VehicleProfile]:
+    """Returns all supported emergency vehicle profiles."""
+    return list(SUPPORTED_VEHICLES.values())
+
+
+@router.get(
+    "/vehicles/{vehicle_id}",
+    response_model=VehicleProfile,
+    summary="Get vehicle profile by ID",
+    description="Returns clearance requirements and constraint specifications for a specific vehicle.",
+)
+def get_vehicle(vehicle_id: str) -> VehicleProfile:
+    """Retrieves profile specifications for a vehicle."""
+    prof = get_vehicle_profile(vehicle_id)
+    if not prof:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Unsupported vehicle profile '{vehicle_id}'. Supported: {list(SUPPORTED_VEHICLES.keys())}",
+        )
+    return prof
+
+
+# ============================================================================
+# Routing & Access Engine Endpoints
+# ============================================================================
+
+@router.post(
+    "/routing/route",
+    response_model=RouteResponse,
+    summary="Calculate emergency vehicle route (POST)",
+    description="Evaluates deterministic route from origin station to destination with physical constraint penalties.",
+)
+def post_route(request: RouteRequest) -> RouteResponse:
+    """Calculates defensible emergency route with step-by-step segment assessments."""
+    try:
+        return access_engine.calculate_route(request)
+    except KeyError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except Exception as exc:
+        logger.error("Routing calculation failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to calculate route: {exc}",
+        )
+
+
+@router.get(
+    "/routing/route",
+    response_model=RouteResponse,
+    summary="Calculate emergency vehicle route (GET)",
+    description="Query-parameter route evaluation for client-side ergonomics.",
+)
+def get_route(
+    origin: str = Query(default="station-01", description="Origin station identifier"),
+    destination_building: Optional[str] = Query(default=None, description="Target building identifier"),
+    destination_road: Optional[str] = Query(default=None, description="Target road segment identifier"),
+    vehicle: str = Query(default="fire", description="Selected vehicle profile ('fire', 'amb', 'rapid')"),
+) -> RouteResponse:
+    """Convenience GET endpoint to evaluate emergency vehicle routing."""
+    req = RouteRequest(
+        origin_station_id=origin,
+        destination_building_id=destination_building,
+        destination_road_id=destination_road,
+        vehicle_id=vehicle,
+    )
+    return post_route(req)
+
+
+@router.get(
+    "/routing/building-access/{building_id}",
+    response_model=BuildingAccessResponse,
+    summary="Assess building-level emergency vehicle access",
+    description="Evaluates building ingress from station, distinguishing fronting road access from unverified entrance.",
+)
+def assess_building_access(
+    building_id: str,
+    vehicle: str = Query(default="fire", description="Selected vehicle profile"),
+    origin: str = Query(default="station-01", description="Origin dispatch station identifier"),
+) -> BuildingAccessResponse:
+    """Evaluates building ingress, setbacks, and road connectivity."""
+    try:
+        return access_engine.assess_building_access(
+            building_id=building_id,
+            vehicle_id=vehicle,
+            origin_station_id=origin,
+        )
+    except KeyError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except Exception as exc:
+        logger.error("Building access evaluation failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to assess building access: {exc}",
+        )
+
+
+@router.get(
+    "/routing/road-access/{road_id}",
+    response_model=RoadAccessResponse,
+    summary="Assess road segment access clearance",
+    description="Direct segment evaluation against vehicle clearance without multi-hop routing.",
+)
+def assess_road_access(
+    road_id: str,
+    vehicle: str = Query(default="fire", description="Selected vehicle profile"),
+) -> RoadAccessResponse:
+    """Evaluates clearance and bottleneck criteria for a single road segment."""
+    try:
+        return access_engine.assess_road_access(road_id=road_id, vehicle_id=vehicle)
+    except KeyError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except Exception as exc:
+        logger.error("Road access evaluation failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to assess road segment: {exc}",
         )

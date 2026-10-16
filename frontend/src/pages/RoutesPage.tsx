@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { GeoJSONFeature } from '../types';
+import React, { useState, useEffect } from 'react';
+import { BuildingAccessResponse, GeoJSONFeature } from '../types';
 import { SvgMap } from '../components/SvgMap';
 import { VEHICLE_OPTIONS } from '../services/store';
+import { api } from '../services/api';
 
 interface RoutesPageProps {
   buildings: GeoJSONFeature[];
@@ -12,7 +13,7 @@ interface RoutesPageProps {
 export const RoutesPage: React.FC<RoutesPageProps> = ({
   buildings,
   stations,
-  roads,
+  roads: _roads,
 }) => {
   const [selectedStationId, setSelectedStationId] = useState<string>(
     stations[0]?.properties.id || 'station-01'
@@ -21,19 +22,51 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
     buildings[0]?.properties.id || 'bldg-201'
   );
   const [selectedVehKey, setSelectedVehKey] = useState<string>('fire');
-  const [analysed, setAnalysed] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [accessResult, setAccessResult] = useState<BuildingAccessResponse | null>(null);
 
-  const selectedBuilding =
-    buildings.find((b) => b.properties.id === selectedBuildingId) || buildings[0];
   const selectedStation =
     stations.find((s) => s.properties.id === selectedStationId) || stations[0];
   const currentVeh = VEHICLE_OPTIONS[selectedVehKey] || VEHICLE_OPTIONS.fire;
 
-  const connectedRoadId = selectedBuilding?.properties.connected_road_id;
-  const connectedRoad = roads.find((r) => r.properties.id === connectedRoadId);
+  const runAnalysis = async () => {
+    if (!selectedBuildingId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.fetchBuildingAccess(
+        selectedBuildingId,
+        selectedVehKey,
+        selectedStationId || 'station-01'
+      );
+      setAccessResult(res);
+    } catch (err: any) {
+      console.warn('Live routing error:', err);
+      setError(err.message || 'Routing evaluation failed');
+      setAccessResult(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleAnalyse = () => {
-    setAnalysed(true);
+  useEffect(() => {
+    runAnalysis();
+  }, [selectedBuildingId, selectedVehKey, selectedStationId]);
+
+  const getPill = (status?: string) => {
+    switch (status) {
+      case 'accessible':
+      case 'feasible':
+      case 'ok':
+        return <b className="pl c-ok">● Verified accessible</b>;
+      case 'constrained':
+        return <b className="pl c-constrained">▲ Constrained route</b>;
+      case 'infeasible':
+        return <b className="pl c-infeasible">✕ Potentially inaccessible</b>;
+      default:
+        return <b className="pl c-unknown">? Unknown (Unsurveyed)</b>;
+    }
   };
 
   return (
@@ -52,10 +85,7 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
             <select
               id="rs"
               value={selectedStationId}
-              onChange={(e) => {
-                setSelectedStationId(e.target.value);
-                setAnalysed(false);
-              }}
+              onChange={(e) => setSelectedStationId(e.target.value)}
             >
               {stations.map((st) => (
                 <option key={st.properties.id} value={st.properties.id}>
@@ -74,10 +104,7 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
             <select
               id="rb"
               value={selectedBuildingId}
-              onChange={(e) => {
-                setSelectedBuildingId(e.target.value);
-                setAnalysed(false);
-              }}
+              onChange={(e) => setSelectedBuildingId(e.target.value)}
             >
               {buildings.map((b) => (
                 <option key={b.properties.id} value={b.properties.id}>
@@ -98,10 +125,7 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                 <button
                   key={k}
                   className={`chip ${selectedVehKey === k ? 'on' : ''}`}
-                  onClick={() => {
-                    setSelectedVehKey(k);
-                    setAnalysed(false);
-                  }}
+                  onClick={() => setSelectedVehKey(k)}
                   aria-pressed={selectedVehKey === k}
                 >
                   {v.n}
@@ -110,31 +134,51 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
             </div>
           </div>
 
-          <button className="btn pri" onClick={handleAnalyse}>
-            Analyse route
+          <button
+            className="btn pri"
+            onClick={runAnalysis}
+            disabled={loading}
+            style={{ marginTop: '4px' }}
+          >
+            {loading ? 'Evaluating engine...' : 'Re-analyse route'}
           </button>
 
           {/* Route Result Container */}
-          <div style={{ marginTop: '28px' }}>
-            {!analysed ? (
-              <p className="lede" style={{ fontSize: '15px' }}>
-                Choose a station, a building, and a vehicle, then run analysis.
+          <div style={{ marginTop: '24px' }}>
+            {error && (
+              <div
+                role="alert"
+                style={{
+                  background: 'var(--glass)',
+                  border: '1px solid var(--sig)',
+                  borderRadius: '12px',
+                  padding: '12px 14px',
+                  color: 'var(--sig)',
+                  fontSize: '13px',
+                }}
+              >
+                <b>Engine notice:</b> {error}
+              </div>
+            )}
+
+            {loading && !accessResult && (
+              <p className="lede" style={{ fontSize: '14px' }}>
+                Querying deterministic access graph...
               </p>
-            ) : (
+            )}
+
+            {accessResult && (
               <div>
-                <h2>Candidate Access Evaluation</h2>
-                <div style={{ margin: '8px 0 12px' }}>
-                  {connectedRoad?.properties.access_status === 'feasible' ? (
-                    <b className="pl c-ok">● Direct corridor feasible</b>
-                  ) : connectedRoad?.properties.access_status === 'constrained' ? (
-                    <b className="pl c-constrained">▲ Width bottleneck identified</b>
-                  ) : connectedRoad?.properties.access_status === 'infeasible' ? (
-                    <b className="pl c-infeasible">✕ Approach corridor obstructed</b>
-                  ) : (
-                    <b className="pl c-unknown">? Ground check required</b>
-                  )}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                  <h3 style={{ margin: 0 }}>Deterministic Evaluation</h3>
+                  {getPill(accessResult.classification)}
                 </div>
 
+                <p style={{ fontSize: '14px', margin: '10px 0', lineHeight: 1.5, color: 'var(--ink)' }}>
+                  {accessResult.plain_language_explanation}
+                </p>
+
+                {/* Key Metrics Summary */}
                 <div
                   style={{
                     background: 'var(--glass)',
@@ -142,51 +186,89 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                     borderRadius: '12px',
                     padding: '14px',
                     margin: '14px 0',
-                    fontSize: '14px',
+                    fontSize: '13px',
+                    lineHeight: 1.6,
                   }}
                 >
-                  <p>
-                    <b>Destination:</b> {selectedBuilding?.properties.name} (ID: {selectedBuilding?.properties.id})
-                  </p>
-                  <p>
-                    <b>Dispatch Origin:</b> {selectedStation?.properties.name}
-                  </p>
-                  <p>
-                    <b>Vehicle Ingress Requirement:</b> {currentVeh.n} (≥ {currentVeh.w} m effective width)
-                  </p>
-                  <p>
-                    <b>Final Access Road:</b> {connectedRoad?.properties.name || connectedRoadId} (Width: {connectedRoad?.properties.width_m ? `${connectedRoad.properties.width_m} m` : 'Unmeasured'})
-                  </p>
+                  <div>
+                    <b>Target Asset:</b> {accessResult.building_name} ({accessResult.building_id})
+                  </div>
+                  <div>
+                    <b>Dispatch Origin:</b> {selectedStation?.properties.name || accessResult.origin_station_id}
+                  </div>
+                  <div>
+                    <b>Vehicle Profile:</b> {accessResult.vehicle.name} (Requires ≥ {accessResult.vehicle.min_clearance_width_m || currentVeh.w}m usable width)
+                  </div>
+                  <div>
+                    <b>Frontage Corridor:</b> {accessResult.connected_road_id || 'None (Unassigned in cadastre)'}
+                  </div>
+                  <div>
+                    <b>Traversal Distance:</b> {accessResult.route ? `${accessResult.route.total_distance_m} m` : 'No contiguous route'}
+                  </div>
+                  <div>
+                    <b>Corridors Traversed:</b> {accessResult.route?.segments_traversed.join(' → ') || 'None'}
+                  </div>
                 </div>
 
-                {/* Scope Notice */}
+                {/* Road Arrival vs Entrance Ingress Distinction */}
                 <div
                   style={{
                     borderLeft: '4px solid var(--tape)',
                     paddingLeft: '12px',
                     color: 'var(--mute)',
-                    fontSize: '13px',
+                    fontSize: '12px',
                     lineHeight: 1.5,
+                    marginBottom: '18px',
                   }}
                 >
-                  <b>Engine Status (Phase 1.5):</b> The full multi-hop Dijkstra/A* shortest
-                  pathfinding engine with dynamic turn radiuses and real-time obstacle avoidance
-                  is scheduled for Phase 2. This preview evaluates direct segment clearance from
-                  the verified database.
+                  <b>Entrance Distinction:</b>{' '}
+                  {accessResult.entrance_status === 'road_frontage_only'
+                    ? `Vehicle reaches the public frontage road. Cadastral setback is ${accessResult.estimated_setback_m ? `${accessResult.estimated_setback_m}m` : 'unmeasured'}; building doorway/gate access requires ground-truth verification.`
+                    : 'Building entrance is unconfirmed with no connected public corridor in cadastre records.'}
                 </div>
 
-                {/* Segments table */}
-                <h3 style={{ marginTop: '20px', marginBottom: '10px' }}>Approach Segments</h3>
-                <div className="row" style={{ gridTemplateColumns: '1fr auto' }}>
-                  <span>
-                    <b>{connectedRoad?.properties.name || 'Access Segment'}</b>
-                    <small>
-                      {connectedRoad?.properties.width_m
-                        ? `Width ${connectedRoad.properties.width_m} m (Sample cadastre)`
-                        : 'Width unmeasured in cadastre'}
-                    </small>
-                  </span>
-                  <b className="pl c-ok">Direct Ingress</b>
+                {/* Approach Segments Breakdown */}
+                {accessResult.route && accessResult.route.steps.length > 0 && (
+                  <div>
+                    <h3 style={{ marginTop: '16px', marginBottom: '8px', fontSize: '15px' }}>
+                      Path Steps ({accessResult.route.steps.length})
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {accessResult.route.steps.map((st) => (
+                        <div
+                          key={`${st.step_index}-${st.road_id}`}
+                          className="row"
+                          style={{
+                            gridTemplateColumns: '1fr auto',
+                            padding: '8px 12px',
+                            background: 'var(--glass)',
+                            borderRadius: '10px',
+                            border: '1px solid var(--line)',
+                          }}
+                        >
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: '13px' }}>
+                              Step {st.step_index}: {st.road_name} ({st.road_id})
+                            </div>
+                            <div style={{ fontSize: '12px', color: 'var(--mute)' }}>
+                              Length: {st.segment_length_m} m · {st.reason}
+                            </div>
+                          </div>
+                          <div>{getPill(st.status)}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Evaluated vs Unevaluated Constraints */}
+                <div style={{ marginTop: '16px', fontSize: '12px', color: 'var(--mute)' }}>
+                  <div>
+                    <b>Evaluated constraints:</b> {accessResult.vehicle.evaluated_constraints?.join(', ') || 'width, physical_obstruction'}
+                  </div>
+                  <div>
+                    <b>Unevaluated (unmeasured in cadastre):</b> {accessResult.vehicle.unevaluated_constraints?.join(', ') || 'overhead_clearance, turning_radius, gate_restrictions'}
+                  </div>
                 </div>
               </div>
             )}
@@ -195,7 +277,11 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
 
         {/* Map Preview Column */}
         <div>
-          <SvgMap nohit={true} />
+          <SvgMap
+            nohit={true}
+            selectedId={selectedBuildingId}
+            selectedKind="b"
+          />
           <div className="lg" style={{ marginTop: '14px' }}>
             <b className="pl c-ok">● Verified accessible</b>
             <b className="pl c-constrained">▲ Constrained</b>
