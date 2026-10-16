@@ -1,4 +1,4 @@
-export type AccessStatus = 'feasible' | 'constrained' | 'infeasible' | 'unknown';
+export type AccessStatus = 'feasible' | 'constrained' | 'infeasible' | 'unknown' | 'ok';
 
 export type FeatureType = 'building' | 'road' | 'station';
 
@@ -83,4 +83,26 @@ export interface VehicleProfile {
   minClearanceWidthM: number;
   description: string;
   typicalEquipment: string;
+}
+
+export interface IssueRecord {
+  id: string;
+  t: string; // Title
+  type: string; // e.g. Obstruction, Unknown width, Width constraint, Restricted entrance
+  edge: string; // Associated road segment ID
+  sev: 'high' | 'med' | 'low';
+  st: 'open' | 'review' | 'verified' | 'resolved';
+  ver: string; // Verification note
+  blocked?: number | boolean;
+  fixW?: number | null;
+  ai?: string;
+  age?: string;
+  photo?: string;
+}
+
+export interface AIObservation {
+  t: string;
+  d: string;
+  c: number;
+  s: 'ok' | 'no' | '';
 }
