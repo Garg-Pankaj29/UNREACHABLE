@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Python Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache and byte-code
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment and Secrets (retain examples)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Frontend build output
+dist/
+dist-ssr/
+build/
+*.tsbuildinfo
+
+# Logs and debug
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Temporary and Scratch files
+/fix*
+/test/
+/tests/
+scratch/
+*.tmp
+*.temp
+
+# IDE / OS noise
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Retain required sample data
+!data/sample/*.geojson
