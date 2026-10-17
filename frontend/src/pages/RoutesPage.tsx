@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BuildingAccessResponse, GeoJSONFeature } from '../types';
-import { SvgMap } from '../components/SvgMap';
+import { MapView } from '../components/MapView';
 import { VEHICLE_OPTIONS } from '../services/store';
 import { api } from '../services/api';
 
@@ -13,7 +13,7 @@ interface RoutesPageProps {
 export const RoutesPage: React.FC<RoutesPageProps> = ({
   buildings,
   stations,
-  roads: _roads,
+  roads,
 }) => {
   const [selectedStationId, setSelectedStationId] = useState<string>(
     stations[0]?.properties.id || 'station-01'
@@ -277,10 +277,19 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
 
         {/* Map Preview Column */}
         <div>
-          <SvgMap
-            nohit={true}
-            selectedId={selectedBuildingId}
-            selectedKind="b"
+          <MapView
+            buildings={buildings}
+            roads={roads}
+            stations={stations}
+            selectedFeature={buildings.find((b) => b.properties.id === selectedBuildingId) || null}
+            selectedVehicle={{
+              id: selectedVehKey,
+              name: currentVeh.n,
+              category: 'Emergency Vehicle',
+              minClearanceWidthM: currentVeh.w,
+              description: currentVeh.desc,
+            }}
+            fullHeight={false}
           />
           <div className="lg" style={{ marginTop: '14px' }}>
             <b className="pl c-ok">● Verified accessible</b>
