@@ -38,6 +38,28 @@ Built with **FastAPI**, **Pydantic v2**, and standard Python logging. It adheres
   - `HealthResponse`: Service health and dataset availability.
   - `GeoJSONFeature` / `FeatureCollectionResponse`: Standard GeoJSON-compatible data structures.
   - `StatsResponse` & `AccessStatusCounts`: Numerical counts for buildings and road segments classified by feasibility status.
+- **`app/models/vehicle.py`**:
+  Configurable emergency vehicle profiles (`VehicleProfile`):
+  - `fire`: Fire tender (≥ 3.5m clearance, 16.0t, 8.5m turning radius).
+  - `amb`: Emergency ambulance (≥ 3.0m clearance, 4.5t, 6.5m turning radius).
+  - `rapid`: Rapid response unit (≥ 2.4m clearance, 2.2t, 5.0m turning radius).
+  - Tracks evaluated constraints (`width`, `physical_obstruction`) vs unmeasured/unevaluated constraints (`turning_radius`, `overhead_clearance`, `gate_restriction`).
+- **`app/models/routing.py`**:
+  Pydantic schemas for deterministic route evaluation:
+  - `AccessClassification`: `accessible`, `constrained`, `inaccessible`, `unknown`.
+  - `SegmentAssessment`, `RouteStep`, `RouteRequest`, `RouteResponse`.
+  - `BuildingAccessResponse`: Explicitly distinguishes road arrival from building entrance access (`road_frontage_only` vs `unconfirmed_entrance`).
+  - `RoadAccessResponse`: Direct corridor clearance assessment.
+- **`app/services/graph_service.py`**:
+  Topological road graph (`RoadGraph`):
+  - Converts GeoJSON `LineString` road segments into nodes (junction coordinates snapped to 6 decimal places ~ 0.11m precision) and bidirectional traversable edges (`RoadEdge`).
+  - Computes exact Great-Circle distances using Haversine formula in meters.
+  - Excludes proximity heuristics; relies strictly on physical coordinate connectivity.
+- **`app/services/access_engine.py`**:
+  Deterministic accessibility and routing engine (`AccessEngine`):
+  - Evaluates physical corridor clearance vs vehicle minimum width and confirmed obstructions.
+  - Penalty-weighted Dijkstra pathfinding: avoids confirmed impassable segments, applies transparent multipliers to constrained (2.5x) and unmeasured/unknown (3.0x) corridors to optimize for defensible access rather than naive shortest distance.
+  - Resolves topological connectivity vs physical blockages (unconstrained BFS fallback).
 - **`app/services/data_service.py`**:
   Manages dataset lifecycle and computation:
   - Reads `data/sample/neighbourhood.geojson` via relative path resolution.
@@ -51,8 +73,12 @@ Built with **FastAPI**, **Pydantic v2**, and standard Python logging. It adheres
   - `GET /api/roads`
   - `GET /api/stats`
   - `GET /api/neighbourhood`
+  - `GET /api/vehicles` & `GET /api/vehicles/{vehicle_id}`
+  - `POST /api/routing/route` & `GET /api/routing/route`
+  - `GET /api/routing/building-access/{building_id}`
+  - `GET /api/routing/road-access/{road_id}`
 - **`app/main.py`**:
-  Application factory configuring restricted CORS middleware and mounting routers under the `/api` prefix.
+  Application factory configuring restricted CORS middleware (allowing GET, POST, OPTIONS) and mounting routers under the `/api` prefix.
 
 ---
 

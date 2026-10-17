@@ -1,4 +1,12 @@
-import { FeatureCollection, HealthResponse, StatsResponse } from '../types';
+import {
+  BuildingAccessResponse,
+  FeatureCollection,
+  HealthResponse,
+  RoadAccessResponse,
+  RouteResponse,
+  StatsResponse,
+  VehicleProfile,
+} from '../types';
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
@@ -51,5 +59,59 @@ export const api = {
   async fetchNeighbourhood(): Promise<FeatureCollection> {
     const res = await fetch(`${API_BASE_URL}/neighbourhood`);
     return handleResponse<FeatureCollection>(res, '/neighbourhood');
+  },
+
+  async fetchVehicles(): Promise<VehicleProfile[]> {
+    const res = await fetch(`${API_BASE_URL}/vehicles`);
+    return handleResponse<VehicleProfile[]>(res, '/vehicles');
+  },
+
+  async fetchRoute(
+    origin: string,
+    destinationBuilding?: string,
+    vehicle: string = 'fire',
+    destinationRoad?: string
+  ): Promise<RouteResponse> {
+    const params = new URLSearchParams({
+      origin,
+      vehicle,
+    });
+    if (destinationBuilding) params.append('destination_building', destinationBuilding);
+    if (destinationRoad) params.append('destination_road', destinationRoad);
+
+    const res = await fetch(`${API_BASE_URL}/routing/route?${params.toString()}`);
+    return handleResponse<RouteResponse>(res, '/routing/route');
+  },
+
+  async fetchBuildingAccess(
+    buildingId: string,
+    vehicle: string = 'fire',
+    origin: string = 'station-01'
+  ): Promise<BuildingAccessResponse> {
+    const params = new URLSearchParams({
+      vehicle,
+      origin,
+    });
+    const res = await fetch(
+      `${API_BASE_URL}/routing/building-access/${buildingId}?${params.toString()}`
+    );
+    return handleResponse<BuildingAccessResponse>(
+      res,
+      `/routing/building-access/${buildingId}`
+    );
+  },
+
+  async fetchRoadAccess(
+    roadId: string,
+    vehicle: string = 'fire'
+  ): Promise<RoadAccessResponse> {
+    const params = new URLSearchParams({ vehicle });
+    const res = await fetch(
+      `${API_BASE_URL}/routing/road-access/${roadId}?${params.toString()}`
+    );
+    return handleResponse<RoadAccessResponse>(
+      res,
+      `/routing/road-access/${roadId}`
+    );
   },
 };

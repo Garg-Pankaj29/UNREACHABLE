@@ -80,9 +80,84 @@ export interface VehicleProfile {
   id: string;
   name: string;
   category: string;
-  minClearanceWidthM: number;
+  minClearanceWidthM?: number;
+  min_clearance_width_m?: number;
+  min_clearance_height_m?: number;
+  turning_radius_m?: number;
+  weight_tons?: number;
   description: string;
-  typicalEquipment: string;
+  typicalEquipment?: string;
+  typical_equipment?: string;
+  evaluated_constraints?: string[];
+  unevaluated_constraints?: string[];
+}
+
+export interface SegmentAssessment {
+  road_id: string;
+  name: string;
+  road_class?: string | null;
+  width_m?: number | null;
+  required_width_m: number;
+  surface?: string | null;
+  obstruction?: string | null;
+  status: AccessStatus;
+  is_passable: boolean;
+  length_m: number;
+  limiting_factors: string[];
+  notes?: string | null;
+}
+
+export interface RouteStep {
+  step_index: number;
+  from_node: string;
+  to_node: string;
+  road_id: string;
+  road_name: string;
+  segment_length_m: number;
+  status: AccessStatus;
+  reason: string;
+}
+
+export interface RouteResponse {
+  origin_id: string;
+  destination_id: string;
+  destination_type: 'building' | 'road';
+  vehicle: VehicleProfile;
+  classification: AccessStatus;
+  route_found: boolean;
+  total_distance_m: number;
+  segments_traversed: string[];
+  steps: RouteStep[];
+  segment_assessments: SegmentAssessment[];
+  limiting_segments: string[];
+  evaluated_constraints: string[];
+  unevaluated_constraints: string[];
+  explanation: string;
+  disclaimer: string;
+}
+
+export interface BuildingAccessResponse {
+  building_id: string;
+  building_name: string;
+  use_type?: string | null;
+  connected_road_id?: string | null;
+  estimated_setback_m?: number | null;
+  entrance_status: string;
+  vehicle: VehicleProfile;
+  classification: AccessStatus;
+  origin_station_id: string;
+  route?: RouteResponse | null;
+  limitations: string[];
+  plain_language_explanation: string;
+  disclaimer: string;
+}
+
+export interface RoadAccessResponse {
+  road_id: string;
+  road_name: string;
+  vehicle: VehicleProfile;
+  assessment: SegmentAssessment;
+  plain_language_explanation: string;
 }
 
 export interface IssueRecord {
