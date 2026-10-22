@@ -449,7 +449,7 @@ export const MapView: React.FC<MapViewProps> = ({
         : '<span style="color:#7d837a; font-weight:700;">? Unknown (Unsurveyed)</span>';
 
     const content = `
-      <div style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; min-width: 190px;">
+      <div style="font-family: 'Inter', system-ui, sans-serif; min-width: 190px;">
         <div style="font-size: 11px; text-transform: uppercase; color: var(--mute, #5d635a); margin-bottom: 2px;">
           ${props.feature_type || 'Asset'} · ${props.id}
         </div>
@@ -600,7 +600,7 @@ export const MapView: React.FC<MapViewProps> = ({
               }}
             >
               <Popup>
-                <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif' }}>
+                <div style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
                   <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700 }}>
                     Emergency Hub · {st.properties.id}
                   </div>
@@ -664,7 +664,7 @@ export const MapView: React.FC<MapViewProps> = ({
                 }}
               >
                 <Popup>
-                  <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif', minWidth: 200 }}>
+                  <div style={{ fontFamily: 'Inter, system-ui, sans-serif', minWidth: 200 }}>
                     <div
                       style={{
                         fontSize: '11px',
@@ -757,7 +757,7 @@ export const MapView: React.FC<MapViewProps> = ({
               icon={createViolationIcon()}
             >
               <Popup>
-                <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif', minWidth: 200 }}>
+                <div style={{ fontFamily: 'Inter, system-ui, sans-serif', minWidth: 200 }}>
                   <div
                     style={{
                       fontSize: '11px',
