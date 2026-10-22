@@ -103,7 +103,7 @@ sequenceDiagram
 ## Key Features
 
 - **100% Local-First & Private:** All spatial parsing, topological graph construction, clearance calculations, and route assessments execute locally on `127.0.0.1`. No external APIs, cloud keys, or remote telemetry.
-- **Deterministic Clearance Guardrails:** Eliminates probabilistic guesswork. Evaluates exact vehicle apparatus metrics (width, turning radius, gross weight, ground clearance) against measured road dimensions (`width_m`, `obstruction`, `surface`).
+- **Deterministic Clearance Guardrails:** Eliminates probabilistic guesswork. Evaluates exact vehicle clearance metrics—specifically effective corridor width (`width_m`) and physical obstructions (`obstruction`); turning radius, gross weight, and ground clearance exist in vehicle profile metadata and are roadmapped for geometric turn-angle expansion.
 - **Penalty-Weighted Routing (Not Naive Shortest-Path):** Uses custom-weighted Dijkstra graph traversal that hard-blocks confirmed obstructions (`inf`), applies a `2.5x` penalty multiplier to constrained corridors, and applies a `3.0x` penalty to unmeasured segments to ensure the calculated route is operationally defensible.
 - **Topological Road Graph with Coordinate Snapping:** Converts GeoJSON `LineString` corridors into bidirectional graph edges with junction node coordinates snapped to 6 decimal places (~0.11m precision) and exact Great-Circle Haversine distance computations.
 - **Transparent 4-Tier Access Classification:**
@@ -308,11 +308,42 @@ http://127.0.0.1:5173
 
 ## Supported Emergency Vehicle Profiles
 
-| Profile ID | Vehicle Name | Min Width Clearance | Turning Radius | Gross Weight | Clearance Constraints Evaluated |
+| Profile ID | Vehicle Name | Min Width Clearance | Turning Radius (Spec) | Gross Weight (Spec) | Active Clearance Constraints (Code) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`fire`** | Fire Tender (Type 1) | **≥ 3.5 m** | 8.5 m | 16.0 t | Corridor width, physical obstructions, turning bottlenecks |
-| **`amb`** | Advanced Life Support Ambulance | **≥ 3.0 m** | 6.5 m | 4.5 t | Corridor width, overhead wire bundles, bollards |
-| **`rapid`** | Rapid Response Two-Wheeler (QRV) | **≥ 2.4 m** | 5.0 m | 2.2 t | Extreme narrow corridors, tight alleyway access |
+| **`fire`** | Fire Tender (Type 1) | **≥ 3.5 m** | 8.5 m | 16.0 t | Effective corridor width (`width_m ≥ 3.5m`) & physical obstructions |
+| **`amb`** | Advanced Life Support Ambulance | **≥ 3.0 m** | 6.5 m | 4.5 t | Effective corridor width (`width_m ≥ 3.0m`) & physical obstructions |
+| **`rapid`** | Rapid Response Unit (QRV) | **≥ 2.4 m** | 5.0 m | 2.2 t | Effective corridor width (`width_m ≥ 2.4m`) & physical obstructions |
+
+*(Note: Turning radius, gross weight, and ground clearance exist in vehicle profile metadata; the routing engine actively enforces width clearance and physical obstructions deterministically).*
+
+---
+
+## Hackathon Update
+
+The hackathon milestone delivers three decisive, demonstrable capabilities with strictly local, deterministic execution:
+
+1. **Reality Check (`GET /api/routing/compare` & `#/routes`):**
+   - Head-to-head comparison between standard naive shortest-path routing (which routes apparatus directly into physical bottlenecks or narrow gullies) and UNREACHABLE's clearance-aware path.
+   - Visualized with a red dashed trajectory overlay and pinpoint hazard violation markers.
+
+2. **Topological Single Points of Failure (`GET /api/analysis/critical-roads` & `#/dashboard`):**
+   - Automated vulnerability analysis ranking the top 5 most critical road corridors by how many building footprints lose emergency access if that segment is severed.
+
+3. **Bottleneck Impact Simulation (`POST /api/simulate` & `#/simulation`):**
+   - Live intervention simulation engine that applies hypothetical fixes (obstruction removal or lane widening) to in-memory dataset copies.
+   - Computes exact before/after metrics showing precisely which building footprints are rescued.
+
+4. **Vehicle Gap Scorecard (`GET /api/analysis/vehicle-gap` & `#/dashboard`):**
+   - Transparent access gap metrics across Heavy Fire Tender, Ambulance, and Rapid Response units.
+   - Follows mathematical safety rules: `Unknown` is excluded and never assumed reachable or unreachable.
+
+5. **Guardrailed AI Explain Briefing (`POST /api/explain` & `#/routes` / `#/inspector`):**
+   - Generates plain-language situation briefings using a local LLM (LM Studio at `127.0.0.1:1234/v1`).
+   - Validated by strict numeric guardrails against deterministic access facts; falls back automatically to deterministic templates if offline or inaccurate.
+
+6. **Presenter Demo Mode & Offline Replay Fallback (`#/demo`):**
+   - 7-step guided presenter controller walking through each core demo milestone.
+   - Instant offline replay fallback with fixture snapshots (`frontend/public/fixtures/`) and visible replay status badges.
 
 ---
 
@@ -323,7 +354,7 @@ The FastAPI backend exposes structured REST endpoints under `/api`:
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/api/health` | Service health status, version, and sample dataset reachability |
-| `GET` | `/api/stats` | Aggregate counts of buildings and road corridors by feasibility state |
+| `GET` | `/api/stats?vehicle_id=` | Aggregate counts of buildings and road corridors by feasibility state (filterable by vehicle) |
 | `GET` | `/api/buildings` | GeoJSON FeatureCollection of building footprints with accessibility statuses |
 | `GET` | `/api/roads` | GeoJSON FeatureCollection of road segments with physical widths and hazards |
 | `GET` | `/api/neighbourhood` | Complete neighbourhood GeoJSON including stations, roads, and buildings |
@@ -333,38 +364,39 @@ The FastAPI backend exposes structured REST endpoints under `/api`:
 | `GET` | `/api/routing/route` | Convenience GET query-parameter routing endpoint for map clients |
 | `GET` | `/api/routing/building-access/{id}` | Evaluate building ingress, setback, and fronting corridor access |
 | `GET` | `/api/routing/road-access/{id}` | Direct road segment clearance and bottleneck evaluation |
+| `GET` | `/api/routing/compare` | Reality Check comparing naive shortest-path vs deterministic clearance routing |
+| `POST` | `/api/simulate` | What-if simulation applying hypothetical road widening/clearance to in-memory dataset copy |
+| `GET` | `/api/analysis/critical-roads` | Topological single points of failure ranked by buildings compromised |
+| `GET` | `/api/analysis/vehicle-gap` | Cross-apparatus access and evidence coverage scorecard |
+| `POST` | `/api/explain` | Guardrailed plain-language route explanation using local LLM with template fallback |
 
 ---
 
 ## Running the Automated Test Suite
 
-UNREACHABLE includes a deterministic automated test suite covering graph topology creation, penalty pathfinding, obstacle avoidance, and edge-case handling:
+UNREACHABLE includes 29 deterministic automated integration tests covering graph topology creation, penalty pathfinding, obstacle avoidance, vehicle gap scoring, simulation, and LLM guardrails:
 
 ```bash
-# From project root with backend environment activated
+# From backend directory with python environment:
 cd backend
-python -m unittest discover -s tests -p "test_*.py" -v
+python -m unittest discover -s tests -q
 ```
 
-### Test Suite Coverage (10 Deterministic Requirements)
-1. **`test_01_route_satisfying_configured_constraints`**: Verifies routes satisfying width requirements are classified as accessible.
-2. **`test_02_constrained_route`**: Validates narrow lane detection and constrained classification.
-3. **`test_03_route_blocked_by_confirmed_obstruction`**: Confirms impassable routes due to physical barriers are classified as inaccessible.
-4. **`test_04_route_containing_unknown_width_segment`**: Enforces unknown classification when unmeasured corridors are traversed.
-5. **`test_05_disconnected_graph`**: Verifies graceful handling and clear error reporting when destinations are topologically disconnected.
-6. **`test_06_invalid_station_and_building_identifiers`**: Validates strict 404 responses on non-existent station or building IDs.
-7. **`test_07_unsupported_vehicle_profiles`**: Confirms rejection of invalid or unknown vehicle configurations.
-8. **`test_08_buildings_without_confirmed_access_points`**: Validates separation of road arrival from unconfirmed building entrances.
-9. **`test_09_invalid_or_missing_geometry`**: Verifies resilience against malformed or missing GeoJSON coordinates.
-10. **`test_10_alternative_path_avoids_blocked_segment`**: Confirms that Dijkstra pathfinding discovers longer valid detours around blocked segments.
+### Test Suite Coverage (29 Deterministic Tests)
+1. **`test_access_engine.py` (12 tests)**: Constraint satisfaction, constrained corridors, obstacle hard-blocks, unmeasured corridor penalties, disconnected graphs, invalid station/building IDs, unsupported vehicle handling, unconfirmed building entrances, malformed geometry tolerance, detour routing, and reality-check routing comparisons.
+2. **`test_vehicle_gap.py` (9 tests)**: Per-apparatus stats filtering, mathematical vehicle-gap scorecard coverage, critical roads single-points-of-failure ranking, and in-memory what-if simulation (clearing obstructions, widening corridors, resetting).
+3. **`test_explain.py` (8 tests)**: Explain endpoint contract, numeric guardrail consistency validation, template fallback when local LLM is unavailable, and protection against simulated hallucinations.
 
 ---
 
 ## Prototype Boundaries & Disclaimer
 
 > [!WARNING]
-> **Prototype Demonstration Notice**: All geographical coordinates, road widths, and hazard fixtures in `data/sample/neighbourhood.geojson` are synthetic models created for software architecture validation. They do not constitute official municipal emergency-access certifications or dispatch guarantees.
+> **Prototype Demonstration Notice**: All geographical coordinates, road widths, and hazard fixtures in `data/sample/neighbourhood.geojson` are synthetic models ("Ward 142") created for software architecture validation. They do not constitute official municipal emergency-access certifications or dispatch guarantees.
 
+- **Interactive Demo Entry Point**: The live presentation interface is the React SPA (`npm run dev` at `http://127.0.0.1:5173`, with the 7-step guided presenter controller at `#/demo`). The file in `docs/design-reference/` is a static visual prototype reference.
+- **AI Inspector Workflow**: The street photo inspector (`#/inspector`) implements a structured human-in-the-loop observation logging workflow; raw neural vision weights are not bundled on-device in this build.
+- **Local-First AI Integration**: Route briefings (`POST /api/explain`) connect to local OpenAI-compatible endpoints (LM Studio at `127.0.0.1:1234/v1`) with strict numeric guardrails and automatic template fallbacks.
 - **Phase 1 MVP Scope**: Demonstrates core topological graph construction, deterministic clearance calculation, interactive vector mapping, and simulation interfaces.
 - **Future Roadmap**:
   - Direct OpenStreetMap (OSM) Overpass API ingestion with automated lane-width inference.

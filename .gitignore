@@ -57,3 +57,7 @@ desktop.ini
 
 # Retain required sample data
 !data/sample/*.geojson
+
+# Documentation scratch
+explain.md
+
