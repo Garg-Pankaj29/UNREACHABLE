@@ -1,0 +1,135 @@
+{
+  "building_id": "bldg-202",
+  "building_name": "Ward Civic Center & Library",
+  "use_type": "Public Facility",
+  "connected_road_id": "road-102",
+  "estimated_setback_m": 3.0,
+  "entrance_status": "road_frontage_only",
+  "vehicle": {
+    "id": "amb",
+    "name": "Ambulance",
+    "category": "Emergency ambulance",
+    "min_clearance_width_m": 3.0,
+    "min_clearance_height_m": 2.5,
+    "turning_radius_m": 6.5,
+    "weight_tons": 4.5,
+    "description": "Standard emergency medical ambulance requiring \u2265 3.0m clearance corridor.",
+    "typical_equipment": "Stretcher, patient monitor, defibrillator, oxygen delivery kit",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "classification": "accessible",
+  "origin_station_id": "station-01",
+  "route": {
+    "origin_id": "station-01",
+    "destination_id": "bldg-202",
+    "destination_type": "building",
+    "vehicle": {
+      "id": "amb",
+      "name": "Ambulance",
+      "category": "Emergency ambulance",
+      "min_clearance_width_m": 3.0,
+      "min_clearance_height_m": 2.5,
+      "turning_radius_m": 6.5,
+      "weight_tons": 4.5,
+      "description": "Standard emergency medical ambulance requiring \u2265 3.0m clearance corridor.",
+      "typical_equipment": "Stretcher, patient monitor, defibrillator, oxygen delivery kit",
+      "evaluated_constraints": [
+        "width",
+        "physical_obstruction"
+      ],
+      "unevaluated_constraints": [
+        "overhead_clearance",
+        "turning_radius",
+        "gross_weight_limit",
+        "gate_restriction",
+        "entrance_doorway_access"
+      ]
+    },
+    "classification": "accessible",
+    "route_found": true,
+    "total_distance_m": 472.5,
+    "segments_traversed": [
+      "road-101",
+      "road-102"
+    ],
+    "steps": [
+      {
+        "step_index": 1,
+        "from_node": "node_77.593000_12.971500",
+        "to_node": "node_77.595000_12.971500",
+        "road_id": "road-101",
+        "road_name": "Station Link Arterial (Main Road)",
+        "segment_length_m": 216.7,
+        "status": "accessible",
+        "reason": "Adequate clearance for Ambulance (7.5m usable width)."
+      },
+      {
+        "step_index": 2,
+        "from_node": "node_77.595000_12.971500",
+        "to_node": "node_77.595000_12.973800",
+        "road_id": "road-102",
+        "road_name": "North Citizen Lane",
+        "segment_length_m": 255.7,
+        "status": "accessible",
+        "reason": "Adequate clearance for Ambulance (3.4m usable width)."
+      }
+    ],
+    "segment_assessments": [
+      {
+        "road_id": "road-101",
+        "name": "Station Link Arterial (Main Road)",
+        "road_class": "Secondary Arterial",
+        "width_m": 7.5,
+        "required_width_m": 3.0,
+        "surface": "asphalt",
+        "obstruction": null,
+        "status": "accessible",
+        "is_passable": true,
+        "length_m": 216.7,
+        "limiting_factors": [],
+        "notes": "Adequate clearance for Ambulance (7.5m usable width)."
+      },
+      {
+        "road_id": "road-102",
+        "name": "North Citizen Lane",
+        "road_class": "Collector Lane",
+        "width_m": 3.4,
+        "required_width_m": 3.0,
+        "surface": "paved_concrete",
+        "obstruction": null,
+        "status": "accessible",
+        "is_passable": true,
+        "length_m": 255.7,
+        "limiting_factors": [],
+        "notes": "Adequate clearance for Ambulance (3.4m usable width)."
+      }
+    ],
+    "limiting_segments": [],
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ],
+    "explanation": "Verified accessible route (472.5m) via 2 corridor(s). All segments meet or exceed Ambulance physical clearance requirements.",
+    "disclaimer": "DETERMINISTIC EVALUATION FOR PROTOTYPE DEMONSTRATION. ROAD ARRIVAL DOES NOT GUARANTEE ENTRANCE ACCESS."
+  },
+  "limitations": [],
+  "plain_language_explanation": "Ambulance can reach the fronting road corridor (road-102). Note: Property entrance gate is unsurveyed; final 3.0m setback must be traversed via pedestrian access or hose relay.",
+  "disclaimer": "MUNICIPAL CADASTRE DEMONSTRATION. BUILDING ENTRANCE ACCESSIBILITY REQUIRES ON-SITE SETBACK SURVEY."
+}

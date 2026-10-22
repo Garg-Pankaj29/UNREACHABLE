@@ -1,0 +1,88 @@
+{
+  "building_id": "bldg-203",
+  "building_name": "Old Quarter Tenement Block A",
+  "use_type": "High-Density Residential",
+  "connected_road_id": "road-103",
+  "estimated_setback_m": 1.2,
+  "entrance_status": "road_frontage_only",
+  "vehicle": {
+    "id": "fire",
+    "name": "Fire tender",
+    "category": "Heavy apparatus",
+    "min_clearance_width_m": 3.5,
+    "min_clearance_height_m": 3.5,
+    "turning_radius_m": 8.5,
+    "weight_tons": 16.0,
+    "description": "Heavy municipal water tender requiring \u2265 3.5m clearance corridor.",
+    "typical_equipment": "4,500L water tank, high-pressure pump, extension ladders, rescue gear",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "classification": "inaccessible",
+  "origin_station_id": "station-01",
+  "route": {
+    "origin_id": "station-01",
+    "destination_id": "bldg-203",
+    "destination_type": "building",
+    "vehicle": {
+      "id": "fire",
+      "name": "Fire tender",
+      "category": "Heavy apparatus",
+      "min_clearance_width_m": 3.5,
+      "min_clearance_height_m": 3.5,
+      "turning_radius_m": 8.5,
+      "weight_tons": 16.0,
+      "description": "Heavy municipal water tender requiring \u2265 3.5m clearance corridor.",
+      "typical_equipment": "4,500L water tank, high-pressure pump, extension ladders, rescue gear",
+      "evaluated_constraints": [
+        "width",
+        "physical_obstruction"
+      ],
+      "unevaluated_constraints": [
+        "overhead_clearance",
+        "turning_radius",
+        "gross_weight_limit",
+        "gate_restriction",
+        "entrance_doorway_access"
+      ]
+    },
+    "classification": "inaccessible",
+    "route_found": false,
+    "total_distance_m": 0.0,
+    "segments_traversed": [],
+    "steps": [],
+    "segment_assessments": [],
+    "limiting_segments": [
+      "road-102",
+      "road-103"
+    ],
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ],
+    "explanation": "All candidate routes for Fire tender are blocked by physical constraints along: road-102, road-103. Reason: Width deficit of 0.1m (usable width 3.4m < required 3.5m); Confirmed physical obstruction: Physical bottleneck: Road width is 2.1m (below standard 2.5m heavy vehicle clearance). Accessible only to QRV / two-wheelers.",
+    "disclaimer": "DETERMINISTIC EVALUATION FOR PROTOTYPE DEMONSTRATION. ROAD ARRIVAL DOES NOT GUARANTEE ENTRANCE ACCESS."
+  },
+  "limitations": [
+    "road-102",
+    "road-103"
+  ],
+  "plain_language_explanation": "Fire tender cannot reach fronting corridor (road-103) due to physical blockage: All candidate routes for Fire tender are blocked by physical constraints along: road-102, road-103. Reason: Width deficit of 0.1m (usable width 3.4m < required 3.5m); Confirmed physical obstruction: Physical bottleneck: Road width is 2.1m (below standard 2.5m heavy vehicle clearance). Accessible only to QRV / two-wheelers.",
+  "disclaimer": "MUNICIPAL CADASTRE DEMONSTRATION. BUILDING ENTRANCE ACCESSIBILITY REQUIRES ON-SITE SETBACK SURVEY."
+}

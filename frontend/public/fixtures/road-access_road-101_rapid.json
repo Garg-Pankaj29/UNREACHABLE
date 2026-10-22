@@ -1,0 +1,41 @@
+{
+  "road_id": "road-101",
+  "road_name": "Station Link Arterial (Main Road)",
+  "vehicle": {
+    "id": "rapid",
+    "name": "Rapid response car",
+    "category": "Rapid response unit",
+    "min_clearance_width_m": 2.4,
+    "min_clearance_height_m": 2.0,
+    "turning_radius_m": 5.0,
+    "weight_tons": 2.2,
+    "description": "Agile quick response unit requiring \u2265 2.4m clearance corridor.",
+    "typical_equipment": "First responder trauma kit, portable fire suppression extinguisher, AED",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "assessment": {
+    "road_id": "road-101",
+    "name": "Station Link Arterial (Main Road)",
+    "road_class": "Secondary Arterial",
+    "width_m": 7.5,
+    "required_width_m": 2.4,
+    "surface": "asphalt",
+    "obstruction": null,
+    "status": "accessible",
+    "is_passable": true,
+    "length_m": 0.0,
+    "limiting_factors": [],
+    "notes": "Adequate clearance for Rapid response car (7.5m usable width)."
+  },
+  "plain_language_explanation": "Adequate clearance for Rapid response car (7.5m usable width)."
+}

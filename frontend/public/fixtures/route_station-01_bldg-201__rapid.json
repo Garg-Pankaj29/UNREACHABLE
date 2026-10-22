@@ -1,0 +1,75 @@
+{
+  "origin_id": "station-01",
+  "destination_id": "bldg-201",
+  "destination_type": "building",
+  "vehicle": {
+    "id": "fire",
+    "name": "Fire tender",
+    "category": "Heavy apparatus",
+    "min_clearance_width_m": 3.5,
+    "min_clearance_height_m": 3.5,
+    "turning_radius_m": 8.5,
+    "weight_tons": 16.0,
+    "description": "Heavy municipal water tender requiring \u2265 3.5m clearance corridor.",
+    "typical_equipment": "4,500L water tank, high-pressure pump, extension ladders, rescue gear",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "classification": "accessible",
+  "route_found": true,
+  "total_distance_m": 216.7,
+  "segments_traversed": [
+    "road-101"
+  ],
+  "steps": [
+    {
+      "step_index": 1,
+      "from_node": "node_77.593000_12.971500",
+      "to_node": "node_77.595000_12.971500",
+      "road_id": "road-101",
+      "road_name": "Station Link Arterial (Main Road)",
+      "segment_length_m": 216.7,
+      "status": "accessible",
+      "reason": "Adequate clearance for Fire tender (7.5m usable width)."
+    }
+  ],
+  "segment_assessments": [
+    {
+      "road_id": "road-101",
+      "name": "Station Link Arterial (Main Road)",
+      "road_class": "Secondary Arterial",
+      "width_m": 7.5,
+      "required_width_m": 3.5,
+      "surface": "asphalt",
+      "obstruction": null,
+      "status": "accessible",
+      "is_passable": true,
+      "length_m": 216.7,
+      "limiting_factors": [],
+      "notes": "Adequate clearance for Fire tender (7.5m usable width)."
+    }
+  ],
+  "limiting_segments": [],
+  "evaluated_constraints": [
+    "width",
+    "physical_obstruction"
+  ],
+  "unevaluated_constraints": [
+    "overhead_clearance",
+    "turning_radius",
+    "gross_weight_limit",
+    "gate_restriction",
+    "entrance_doorway_access"
+  ],
+  "explanation": "Verified accessible route (216.7m) via 1 corridor(s). All segments meet or exceed Fire tender physical clearance requirements.",
+  "disclaimer": "DETERMINISTIC EVALUATION FOR PROTOTYPE DEMONSTRATION. ROAD ARRIVAL DOES NOT GUARANTEE ENTRANCE ACCESS."
+}

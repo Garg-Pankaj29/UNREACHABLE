@@ -1,0 +1,20 @@
+{
+  "before": {
+    "accessible": 1,
+    "constrained": 1,
+    "inaccessible": 3,
+    "unknown": 1
+  },
+  "after": {
+    "accessible": 1,
+    "constrained": 1,
+    "inaccessible": 3,
+    "unknown": 1
+  },
+  "changed_buildings": [],
+  "assumptions": [
+    "Simulation is evaluated deterministically in-memory without persistent modifications.",
+    "All access constraints verified against Fire tender physical apparatus specifications.",
+    "Physical obstructions and wire bundles cleared from Temple Cross Link (Simulated Obstruction) (road-104)."
+  ]
+}

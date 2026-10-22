@@ -1,0 +1,151 @@
+{
+  "building_id": "bldg-205",
+  "building_name": "East Industrial Depot 3",
+  "use_type": "Storage / Light Industrial",
+  "connected_road_id": "road-105",
+  "estimated_setback_m": 5.0,
+  "entrance_status": "unconfirmed_entrance",
+  "vehicle": {
+    "id": "fire",
+    "name": "Fire tender",
+    "category": "Heavy apparatus",
+    "min_clearance_width_m": 3.5,
+    "min_clearance_height_m": 3.5,
+    "turning_radius_m": 8.5,
+    "weight_tons": 16.0,
+    "description": "Heavy municipal water tender requiring \u2265 3.5m clearance corridor.",
+    "typical_equipment": "4,500L water tank, high-pressure pump, extension ladders, rescue gear",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "classification": "unknown",
+  "origin_station_id": "station-01",
+  "route": {
+    "origin_id": "station-01",
+    "destination_id": "bldg-205",
+    "destination_type": "building",
+    "vehicle": {
+      "id": "fire",
+      "name": "Fire tender",
+      "category": "Heavy apparatus",
+      "min_clearance_width_m": 3.5,
+      "min_clearance_height_m": 3.5,
+      "turning_radius_m": 8.5,
+      "weight_tons": 16.0,
+      "description": "Heavy municipal water tender requiring \u2265 3.5m clearance corridor.",
+      "typical_equipment": "4,500L water tank, high-pressure pump, extension ladders, rescue gear",
+      "evaluated_constraints": [
+        "width",
+        "physical_obstruction"
+      ],
+      "unevaluated_constraints": [
+        "overhead_clearance",
+        "turning_radius",
+        "gross_weight_limit",
+        "gate_restriction",
+        "entrance_doorway_access"
+      ]
+    },
+    "classification": "unknown",
+    "route_found": true,
+    "total_distance_m": 721.1,
+    "segments_traversed": [
+      "road-101",
+      "road-105"
+    ],
+    "steps": [
+      {
+        "step_index": 1,
+        "from_node": "node_77.593000_12.971500",
+        "to_node": "node_77.595000_12.971500",
+        "road_id": "road-101",
+        "road_name": "Station Link Arterial (Main Road)",
+        "segment_length_m": 216.7,
+        "status": "accessible",
+        "reason": "Adequate clearance for Fire tender (7.5m usable width)."
+      },
+      {
+        "step_index": 2,
+        "from_node": "node_77.595000_12.971500",
+        "to_node": "node_77.597500_12.971500",
+        "road_id": "road-101",
+        "road_name": "Station Link Arterial (Main Road)",
+        "segment_length_m": 270.9,
+        "status": "accessible",
+        "reason": "Adequate clearance for Fire tender (7.5m usable width)."
+      },
+      {
+        "step_index": 3,
+        "from_node": "node_77.597500_12.971500",
+        "to_node": "node_77.597500_12.973600",
+        "road_id": "road-105",
+        "road_name": "East Perimeter By-lane (Unknown Width)",
+        "segment_length_m": 233.5,
+        "status": "unknown",
+        "reason": "Width unmeasured in cadastre; clearance unverified."
+      }
+    ],
+    "segment_assessments": [
+      {
+        "road_id": "road-101",
+        "name": "Station Link Arterial (Main Road)",
+        "road_class": "Secondary Arterial",
+        "width_m": 7.5,
+        "required_width_m": 3.5,
+        "surface": "asphalt",
+        "obstruction": null,
+        "status": "accessible",
+        "is_passable": true,
+        "length_m": 216.7,
+        "limiting_factors": [],
+        "notes": "Adequate clearance for Fire tender (7.5m usable width)."
+      },
+      {
+        "road_id": "road-105",
+        "name": "East Perimeter By-lane (Unknown Width)",
+        "road_class": "Unclassified Byway",
+        "width_m": null,
+        "required_width_m": 3.5,
+        "surface": "unpaved_gravel",
+        "obstruction": null,
+        "status": "unknown",
+        "is_passable": true,
+        "length_m": 233.5,
+        "limiting_factors": [
+          "Unmeasured corridor width in cadastre: ground truth audit required"
+        ],
+        "notes": "Width unmeasured in cadastre; clearance unverified."
+      }
+    ],
+    "limiting_segments": [
+      "road-105"
+    ],
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ],
+    "explanation": "Route identified (721.1m across 2 segments), but contains unmeasured segment(s): road-105. Access cannot be confirmed accessible without ground truth width survey.",
+    "disclaimer": "DETERMINISTIC EVALUATION FOR PROTOTYPE DEMONSTRATION. ROAD ARRIVAL DOES NOT GUARANTEE ENTRANCE ACCESS."
+  },
+  "limitations": [
+    "road-105"
+  ],
+  "plain_language_explanation": "Corridor accessibility to bldg-205 is unknown due to missing width or unsurveyed data along path.",
+  "disclaimer": "MUNICIPAL CADASTRE DEMONSTRATION. BUILDING ENTRANCE ACCESSIBILITY REQUIRES ON-SITE SETBACK SURVEY."
+}

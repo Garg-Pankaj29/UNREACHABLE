@@ -1,0 +1,43 @@
+{
+  "road_id": "road-104",
+  "road_name": "Temple Cross Link (Simulated Obstruction)",
+  "vehicle": {
+    "id": "fire",
+    "name": "Fire tender",
+    "category": "Heavy apparatus",
+    "min_clearance_width_m": 3.5,
+    "min_clearance_height_m": 3.5,
+    "turning_radius_m": 8.5,
+    "weight_tons": 16.0,
+    "description": "Heavy municipal water tender requiring \u2265 3.5m clearance corridor.",
+    "typical_equipment": "4,500L water tank, high-pressure pump, extension ladders, rescue gear",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "assessment": {
+    "road_id": "road-104",
+    "name": "Temple Cross Link (Simulated Obstruction)",
+    "road_class": "Local Link",
+    "width_m": 4.0,
+    "required_width_m": 3.5,
+    "surface": "asphalt",
+    "obstruction": "Simulated immovable physical bollards & low sagging overhead optical/power cable bundle (< 2.2m clearance)",
+    "status": "inaccessible",
+    "is_passable": false,
+    "length_m": 0.0,
+    "limiting_factors": [
+      "Confirmed physical obstruction: Simulated immovable physical bollards & low sagging overhead optical/power cable bundle (< 2.2m clearance)"
+    ],
+    "notes": "Physically impassable: Simulated immovable physical bollards & low sagging overhead optical/power cable bundle (< 2.2m clearance)"
+  },
+  "plain_language_explanation": "Physically impassable: Simulated immovable physical bollards & low sagging overhead optical/power cable bundle (< 2.2m clearance)"
+}

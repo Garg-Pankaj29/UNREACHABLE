@@ -1,0 +1,43 @@
+[
+  {
+    "road_id": "road-101",
+    "name": "Station Link Arterial (Main Road)",
+    "buildings_affected": 4,
+    "building_ids": [
+      "bldg-201",
+      "bldg-202",
+      "bldg-205",
+      "bldg-206"
+    ]
+  },
+  {
+    "road_id": "road-102",
+    "name": "North Citizen Lane",
+    "buildings_affected": 1,
+    "building_ids": [
+      "bldg-202"
+    ]
+  },
+  {
+    "road_id": "road-105",
+    "name": "East Perimeter By-lane (Unknown Width)",
+    "buildings_affected": 1,
+    "building_ids": [
+      "bldg-205"
+    ]
+  },
+  {
+    "road_id": "road-106",
+    "name": "South Sector Spur",
+    "buildings_affected": 1,
+    "building_ids": [
+      "bldg-206"
+    ]
+  },
+  {
+    "road_id": "road-103",
+    "name": "Old Bazaar Gully (Narrow Corridor)",
+    "buildings_affected": 0,
+    "building_ids": []
+  }
+]
