@@ -15,6 +15,6 @@
   "assumptions": [
     "Simulation is evaluated deterministically in-memory without persistent modifications.",
     "All access constraints verified against Fire tender physical apparatus specifications.",
-    "Physical obstructions and wire bundles cleared from Temple Cross Link (Simulated Obstruction) (road-104)."
+    "Physical obstructions and wire bundles cleared from Hostel Complex Cross Link (Simulated Obstruction) (road-104)."
   ]
 }

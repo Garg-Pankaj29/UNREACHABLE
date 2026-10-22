@@ -320,7 +320,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
       {/* KPI Numbers Grid (updates with selected vehicle) */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '0 0 8px 4px' }}>
         <small style={{ fontSize: '12px', fontWeight: 700, color: 'var(--mute)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-          Ward 142 Assessment for {selectedVehicle === 'fire' ? 'Fire Engine (≥3.5m)' : selectedVehicle === 'amb' ? 'Ambulance (≥3.0m)' : 'Rapid Response (≥2.4m)'}
+          CU Gharuan Sector Assessment for {selectedVehicle === 'fire' ? 'Fire Engine (≥3.5m)' : selectedVehicle === 'amb' ? 'Ambulance (≥3.0m)' : 'Rapid Response (≥2.4m)'}
         </small>
       </div>
       <div className="nums">

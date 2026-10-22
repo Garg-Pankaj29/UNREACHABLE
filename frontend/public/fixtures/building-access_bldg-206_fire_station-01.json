@@ -1,6 +1,6 @@
 {
   "building_id": "bldg-206",
-  "building_name": "Surya Nilaya Apartments",
+  "building_name": "Faculty Residences & International Hostel Towers",
   "use_type": "Multi-Family Residential",
   "connected_road_id": "road-106",
   "estimated_setback_m": 3.0,
@@ -65,20 +65,20 @@
     "steps": [
       {
         "step_index": 1,
-        "from_node": "node_77.593000_12.971500",
-        "to_node": "node_77.595000_12.971500",
+        "from_node": "node_76.571881_30.767850",
+        "to_node": "node_76.574149_30.767850",
         "road_id": "road-101",
-        "road_name": "Station Link Arterial (Main Road)",
+        "road_name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
         "segment_length_m": 216.7,
         "status": "accessible",
         "reason": "Adequate clearance for Fire tender (7.5m usable width)."
       },
       {
         "step_index": 2,
-        "from_node": "node_77.595000_12.971500",
-        "to_node": "node_77.595000_12.969800",
+        "from_node": "node_76.574149_30.767850",
+        "to_node": "node_76.574149_30.766150",
         "road_id": "road-106",
-        "road_name": "South Sector Spur",
+        "road_name": "Sports Arena & South Transit Spur",
         "segment_length_m": 189.0,
         "status": "constrained",
         "reason": "Narrow corridor: 0.3m clearance margin."
@@ -87,8 +87,8 @@
     "segment_assessments": [
       {
         "road_id": "road-101",
-        "name": "Station Link Arterial (Main Road)",
-        "road_class": "Secondary Arterial",
+        "name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
+        "road_class": "Primary Access Arterial",
         "width_m": 7.5,
         "required_width_m": 3.5,
         "surface": "asphalt",
@@ -101,8 +101,8 @@
       },
       {
         "road_id": "road-106",
-        "name": "South Sector Spur",
-        "road_class": "Residential Access",
+        "name": "Sports Arena & South Transit Spur",
+        "road_class": "Campus Perimeter Access",
         "width_m": 3.8,
         "required_width_m": 3.5,
         "surface": "asphalt",

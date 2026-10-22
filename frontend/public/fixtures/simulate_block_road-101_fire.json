@@ -14,19 +14,19 @@
   "changed_buildings": [
     {
       "id": "bldg-201",
-      "name": "Community Health Sub-Center (Ward 142)",
+      "name": "CU Student Health & Medical Sub-Center",
       "before": "accessible",
       "after": "inaccessible"
     },
     {
       "id": "bldg-205",
-      "name": "East Industrial Depot 3",
+      "name": "Gharuan Logistics Depot & Agro Storage",
       "before": "unknown",
       "after": "inaccessible"
     },
     {
       "id": "bldg-206",
-      "name": "Surya Nilaya Apartments",
+      "name": "Faculty Residences & International Hostel Towers",
       "before": "constrained",
       "after": "inaccessible"
     }
@@ -34,6 +34,6 @@
   "assumptions": [
     "Simulation is evaluated deterministically in-memory without persistent modifications.",
     "All access constraints verified against Fire tender physical apparatus specifications.",
-    "Road Station Link Arterial (Main Road) (road-101) temporarily closed to emergency apparatus."
+    "Road NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access) (road-101) temporarily closed to emergency apparatus."
   ]
 }

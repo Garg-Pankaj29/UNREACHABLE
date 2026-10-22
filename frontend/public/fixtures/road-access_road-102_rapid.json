@@ -1,6 +1,6 @@
 {
   "road_id": "road-102",
-  "road_name": "North Citizen Lane",
+  "road_name": "Academic Blocks Central Spine (North Campus Lane)",
   "vehicle": {
     "id": "rapid",
     "name": "Rapid response car",
@@ -25,8 +25,8 @@
   },
   "assessment": {
     "road_id": "road-102",
-    "name": "North Citizen Lane",
-    "road_class": "Collector Lane",
+    "name": "Academic Blocks Central Spine (North Campus Lane)",
+    "road_class": "Campus Collector Lane",
     "width_m": 3.4,
     "required_width_m": 2.4,
     "surface": "paved_concrete",

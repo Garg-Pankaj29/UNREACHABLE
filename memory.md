@@ -6,7 +6,7 @@
 ## 1. Project snapshot
 - UNREACHABLE: emergency-access intelligence. Answers: can THIS vehicle reach THIS building, how sure are we, what to fix first.
 - Deterministic rules decide access. AI only explains. Unknown is a valid, actionable result.
-- Data is SYNTHETIC (data/sample/neighbourhood.geojson, "Ward 142"). Always label it so.
+- Data is SYNTHETIC (data/sample/neighbourhood.geojson, Chandigarh University & Gharuan Sector). Always label it so.
 - Local-first: backend binds 127.0.0.1:8000, frontend 127.0.0.1:5173. No cloud, no new deps.
 - Hackathon goal: 3 demo moments = Reality Check, Break-the-city (critical roads), Fix-first simulation.
 
@@ -62,6 +62,7 @@ GET /api/audit/work-order?vehicle_id= -> [{road_id,name,reason,buildings_affecte
 | 7 | Audit work order (optional) | done |
 
 ## 7. Recent changes (newest first, MAX 8 lines, one line each: date | phase | what | files)
+- 2026-10-22 | Polish | Updated dataset to Chandigarh University & Gharuan Sector (lat 30.7686, lon 76.5750) and refreshed all fixtures; tests 32/32 OK, build OK | neighbourhood.geojson, MapView.tsx, OverviewPage.tsx, InterventionsPage.tsx, DemoPage.tsx, memory.md
 - 2026-10-22 | Polish | Fixed light mode synthetic badge contrast and swapped all emojis for Lucide React icons; tests 32/32 OK, build OK | index.css, TopHeader.tsx, App.tsx, DashboardPage.tsx, DemoPage.tsx, RoutesPage.tsx, SimulationPage.tsx, memory.md
 - 2026-10-22 | Polish | Fixed navbar overlap with frosted opacity/blur, integrated badges, friendly theme toggle; tests 32/32 OK, build OK | index.css, TopHeader.tsx, App.tsx, memory.md
 - 2026-10-22 | Phase 7 | Added GET /api/audit/work-order, CSV export & print view in InterventionsPage; tests 30/30 OK, build OK | access_engine.py, routes.py, test_access_engine.py, InterventionsPage.tsx, api.ts, memory.md
@@ -69,7 +70,6 @@ GET /api/audit/work-order?vehicle_id= -> [{road_id,name,reason,buildings_affecte
 - 2026-10-22 | Phase 5 | Added DemoPage (7-step presenter bar), snapshot_fixtures script, api replay fallback & visible badge; tests 29/29 OK, build OK | DemoPage.tsx, App.tsx, api.ts, snapshot_fixtures.py, memory.md
 - 2026-10-22 | Phase 4 | Added POST /api/explain, explain_service with strict guardrails, UI Explain & two cards; tests 29/29 OK, build OK | explain_service.py, routes.py, schemas.py, test_explain.py, RoutesPage.tsx, AIInspectorPage.tsx, api.ts, index.ts, App.tsx, memory.md
 - 2026-10-22 | Phase 3 | Added ?vehicle_id= to /api/stats, GET /api/analysis/vehicle-gap, Vehicle gap strip in OverviewPage; tests 20/20 OK, build OK | data_service.py, schemas.py, routes.py, test_vehicle_gap.py, OverviewPage.tsx, api.ts, index.ts, memory.md
-- 2026-10-22 | Phase 2 | Added /api/simulate & /api/analysis/critical-roads, live SimulationPage, block road action, top 5 SPOF card; tests 15/15 OK, build OK | access_engine.py, routes.py, routing.py, test_access_engine.py, SimulationPage.tsx, DetailPanel.tsx, OverviewPage.tsx, api.ts, index.ts, memory.md
 
 
 ## 8. Known issues / README-vs-code gaps

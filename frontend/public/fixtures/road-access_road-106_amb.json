@@ -1,6 +1,6 @@
 {
   "road_id": "road-106",
-  "road_name": "South Sector Spur",
+  "road_name": "Sports Arena & South Transit Spur",
   "vehicle": {
     "id": "amb",
     "name": "Ambulance",
@@ -25,8 +25,8 @@
   },
   "assessment": {
     "road_id": "road-106",
-    "name": "South Sector Spur",
-    "road_class": "Residential Access",
+    "name": "Sports Arena & South Transit Spur",
+    "road_class": "Campus Perimeter Access",
     "width_m": 3.8,
     "required_width_m": 3.0,
     "surface": "asphalt",

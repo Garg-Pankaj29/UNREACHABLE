@@ -1,7 +1,7 @@
 [
   {
     "road_id": "road-101",
-    "name": "Station Link Arterial (Main Road)",
+    "name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
     "buildings_affected": 4,
     "building_ids": [
       "bldg-201",
@@ -12,7 +12,7 @@
   },
   {
     "road_id": "road-102",
-    "name": "North Citizen Lane",
+    "name": "Academic Blocks Central Spine (North Campus Lane)",
     "buildings_affected": 1,
     "building_ids": [
       "bldg-202"
@@ -20,7 +20,7 @@
   },
   {
     "road_id": "road-105",
-    "name": "East Perimeter By-lane (Unknown Width)",
+    "name": "Gharuan East Rural By-lane (Unknown Width)",
     "buildings_affected": 1,
     "building_ids": [
       "bldg-205"
@@ -28,7 +28,7 @@
   },
   {
     "road_id": "road-106",
-    "name": "South Sector Spur",
+    "name": "Sports Arena & South Transit Spur",
     "buildings_affected": 1,
     "building_ids": [
       "bldg-206"
@@ -36,7 +36,7 @@
   },
   {
     "road_id": "road-103",
-    "name": "Old Bazaar Gully (Narrow Corridor)",
+    "name": "Old Gharuan Village Bypass Gully (Narrow Corridor)",
     "buildings_affected": 0,
     "building_ids": []
   }

@@ -1,6 +1,6 @@
 {
   "road_id": "road-101",
-  "road_name": "Station Link Arterial (Main Road)",
+  "road_name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
   "vehicle": {
     "id": "amb",
     "name": "Ambulance",
@@ -25,8 +25,8 @@
   },
   "assessment": {
     "road_id": "road-101",
-    "name": "Station Link Arterial (Main Road)",
-    "road_class": "Secondary Arterial",
+    "name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
+    "road_class": "Primary Access Arterial",
     "width_m": 7.5,
     "required_width_m": 3.0,
     "surface": "asphalt",

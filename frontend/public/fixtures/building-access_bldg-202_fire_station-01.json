@@ -1,7 +1,7 @@
 {
   "building_id": "bldg-202",
-  "building_name": "Ward Civic Center & Library",
-  "use_type": "Public Facility",
+  "building_name": "Central Library & Administrative Block (CU)",
+  "use_type": "Public & Educational Facility",
   "connected_road_id": "road-102",
   "estimated_setback_m": 3.0,
   "entrance_status": "road_frontage_only",
