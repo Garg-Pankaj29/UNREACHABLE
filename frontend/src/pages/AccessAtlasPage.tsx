@@ -211,6 +211,12 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
           </div>
         </div>
 
+        {buildings.length === 0 && roads.length === 0 && (
+          <p style={{ fontSize: '12px', color: 'var(--sig)', marginTop: '8px', lineHeight: 1.4 }}>
+            Loading municipal spatial layers from backend...
+          </p>
+        )}
+
         <p style={{ fontSize: '12px', color: 'var(--mute)', marginTop: '6px', lineHeight: 1.4 }}>
           Grey is unknown, never assumed inaccessible. Synthetic demo dataset.
         </p>

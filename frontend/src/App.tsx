@@ -6,6 +6,7 @@ import {
   StatsResponse,
 } from './types';
 import { INITIAL_ISSUES } from './services/store';
+import { Zap } from 'lucide-react';
 import { LivingBackground } from './components/LivingBackground';
 import { TopHeader } from './components/TopHeader';
 import { FloatingDock } from './components/FloatingDock';
@@ -20,6 +21,7 @@ import { SimulationPage } from './pages/SimulationPage';
 import { AboutPage } from './pages/AboutPage';
 import { BuildingDetailPage } from './pages/BuildingDetailPage';
 import { IssueDetailPage } from './pages/IssueDetailPage';
+import { DemoPage } from './pages/DemoPage';
 
 export function App() {
   // Theme state
@@ -41,6 +43,11 @@ export function App() {
   const [selectedFeature, setSelectedFeature] = useState<GeoJSONFeature | null>(null);
   const [backendLoading, setBackendLoading] = useState<boolean>(true);
   const [backendError, setBackendError] = useState<string | null>(null);
+  const [isReplay, setIsReplay] = useState<boolean>(() => api.isReplay());
+
+  useEffect(() => {
+    return api.onReplayChange(setIsReplay);
+  }, []);
 
   // Issues and activity log state
   const [issues, setIssues] = useState<IssueRecord[]>(INITIAL_ISSUES);
@@ -184,8 +191,10 @@ export function App() {
         return (
           <AIInspectorPage
             roads={roads}
+            buildings={buildings}
             onAddIssue={handleAddIssue}
           />
+
         );
 
       case 'interventions':
@@ -207,12 +216,26 @@ export function App() {
       case 'about':
         return <AboutPage />;
 
+      case 'demo':
+        return (
+          <DemoPage
+            stepParam={routeParam}
+            buildings={buildings}
+            roads={roads}
+            stations={stations}
+            issues={issues}
+            onUpdateIssueStatus={handleUpdateIssueStatus}
+          />
+        );
+
       case 'b':
         return (
           <BuildingDetailPage
             buildingId={routeParam}
             buildings={buildings}
             roads={roads}
+            loading={backendLoading}
+            error={backendError}
           />
         );
 
@@ -251,7 +274,7 @@ export function App() {
             height: '3px',
             background:
               'repeating-linear-gradient(90deg, var(--tape) 0 10px, var(--ink) 10px 20px)',
-            zIndex: 100,
+            zIndex: 1001,
           }}
           aria-hidden="true"
         />
@@ -260,14 +283,44 @@ export function App() {
       {/* Living background simulation canvas */}
       <LivingBackground theme={theme} />
 
-      {/* Top Header */}
+      {/* Top Header with integrated Synthetic Badge, Replay Badge, and Friendly Theme Toggle */}
       <TopHeader
         theme={theme}
         onToggleTheme={toggleTheme}
+        isReplay={isReplay}
       />
 
-      {/* Connection notification if backend is unreachable */}
-      {backendError && (
+      {/* Quick Launch Demo Mode Chip (hidden when already on #/demo) */}
+      {currentRoute !== 'demo' && (
+        <a
+          href="#/demo"
+          id="demo-mode-launcher"
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            left: '24px',
+            zIndex: 40,
+            background: 'var(--tape, #ffd60a)',
+            color: '#1c1f1b',
+            border: '1px solid rgba(0,0,0,0.1)',
+            borderRadius: '99px',
+            padding: '6px 14px',
+            fontSize: '12px',
+            fontWeight: 800,
+            textDecoration: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.12)',
+          }}
+        >
+          <Zap size={14} className="fill-current text-current" aria-hidden="true" />
+          <span>Presenter Demo</span>
+        </a>
+      )}
+
+      {/* Connection notification if backend is unreachable and not in replay */}
+      {backendError && !isReplay && (
         <div
           role="alert"
           style={{

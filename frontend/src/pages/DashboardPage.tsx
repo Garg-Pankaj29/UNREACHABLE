@@ -19,6 +19,7 @@ import {
   Building,
   Route as RouteIcon,
   ShieldAlert,
+  Truck,
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
@@ -175,13 +176,14 @@ export const DashboardPage: React.FC = () => {
                       <button
                         key={st.properties.id}
                         onClick={() => setSelectedFeature(st)}
-                        className={`px-2 py-1 rounded text-[11px] font-medium border shrink-0 transition-colors ${
+                        className={`px-2 py-1 rounded text-[11px] font-medium border shrink-0 transition-colors inline-flex items-center gap-1.5 ${
                           selectedFeature?.properties.id === st.properties.id
                             ? 'bg-blue-600 text-white border-blue-700 font-semibold'
                             : 'bg-blue-50 text-blue-900 border-blue-200 hover:bg-blue-100'
                         }`}
                       >
-                        🚒 {st.properties.name}
+                        <Truck size={12} aria-hidden="true" />
+                        <span>{st.properties.name}</span>
                       </button>
                     ))}
 

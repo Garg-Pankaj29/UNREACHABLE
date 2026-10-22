@@ -68,6 +68,19 @@ export interface StatsResponse {
   disclaimer: string;
 }
 
+export interface VehicleGapStats {
+  counts: AccessStatusCounts;
+  verified_reachable_pct: number;
+  evidence_coverage_pct: number;
+}
+
+export interface VehicleGapResponse {
+  fire: VehicleGapStats;
+  amb: VehicleGapStats;
+  rapid: VehicleGapStats;
+}
+
+
 export interface HealthResponse {
   status: string;
   version: string;
@@ -160,6 +173,66 @@ export interface RoadAccessResponse {
   plain_language_explanation: string;
 }
 
+export interface RouteViolation {
+  road_id: string;
+  reason: string;
+  width_m?: number | null;
+  required_m: number;
+}
+
+export interface NaiveRouteSummary {
+  road_ids: string[];
+  distance_m: number;
+  violations: RouteViolation[];
+}
+
+export interface AwareRouteSummary {
+  road_ids: string[];
+  distance_m: number;
+  classification: AccessStatus;
+}
+
+export interface RouteCompareResponse {
+  naive: NaiveRouteSummary;
+  aware: AwareRouteSummary;
+  verdict: string;
+  naive_would_fail: boolean;
+}
+
+export interface SimulateChange {
+  road_id: string;
+  action: 'close' | 'clear_obstruction' | 'set_width';
+  value?: number;
+}
+
+export interface SimulateRequest {
+  vehicle_id?: string;
+  changes: SimulateChange[];
+}
+
+export interface ChangedBuilding {
+  id: string;
+  name: string;
+  before: string;
+  after: string;
+}
+
+export interface SimulateResponse {
+  before: Record<string, number>;
+  after: Record<string, number>;
+  changed_buildings: ChangedBuilding[];
+  assumptions: string[];
+}
+
+export interface CriticalRoad {
+  road_id: string;
+  name: string;
+  buildings_affected: number;
+  building_ids: string[];
+}
+
+
+
 export interface IssueRecord {
   id: string;
   t: string; // Title
@@ -181,3 +254,16 @@ export interface AIObservation {
   c: number;
   s: 'ok' | 'no' | '';
 }
+
+export interface ExplainRequest {
+  station_id?: string;
+  building_id: string;
+  vehicle_id?: string;
+}
+
+export interface ExplainResponse {
+  text: string;
+  source: 'local_llm' | 'template';
+  validated: boolean;
+}
+

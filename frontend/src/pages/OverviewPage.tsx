@@ -1,7 +1,8 @@
-import React from 'react';
-import { StatsResponse, IssueRecord } from '../types';
+import React, { useState, useEffect } from 'react';
+import { StatsResponse, IssueRecord, CriticalRoad, VehicleGapResponse } from '../types';
 import { SvgMap } from '../components/SvgMap';
 import { calculateIssueScore, SEVERITY_NAMES } from '../services/store';
+import { api } from '../services/api';
 
 interface OverviewPageProps {
   stats: StatsResponse | null;
@@ -14,10 +15,56 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
   issues,
   sessionLog,
 }) => {
-  const buildingsCount = stats?.buildings.total ?? 6;
+  const [selectedVehicle, setSelectedVehicle] = useState<'fire' | 'amb' | 'rapid'>('fire');
+  const [vehicleStats, setVehicleStats] = useState<StatsResponse | null>(stats);
+  const [vehicleGap, setVehicleGap] = useState<VehicleGapResponse | null>(null);
+  const [criticalRoads, setCriticalRoads] = useState<CriticalRoad[]>([]);
+  const [criticalLoading, setCriticalLoading] = useState<boolean>(false);
+
+  // Load comparative vehicle gap analysis once
+  useEffect(() => {
+    let isMounted = true;
+    api.fetchVehicleGap()
+      .then((res) => {
+        if (isMounted) setVehicleGap(res);
+      })
+      .catch((err) => console.warn('Failed to load vehicle gap analysis:', err));
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Update apparatus-specific stats and critical roads whenever selected vehicle changes
+  useEffect(() => {
+    let isMounted = true;
+    setCriticalLoading(true);
+
+    Promise.all([
+      api.fetchStats(selectedVehicle),
+      api.fetchCriticalRoads(selectedVehicle, 5),
+    ])
+      .then(([statsRes, criticalRes]) => {
+        if (isMounted) {
+          setVehicleStats(statsRes);
+          setCriticalRoads(criticalRes);
+        }
+      })
+      .catch((err) => console.warn('Failed to load vehicle-specific data:', err))
+      .finally(() => {
+        if (isMounted) setCriticalLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedVehicle]);
+
+  const activeStats = vehicleStats || stats;
+  const buildingsCount = activeStats?.buildings.total ?? 6;
+  const reachableCount = activeStats?.buildings.feasible ?? 1;
   const constraintsCount =
-    (stats?.buildings.constrained ?? 1) + (stats?.buildings.infeasible ?? 1);
-  const unknownCount = stats?.buildings.unknown ?? 1;
+    (activeStats?.buildings.constrained ?? 0) + (activeStats?.buildings.infeasible ?? 0);
+  const unknownCount = activeStats?.buildings.unknown ?? 1;
   const openIssuesCount = issues.filter(
     (i) => i.st === 'open' || i.st === 'review'
   ).length;
@@ -26,6 +73,23 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
     .filter((i) => i.st !== 'resolved')
     .sort((a, b) => calculateIssueScore(b) - calculateIssueScore(a))
     .slice(0, 5);
+
+  const FORMULA_TOOLTIP =
+    "Formulas:\n" +
+    "• evidence_coverage_pct = (feasible + constrained + infeasible) / total buildings * 100\n" +
+    "• verified_reachable_pct = feasible / (feasible + constrained + infeasible) * 100\n" +
+    "(Unknown is excluded, never counted as reachable or unreachable)";
+
+  const VEHICLE_CONFIG: Array<{
+    key: 'fire' | 'amb' | 'rapid';
+    name: string;
+    clearance: string;
+    sublabel: string;
+  }> = [
+    { key: 'fire', name: 'Fire Engine', clearance: '≥ 3.5m clearance', sublabel: 'Heavy municipal apparatus' },
+    { key: 'amb', name: 'Ambulance', clearance: '≥ 3.0m clearance', sublabel: 'Medium emergency apparatus' },
+    { key: 'rapid', name: 'Rapid Response', clearance: '≥ 2.4m clearance', sublabel: 'Light access motorcycle/4x4' },
+  ];
 
   const getSevClass = (sev: string) => {
     switch (sev) {
@@ -70,14 +134,206 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         </a>
       </div>
 
-      {/* KPI Numbers Grid */}
+      {/* Vehicle Gap Scorecard Strip */}
+      <div
+        className="vehicle-gap-strip"
+        style={{
+          margin: '24px 0',
+          background: 'var(--glass)',
+          border: '1.5px solid var(--line)',
+          borderRadius: '16px',
+          padding: '20px 22px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h2 style={{ margin: 0, fontSize: '18px', letterSpacing: '-0.01em' }}>Vehicle Gap Scorecard</h2>
+              <span
+                title={FORMULA_TOOLTIP}
+                style={{
+                  cursor: 'help',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '18px',
+                  height: '18px',
+                  borderRadius: '50%',
+                  background: 'var(--line)',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  color: 'var(--ink)',
+                }}
+              >
+                ⓘ
+              </span>
+            </div>
+            <p className="lede" style={{ fontSize: '13px', margin: '4px 0 0 0' }}>
+              One memorable number per apparatus. Click a column to filter citywide KPIs and vulnerability analysis.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span
+              style={{
+                fontSize: '11px',
+                textTransform: 'uppercase',
+                fontWeight: 800,
+                color: 'var(--mute)',
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid var(--line)',
+                padding: '4px 10px',
+                borderRadius: '20px',
+                letterSpacing: '0.04em',
+              }}
+            >
+              Synthetic demo data
+            </span>
+          </div>
+        </div>
+
+        {/* 3 Columns: Fire / Ambulance / Rapid */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '14px',
+            marginTop: '16px',
+          }}
+        >
+          {VEHICLE_CONFIG.map((cfg) => {
+            const data = vehicleGap ? vehicleGap[cfg.key] : null;
+            const isSelected = selectedVehicle === cfg.key;
+            // Fallback hand-computable defaults matching Ward 142 dataset if offline/loading
+            const reachPct = data?.verified_reachable_pct ?? (cfg.key === 'fire' ? 20.0 : 60.0);
+            const covPct = data?.evidence_coverage_pct ?? 83.3;
+            const feasibleCount = data?.counts.feasible ?? (cfg.key === 'fire' ? 1 : 3);
+            const totalAssessed = (data?.counts.feasible ?? (cfg.key === 'fire' ? 1 : 3)) +
+                                  (data?.counts.constrained ?? (cfg.key === 'fire' ? 1 : 0)) +
+                                  (data?.counts.infeasible ?? (cfg.key === 'fire' ? 3 : 2));
+
+            const barColor = reachPct >= 60 ? '#2a9d8f' : reachPct >= 35 ? '#e9c46a' : '#d7263d';
+
+            return (
+              <button
+                key={cfg.key}
+                type="button"
+                onClick={() => setSelectedVehicle(cfg.key)}
+                title={FORMULA_TOOLTIP}
+                style={{
+                  textAlign: 'left',
+                  background: isSelected ? 'rgba(231,111,81,0.09)' : 'var(--bg)',
+                  border: isSelected ? '2px solid var(--accent, #e76f51)' : '1px solid var(--line)',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  transition: 'all 0.15s ease',
+                  boxShadow: isSelected ? '0 4px 12px rgba(231,111,81,0.15)' : 'none',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div>
+                    <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--ink)' }}>
+                      {cfg.name}
+                    </span>
+                    <div style={{ fontSize: '11px', color: 'var(--mute)' }}>{cfg.clearance}</div>
+                  </div>
+                  {isSelected ? (
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        background: 'var(--accent, #e76f51)',
+                        color: '#fff',
+                        padding: '2px 7px',
+                        borderRadius: '6px',
+                      }}
+                    >
+                      Selected
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: '11px', color: 'var(--mute)', fontWeight: 600 }}>Click to test</span>
+                  )}
+                </div>
+
+                {/* Number 1: Verified Reachable % (Memorable Number) */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                    <b style={{ fontSize: '28px', lineHeight: 1, color: isSelected ? 'var(--accent, #e76f51)' : 'var(--ink)' }}>
+                      {reachPct.toFixed(1)}%
+                    </b>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--mute)' }}>
+                      verified reachable
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '2px' }}>
+                    {feasibleCount} of {totalAssessed} surveyed buildings reachable
+                  </div>
+                </div>
+
+                {/* Small Bar */}
+                <div
+                  style={{
+                    width: '100%',
+                    height: '6px',
+                    borderRadius: '3px',
+                    background: 'var(--line)',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      height: '100%',
+                      width: `${Math.min(100, Math.max(0, reachPct))}%`,
+                      background: barColor,
+                      borderRadius: '3px',
+                      transition: 'width 0.4s ease',
+                    }}
+                  />
+                </div>
+
+                {/* Number 2: Evidence Coverage % */}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderTop: '1px solid var(--line)',
+                    paddingTop: '8px',
+                    marginTop: '2px',
+                  }}
+                >
+                  <span style={{ fontSize: '11px', color: 'var(--mute)' }}>Evidence coverage:</span>
+                  <b style={{ fontSize: '13px', color: 'var(--ink)' }}>{covPct.toFixed(1)}%</b>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* KPI Numbers Grid (updates with selected vehicle) */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '0 0 8px 4px' }}>
+        <small style={{ fontSize: '12px', fontWeight: 700, color: 'var(--mute)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          Ward 142 Assessment for {selectedVehicle === 'fire' ? 'Fire Engine (≥3.5m)' : selectedVehicle === 'amb' ? 'Ambulance (≥3.0m)' : 'Rapid Response (≥2.4m)'}
+        </small>
+      </div>
       <div className="nums">
         <div>
           <b>{buildingsCount}</b>
           <small>Buildings assessed</small>
         </div>
         <div>
-          <b>{constraintsCount}</b>
+          <b style={{ color: reachableCount > 0 ? '#2a9d8f' : 'inherit' }}>{reachableCount}</b>
+          <small>Verified reachable</small>
+        </div>
+        <div>
+          <b style={{ color: constraintsCount > 0 ? '#d7263d' : 'inherit' }}>{constraintsCount}</b>
           <small>Access constraints</small>
         </div>
         <div>
@@ -88,6 +344,65 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
           <b>{openIssuesCount}</b>
           <small>Issues awaiting review</small>
         </div>
+      </div>
+
+
+      {/* Top 5 Single Points of Failure Card */}
+      <div style={{ margin: '24px 0', background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '16px', padding: '18px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: '18px' }}>Top 5 Single Points of Failure</h2>
+            <p className="lede" style={{ fontSize: '13px', margin: '4px 0 0 0' }}>
+              Critical corridors ranked by number of buildings whose access deteriorates if blocked (evaluated for Fire Tender).
+            </p>
+          </div>
+          <span style={{ fontSize: '11px', textTransform: 'uppercase', fontWeight: 800, color: 'var(--sig)', background: 'rgba(215,38,61,0.08)', padding: '3px 8px', borderRadius: '6px' }}>
+            Vulnerability Engine
+          </span>
+        </div>
+
+        {criticalLoading ? (
+          <p style={{ color: 'var(--mute)', fontSize: '13px', margin: '12px 0' }}>Analyzing topological single points of failure...</p>
+        ) : criticalRoads.length === 0 ? (
+          <p style={{ color: 'var(--mute)', fontSize: '13px', margin: '14px 0' }}>
+            No critical single points of failure detected for this vehicle profile.
+          </p>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginTop: '14px' }}>
+            {criticalRoads.map((cr, idx) => (
+              <div
+                key={cr.road_id}
+                style={{
+                  background: 'var(--bg)',
+                  border: '1px solid var(--line)',
+                  borderRadius: '10px',
+                  padding: '12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--mute)' }}>#{idx + 1}</span>
+                    <span className="sc" style={{ background: cr.buildings_affected > 0 ? '#d7263d' : '#2a9d8f' }}>
+                      {cr.buildings_affected}
+                    </span>
+                  </div>
+                  <div style={{ fontWeight: 800, fontSize: '14px', marginTop: '4px', color: 'var(--ink)' }}>
+                    {cr.name}
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--mute)', fontFamily: 'monospace' }}>
+                    {cr.road_id}
+                  </div>
+                </div>
+                <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--sig)', fontWeight: 600 }}>
+                  {cr.buildings_affected} building{cr.buildings_affected !== 1 ? 's' : ''} compromised
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Two-Column Section */}

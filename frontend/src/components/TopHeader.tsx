@@ -1,30 +1,85 @@
 import React from 'react';
+import { Zap, Sun, Moon } from 'lucide-react';
 
 interface TopHeaderProps {
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
+  isReplay?: boolean;
 }
 
 export const TopHeader: React.FC<TopHeaderProps> = ({
+  theme,
   onToggleTheme,
+  isReplay = false,
 }) => {
   return (
-    <header className="top">
-      <a className="brand" href="#/">
-        <i aria-hidden="true" />
-        <span>UNREACHABLE</span>
-      </a>
-
-      <div className="tr">
-        <button
-          className="ic"
-          onClick={onToggleTheme}
-          aria-label="Toggle light and dark"
-          title="Toggle light and dark mode"
+    <header className="top" role="banner">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <a className="brand" href="#/" title="UNREACHABLE Emergency Access Intelligence">
+          <i aria-hidden="true" />
+          <span>UNREACHABLE</span>
+        </a>
+        <span
+          id="synthetic-demo-data-ribbon"
+          className="header-synthetic-badge"
+          role="note"
+          aria-label="Synthetic demo data notice"
         >
-          ◐
+          <Zap size={11} className="fill-current text-current" aria-hidden="true" />
+          <span>Synthetic demo data</span>
+        </span>
+      </div>
+
+      <div className="tr" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {isReplay && (
+          <div
+            role="status"
+            id="replay-mode-badge"
+            style={{
+              background: 'rgba(215, 38, 61, 0.92)',
+              border: '1.5px solid #d7263d',
+              borderRadius: '99px',
+              padding: '4px 12px',
+              fontSize: '11px',
+              color: '#ffffff',
+              fontWeight: 800,
+              letterSpacing: '0.04em',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 2px 10px rgba(215, 38, 61, 0.35)',
+              textTransform: 'uppercase',
+            }}
+          >
+            <span
+              style={{
+                width: '7px',
+                height: '7px',
+                borderRadius: '50%',
+                background: '#ffd60a',
+                display: 'inline-block',
+                boxShadow: '0 0 6px #ffd60a',
+              }}
+            />
+            <span>Replay mode (saved data)</span>
+          </div>
+        )}
+
+        <button
+          className="theme-toggle-btn"
+          onClick={onToggleTheme}
+          aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+          title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+        >
+          {theme === 'dark' ? (
+            <Sun size={14} aria-hidden="true" />
+          ) : (
+            <Moon size={14} aria-hidden="true" />
+          )}
+          <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
         </button>
       </div>
     </header>
   );
 };
+
