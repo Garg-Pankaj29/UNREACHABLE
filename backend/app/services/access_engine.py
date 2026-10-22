@@ -933,18 +933,23 @@ class AccessEngine:
             r_props = target_feat.setdefault("properties", {})
             r_name = r_props.get("name", r_id)
 
-            if act == "close":
+            if act in ("close", "block"):
                 r_props["obstruction"] = "Simulated closure / emergency incident block"
                 r_props["access_status"] = "infeasible"
                 assumptions.append(f"Road {r_name} ({r_id}) temporarily closed to emergency apparatus.")
-            elif act == "clear_obstruction":
+            elif act in ("clear", "clear_obstruction"):
                 r_props["obstruction"] = None
                 r_props["access_status"] = "feasible"
                 assumptions.append(f"Physical obstructions and wire bundles cleared from {r_name} ({r_id}).")
-            elif act == "set_width":
-                if change.value is not None:
-                    r_props["width_m"] = float(change.value)
-                    assumptions.append(f"Usable width of {r_name} ({r_id}) adjusted to {change.value}m.")
+            elif act in ("set_width", "widen"):
+                val = change.value if change.value is not None else getattr(change, "new_width_m", None)
+                if val is not None:
+                    r_props["width_m"] = float(val)
+                    obs = str(r_props.get("obstruction") or "").lower()
+                    if "width" in obs or "bottleneck" in obs or "narrow" in obs or "clearance" in obs:
+                        r_props["obstruction"] = None
+                    r_props["access_status"] = "feasible"
+                    assumptions.append(f"Usable width of {r_name} ({r_id}) adjusted to {val}m.")
 
         # 4. Create isolated in-memory DataService and AccessEngine for AFTER state
         class InMemoryDataService(DataService):

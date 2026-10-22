@@ -148,6 +148,7 @@ class SimulateChange(BaseModel):
     road_id: str
     action: str = Field(description="'close' | 'clear_obstruction' | 'set_width'")
     value: Optional[float] = None
+    new_width_m: Optional[float] = None
 
 
 class SimulateRequest(BaseModel):

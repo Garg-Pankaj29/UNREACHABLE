@@ -377,27 +377,27 @@ export const InterventionsPage: React.FC<InterventionsPageProps> = ({
               <tbody>
                 {auditItems.map((item, idx) => (
                   <tr key={item.road_id}>
-                    <td className="sc">#{idx + 1}</td>
-                    <td>
+                    <td className="sc" style={{ fontSize: '15px' }}>#{idx + 1}</td>
+                    <td style={{ fontSize: '15px' }}>
                       <b>{item.name}</b>
                       <div
                         style={{
-                          fontSize: '12px',
+                          fontSize: '13px',
                           color: 'var(--c-muted, #94a3b8)',
                         }}
                       >
                         {item.road_id}
                       </div>
                     </td>
-                    <td style={{ fontSize: '13px' }}>{item.reason}</td>
+                    <td style={{ fontSize: '14px', lineHeight: 1.5 }}>{item.reason}</td>
                     <td style={{ textAlign: 'center' }}>
-                      <b className="pl c-constrained">
+                      <b className="pl c-constrained" style={{ fontSize: '14px' }}>
                         {item.buildings_affected}
                       </b>
                     </td>
                     <td
                       style={{
-                        fontSize: '12px',
+                        fontSize: '13px',
                         color: 'var(--c-muted, #94a3b8)',
                       }}
                     >
@@ -406,7 +406,7 @@ export const InterventionsPage: React.FC<InterventionsPageProps> = ({
                     <td>
                       <span
                         className="pl c-unknown"
-                        style={{ fontSize: '11px' }}
+                        style={{ fontSize: '13px' }}
                       >
                         Survey Required
                       </span>

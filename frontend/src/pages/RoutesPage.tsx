@@ -444,27 +444,27 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                 <div
                   style={{
                     background: 'var(--glass)',
-                    border: '1px solid var(--line)',
-                    borderRadius: '12px',
-                    padding: '14px',
-                    margin: '14px 0',
-                    fontSize: '13px',
-                    lineHeight: 1.6,
+                    border: '1.5px solid var(--line)',
+                    borderRadius: '14px',
+                    padding: '16px 18px',
+                    margin: '16px 0',
+                    fontSize: '15px',
+                    lineHeight: 1.65,
                   }}
                 >
-                  <div>
+                  <div style={{ marginBottom: '4px' }}>
                     <b>Target Asset:</b> {accessResult.building_name} ({accessResult.building_id})
                   </div>
-                  <div>
+                  <div style={{ marginBottom: '4px' }}>
                     <b>Dispatch Origin:</b> {selectedStation?.properties.name || accessResult.origin_station_id}
                   </div>
-                  <div>
+                  <div style={{ marginBottom: '4px' }}>
                     <b>Vehicle Profile:</b> {accessResult.vehicle.name} (Requires ≥ {accessResult.vehicle.min_clearance_width_m || currentVeh.w}m usable width)
                   </div>
-                  <div>
+                  <div style={{ marginBottom: '4px' }}>
                     <b>Frontage Corridor:</b> {accessResult.connected_road_id || 'None (Unassigned in cadastre)'}
                   </div>
-                  <div>
+                  <div style={{ marginBottom: '4px' }}>
                     <b>Traversal Distance:</b> {accessResult.route ? `${accessResult.route.total_distance_m} m` : 'No contiguous route'}
                   </div>
                   <div>
@@ -476,11 +476,11 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                 <div
                   style={{
                     borderLeft: '4px solid var(--tape)',
-                    paddingLeft: '12px',
+                    paddingLeft: '14px',
                     color: 'var(--mute)',
-                    fontSize: '12px',
-                    lineHeight: 1.5,
-                    marginBottom: '18px',
+                    fontSize: '14px',
+                    lineHeight: 1.6,
+                    marginBottom: '20px',
                   }}
                 >
                   <b>Entrance Distinction:</b>{' '}
@@ -492,27 +492,27 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                 {/* Approach Segments Breakdown */}
                 {accessResult.route && accessResult.route.steps.length > 0 && (
                   <div>
-                    <h3 style={{ marginTop: '16px', marginBottom: '8px', fontSize: '15px' }}>
+                    <h3 style={{ marginTop: '18px', marginBottom: '10px', fontSize: '17px', fontWeight: 800 }}>
                       Path Steps ({accessResult.route.steps.length})
                     </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                       {accessResult.route.steps.map((st) => (
                         <div
                           key={`${st.step_index}-${st.road_id}`}
                           className="row"
                           style={{
                             gridTemplateColumns: '1fr auto',
-                            padding: '8px 12px',
+                            padding: '10px 14px',
                             background: 'var(--glass)',
-                            borderRadius: '10px',
-                            border: '1px solid var(--line)',
+                            borderRadius: '12px',
+                            border: '1.5px solid var(--line)',
                           }}
                         >
                           <div>
-                            <div style={{ fontWeight: 700, fontSize: '13px' }}>
+                            <div style={{ fontWeight: 700, fontSize: '15px' }}>
                               Step {st.step_index}: {st.road_name} ({st.road_id})
                             </div>
-                            <div style={{ fontSize: '12px', color: 'var(--mute)' }}>
+                            <div style={{ fontSize: '13px', color: 'var(--mute)', marginTop: '2px' }}>
                               Length: {st.segment_length_m} m · {st.reason}
                             </div>
                           </div>
@@ -524,7 +524,7 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                 )}
 
                 {/* Evaluated vs Unevaluated Constraints */}
-                <div style={{ marginTop: '16px', fontSize: '12px', color: 'var(--mute)' }}>
+                <div style={{ marginTop: '18px', fontSize: '14px', color: 'var(--mute)', lineHeight: 1.6 }}>
                   <div>
                     <b>Evaluated constraints:</b> {accessResult.vehicle.evaluated_constraints?.join(', ') || 'width, physical_obstruction'}
                   </div>

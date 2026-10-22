@@ -418,17 +418,38 @@ export const MapView: React.FC<MapViewProps> = ({
       },
     });
 
+    // Compute effective vehicle-aware status for popup badge
+    const reqW = selectedVehicle?.minClearanceWidthM ?? selectedVehicle?.min_clearance_width_m;
+    let effectiveStatus = props.access_status || 'unknown';
+    if (props.feature_type === 'road' && reqW !== undefined) {
+      const roadWidth = props.width_m;
+      const hasObstruction = props.obstruction && String(props.obstruction).trim() && String(props.obstruction).toLowerCase() !== 'null';
+      if (hasObstruction) {
+        effectiveStatus = 'infeasible';
+      } else if (roadWidth !== null && roadWidth !== undefined) {
+        if (roadWidth < reqW) {
+          effectiveStatus = 'infeasible';
+        } else if (roadWidth < reqW + 0.4) {
+          effectiveStatus = 'constrained';
+        } else {
+          effectiveStatus = 'feasible';
+        }
+      } else {
+        effectiveStatus = 'unknown';
+      }
+    }
+
     const statusBadge =
-      props.access_status === 'feasible' || props.access_status === 'ok'
+      effectiveStatus === 'feasible' || effectiveStatus === 'ok'
         ? '<span style="color:#168a5c; font-weight:700;">● Verified accessible</span>'
-        : props.access_status === 'constrained'
+        : effectiveStatus === 'constrained'
         ? '<span style="color:#e8710a; font-weight:700;">▲ Constrained</span>'
-        : props.access_status === 'infeasible'
-        ? '<span style="color:#d7263d; font-weight:700;">✕ Potentially inaccessible</span>'
+        : effectiveStatus === 'infeasible'
+        ? '<span style="color:#d7263d; font-weight:700;">✕ Inaccessible</span>'
         : '<span style="color:#7d837a; font-weight:700;">? Unknown (Unsurveyed)</span>';
 
     const content = `
-      <div style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; min-width: 190px;">
+      <div style="font-family: 'Inter', system-ui, sans-serif; min-width: 190px;">
         <div style="font-size: 11px; text-transform: uppercase; color: var(--mute, #5d635a); margin-bottom: 2px;">
           ${props.feature_type || 'Asset'} · ${props.id}
         </div>
@@ -579,7 +600,7 @@ export const MapView: React.FC<MapViewProps> = ({
               }}
             >
               <Popup>
-                <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif' }}>
+                <div style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
                   <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700 }}>
                     Emergency Hub · {st.properties.id}
                   </div>
@@ -615,11 +636,35 @@ export const MapView: React.FC<MapViewProps> = ({
                 position={[mid[1], mid[0]]}
                 icon={createIssueIcon(iss.sev)}
                 eventHandlers={{
-                  click: () => onSelectFeature?.(road),
+                  click: () => {
+                    onSelectFeature?.({
+                      type: 'Feature',
+                      id: iss.id,
+                      geometry: {
+                        type: 'Point',
+                        coordinates: mid,
+                      },
+                      properties: {
+                        id: iss.id,
+                        feature_type: 'issue',
+                        name: iss.t,
+                        type: iss.type,
+                        severity: iss.sev,
+                        edge: iss.edge,
+                        road_name: road.properties?.name || iss.edge,
+                        verification_status: iss.ver,
+                        status: iss.st,
+                        fixW: iss.fixW,
+                        ai: iss.ai,
+                        age: iss.age,
+                        access_status: iss.sev === 'high' ? 'infeasible' : 'constrained',
+                      },
+                    } as any);
+                  },
                 }}
               >
                 <Popup>
-                  <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif', minWidth: 200 }}>
+                  <div style={{ fontFamily: 'Inter, system-ui, sans-serif', minWidth: 200 }}>
                     <div
                       style={{
                         fontSize: '11px',
@@ -712,7 +757,7 @@ export const MapView: React.FC<MapViewProps> = ({
               icon={createViolationIcon()}
             >
               <Popup>
-                <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif', minWidth: 200 }}>
+                <div style={{ fontFamily: 'Inter, system-ui, sans-serif', minWidth: 200 }}>
                   <div
                     style={{
                       fontSize: '11px',

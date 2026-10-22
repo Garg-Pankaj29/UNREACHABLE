@@ -552,7 +552,18 @@ export const DemoPage: React.FC<DemoPageProps> = ({
               <div>
                 <h3 style={{ marginBottom: '10px', color: '#d7263d' }}>Simulated Severance (road-101 Blocked)</h3>
                 <div style={{ border: '1.5px solid #d7263d', borderRadius: '16px', overflow: 'hidden', background: 'rgba(215, 38, 61, 0.05)', padding: '12px' }}>
-                  <SvgMap nohit={true} />
+                  <SvgMap
+                    nohit={true}
+                    roadStatuses={{ 'road-101': 'inaccessible' }}
+                    buildingStatuses={{
+                      'bldg-201': 'inaccessible',
+                      'bldg-202': 'inaccessible',
+                      'bldg-203': 'inaccessible',
+                      'bldg-204': 'inaccessible',
+                      'bldg-205': 'inaccessible',
+                      'bldg-206': 'inaccessible',
+                    }}
+                  />
                 </div>
                 <p style={{ marginTop: '10px', fontSize: '13px', color: '#d7263d', fontWeight: 600 }}>
                   ✕ Critical arterial severed. Station-01 isolated from sector network.
