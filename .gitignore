@@ -45,7 +45,18 @@ scratch/
 *.tmp
 *.temp
 
-# IDE / OS noise
+# Documentation scratch & local notes
+explain.md
+*.scratch
+*.scratch.*
+
+# Coverage & testing artifacts
+.coverage
+htmlcov/
+coverage.xml
+*.coverage.*
+
+# Editor and OS
 .vscode/
 .idea/
 *.swp
@@ -54,10 +65,7 @@ scratch/
 .DS_Store
 Thumbs.db
 desktop.ini
+*.bak
+*.orig
 
-# Retain required sample data
-!data/sample/*.geojson
-
-# Documentation scratch
-explain.md
 

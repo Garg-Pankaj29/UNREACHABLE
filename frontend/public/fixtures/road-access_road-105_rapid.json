@@ -1,6 +1,6 @@
 {
   "road_id": "road-105",
-  "road_name": "East Perimeter By-lane (Unknown Width)",
+  "road_name": "Gharuan East Rural By-lane (Unknown Width)",
   "vehicle": {
     "id": "rapid",
     "name": "Rapid response car",
@@ -25,8 +25,8 @@
   },
   "assessment": {
     "road_id": "road-105",
-    "name": "East Perimeter By-lane (Unknown Width)",
-    "road_class": "Unclassified Byway",
+    "name": "Gharuan East Rural By-lane (Unknown Width)",
+    "road_class": "Unclassified Rural Byway",
     "width_m": null,
     "required_width_m": 2.4,
     "surface": "unpaved_gravel",

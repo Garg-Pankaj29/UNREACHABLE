@@ -1,6 +1,6 @@
 {
   "road_id": "road-103",
-  "road_name": "Old Bazaar Gully (Narrow Corridor)",
+  "road_name": "Old Gharuan Village Bypass Gully (Narrow Corridor)",
   "vehicle": {
     "id": "rapid",
     "name": "Rapid response car",
@@ -25,8 +25,8 @@
   },
   "assessment": {
     "road_id": "road-103",
-    "name": "Old Bazaar Gully (Narrow Corridor)",
-    "road_class": "Access Alley",
+    "name": "Old Gharuan Village Bypass Gully (Narrow Corridor)",
+    "road_class": "Village Access Alley",
     "width_m": 2.1,
     "required_width_m": 2.4,
     "surface": "paved_stone",

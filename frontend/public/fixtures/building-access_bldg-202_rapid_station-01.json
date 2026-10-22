@@ -1,7 +1,7 @@
 {
   "building_id": "bldg-202",
-  "building_name": "Ward Civic Center & Library",
-  "use_type": "Public Facility",
+  "building_name": "Central Library & Administrative Block (CU)",
+  "use_type": "Public & Educational Facility",
   "connected_road_id": "road-102",
   "estimated_setback_m": 3.0,
   "entrance_status": "road_frontage_only",
@@ -57,7 +57,7 @@
     },
     "classification": "accessible",
     "route_found": true,
-    "total_distance_m": 472.5,
+    "total_distance_m": 472.4,
     "segments_traversed": [
       "road-101",
       "road-102"
@@ -65,20 +65,20 @@
     "steps": [
       {
         "step_index": 1,
-        "from_node": "node_77.593000_12.971500",
-        "to_node": "node_77.595000_12.971500",
+        "from_node": "node_76.571881_30.767850",
+        "to_node": "node_76.574149_30.767850",
         "road_id": "road-101",
-        "road_name": "Station Link Arterial (Main Road)",
+        "road_name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
         "segment_length_m": 216.7,
         "status": "accessible",
         "reason": "Adequate clearance for Rapid response car (7.5m usable width)."
       },
       {
         "step_index": 2,
-        "from_node": "node_77.595000_12.971500",
-        "to_node": "node_77.595000_12.973800",
+        "from_node": "node_76.574149_30.767850",
+        "to_node": "node_76.574149_30.770150",
         "road_id": "road-102",
-        "road_name": "North Citizen Lane",
+        "road_name": "Academic Blocks Central Spine (North Campus Lane)",
         "segment_length_m": 255.7,
         "status": "accessible",
         "reason": "Adequate clearance for Rapid response car (3.4m usable width)."
@@ -87,8 +87,8 @@
     "segment_assessments": [
       {
         "road_id": "road-101",
-        "name": "Station Link Arterial (Main Road)",
-        "road_class": "Secondary Arterial",
+        "name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
+        "road_class": "Primary Access Arterial",
         "width_m": 7.5,
         "required_width_m": 2.4,
         "surface": "asphalt",
@@ -101,8 +101,8 @@
       },
       {
         "road_id": "road-102",
-        "name": "North Citizen Lane",
-        "road_class": "Collector Lane",
+        "name": "Academic Blocks Central Spine (North Campus Lane)",
+        "road_class": "Campus Collector Lane",
         "width_m": 3.4,
         "required_width_m": 2.4,
         "surface": "paved_concrete",
@@ -126,7 +126,7 @@
       "gate_restriction",
       "entrance_doorway_access"
     ],
-    "explanation": "Verified accessible route (472.5m) via 2 corridor(s). All segments meet or exceed Rapid response car physical clearance requirements.",
+    "explanation": "Verified accessible route (472.4m) via 2 corridor(s). All segments meet or exceed Rapid response car physical clearance requirements.",
     "disclaimer": "DETERMINISTIC EVALUATION FOR PROTOTYPE DEMONSTRATION. ROAD ARRIVAL DOES NOT GUARANTEE ENTRANCE ACCESS."
   },
   "limitations": [],

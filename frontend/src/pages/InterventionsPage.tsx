@@ -151,7 +151,7 @@ export const InterventionsPage: React.FC<InterventionsPageProps> = ({
               EMERGENCY ACCESS FIELD AUDIT WORK ORDER
             </h2>
             <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#4b5563' }}>
-              Jurisdiction: Ward 142 (Synthetic Cadastre) &bull; Vehicle Profile:{' '}
+              Jurisdiction: Chandigarh University & Gharuan Sector (Synthetic Cadastre) &bull; Vehicle Profile:{' '}
               <b>{auditVehicle.toUpperCase()}</b> &bull; Priority Queue
             </p>
           </div>

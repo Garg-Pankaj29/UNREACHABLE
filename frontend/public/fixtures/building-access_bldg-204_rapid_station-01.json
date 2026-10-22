@@ -1,7 +1,7 @@
 {
   "building_id": "bldg-204",
-  "building_name": "Prabhat Commercial Complex",
-  "use_type": "Commercial / Retail",
+  "building_name": "University Student Mall & Commercial Complex",
+  "use_type": "Commercial / Student Amenities",
   "connected_road_id": "road-104",
   "estimated_setback_m": 2.0,
   "entrance_status": "road_frontage_only",

@@ -25,7 +25,7 @@ const DEMO_STEPS: DemoStep[] = [
     id: 1,
     title: 'Access Atlas: Fire Tender Baseline',
     speakerPrompt:
-      'Demonstrate baseline municipal access across Ward 142 for a standard heavy Fire Tender (3.5m clearance requirement).',
+      'Demonstrate baseline municipal access across Chandigarh University & Gharuan Sector for a standard heavy Fire Tender (3.5m clearance requirement).',
   },
   {
     id: 2,

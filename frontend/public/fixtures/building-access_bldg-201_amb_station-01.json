@@ -1,6 +1,6 @@
 {
   "building_id": "bldg-201",
-  "building_name": "Community Health Sub-Center (Ward 142)",
+  "building_name": "CU Student Health & Medical Sub-Center",
   "use_type": "Healthcare / Critical",
   "connected_road_id": "road-101",
   "estimated_setback_m": 4.5,
@@ -64,10 +64,10 @@
     "steps": [
       {
         "step_index": 1,
-        "from_node": "node_77.593000_12.971500",
-        "to_node": "node_77.595000_12.971500",
+        "from_node": "node_76.571881_30.767850",
+        "to_node": "node_76.574149_30.767850",
         "road_id": "road-101",
-        "road_name": "Station Link Arterial (Main Road)",
+        "road_name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
         "segment_length_m": 216.7,
         "status": "accessible",
         "reason": "Adequate clearance for Ambulance (7.5m usable width)."
@@ -76,8 +76,8 @@
     "segment_assessments": [
       {
         "road_id": "road-101",
-        "name": "Station Link Arterial (Main Road)",
-        "road_class": "Secondary Arterial",
+        "name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
+        "road_class": "Primary Access Arterial",
         "width_m": 7.5,
         "required_width_m": 3.0,
         "surface": "asphalt",
