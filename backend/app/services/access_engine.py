@@ -1,16 +1,26 @@
 """Vehicle-aware emergency access and deterministic routing engine."""
+import copy
 import heapq
 import logging
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from app.models.routing import (
     AccessClassification,
+    AwareRouteSummary,
     BuildingAccessResponse,
+    ChangedBuilding,
+    CriticalRoad,
+    NaiveRouteSummary,
     RoadAccessResponse,
+    RouteCompareResponse,
     RouteRequest,
     RouteResponse,
     RouteStep,
+    RouteViolation,
     SegmentAssessment,
+    SimulateChange,
+    SimulateRequest,
+    SimulateResponse,
 )
 from app.models.vehicle import VehicleProfile, get_vehicle_profile
 from app.services.data_service import DataService, data_service
@@ -622,6 +632,220 @@ class AccessEngine:
             plain_language_explanation=plain_explanation,
         )
 
+    def calculate_naive_route(
+        self,
+        origin_station_id: str,
+        destination_building_id: Optional[str] = None,
+        destination_road_id: Optional[str] = None,
+    ) -> Tuple[List[RoadEdge], float, List[str]]:
+        """Calculates distance-only shortest path using Dijkstra, ignoring vehicle clearance constraints."""
+        graph = self.get_graph()
+        fc = self.data_service.get_feature_collection()
+        features = fc.get("features", [])
+
+        # Resolve Origin Station
+        origin_st = None
+        for f in features:
+            props = f.get("properties", {})
+            if props.get("feature_type") == "station" and (
+                props.get("id") == origin_station_id or f.get("id") == origin_station_id
+            ):
+                origin_st = f
+                break
+
+        if not origin_st:
+            raise KeyError(f"Origin station not found: {origin_station_id}")
+
+        st_props = origin_st.get("properties", {})
+        st_road_id = st_props.get("primary_access_road")
+        st_coords = origin_st.get("geometry", {}).get("coordinates", [])
+
+        if len(st_coords) >= 2:
+            st_origin_node = graph.get_closest_node((float(st_coords[0]), float(st_coords[1])))
+        else:
+            st_origin_node = None
+
+        if not st_origin_node and st_road_id:
+            st_nodes = graph.get_nodes_for_road(st_road_id)
+            st_origin_node = next(iter(st_nodes)) if st_nodes else None
+
+        if not st_origin_node:
+            raise ValueError(f"Origin station {origin_station_id} has no connected road nodes")
+
+        # Resolve Destination
+        target_road_id: Optional[str] = None
+        if destination_building_id:
+            target_bldg = None
+            for f in features:
+                props = f.get("properties", {})
+                if props.get("feature_type") == "building" and (
+                    props.get("id") == destination_building_id or f.get("id") == destination_building_id
+                ):
+                    target_bldg = f
+                    break
+            if not target_bldg:
+                raise KeyError(f"Destination building not found: {destination_building_id}")
+            target_road_id = target_bldg.get("properties", {}).get("connected_road_id")
+            if not target_road_id:
+                return [], 0.0, []
+        elif destination_road_id:
+            target_road_id = destination_road_id
+            if not graph.get_nodes_for_road(target_road_id):
+                raise KeyError(f"Destination road not found in network: {destination_road_id}")
+        else:
+            raise ValueError("Either destination_building_id or destination_road_id must be provided")
+
+        target_nodes = graph.get_nodes_for_road(target_road_id)
+        if not target_nodes:
+            return [], 0.0, []
+
+        # Pure distance Dijkstra
+        pq: List[Tuple[float, str, List[RoadEdge]]] = []
+        best_cost: Dict[Tuple[str, bool], float] = {}
+
+        heapq.heappush(pq, (0.0, st_origin_node, []))
+        best_cost[(st_origin_node, False)] = 0.0
+
+        chosen_edges: Optional[List[RoadEdge]] = None
+
+        while pq:
+            dist, u, path = heapq.heappop(pq)
+            has_target = any(e.road_id == target_road_id for e in path)
+
+            if dist > best_cost.get((u, has_target), float("inf")):
+                continue
+
+            if has_target and u in target_nodes:
+                chosen_edges = path
+                break
+
+            for edge in graph.adjacency.get(u, []):
+                if path and path[-1].edge_id == f"{edge.road_id}_{edge.to_node}->{edge.from_node}":
+                    continue
+
+                new_dist = dist + edge.length_m
+                v = edge.to_node
+                new_has_target = has_target or (edge.road_id == target_road_id)
+
+                if new_dist < best_cost.get((v, new_has_target), float("inf")):
+                    best_cost[(v, new_has_target)] = new_dist
+                    heapq.heappush(pq, (new_dist, v, path + [edge]))
+
+        if not chosen_edges:
+            return [], 0.0, []
+
+        road_ids: List[str] = []
+        total_dist_m = 0.0
+        for e in chosen_edges:
+            total_dist_m += e.length_m
+            if e.road_id not in road_ids:
+                road_ids.append(e.road_id)
+
+        return chosen_edges, round(total_dist_m, 1), road_ids
+
+    def compare_routes(
+        self,
+        station_id: str = "station-01",
+        building_id: Optional[str] = None,
+        vehicle_id: str = "fire",
+        road_id: Optional[str] = None,
+    ) -> RouteCompareResponse:
+        """Compares naive distance-only pathfinding vs vehicle-aware emergency access."""
+        vehicle = get_vehicle_profile(vehicle_id)
+        if not vehicle:
+            raise ValueError(f"Unsupported vehicle profile: {vehicle_id}")
+
+        # 1. Compute naive distance-only path
+        naive_edges, naive_dist_m, naive_road_ids = self.calculate_naive_route(
+            origin_station_id=station_id,
+            destination_building_id=building_id,
+            destination_road_id=road_id,
+        )
+
+        # 2. Evaluate each segment on the naive path with the existing clearance function
+        violations: List[RouteViolation] = []
+        evaluated_segments: Set[str] = set()
+
+        for edge in naive_edges:
+            if edge.road_id in evaluated_segments:
+                continue
+            evaluated_segments.add(edge.road_id)
+
+            asmt = self.evaluate_segment(
+                road_id=edge.road_id,
+                vehicle=vehicle,
+                props=edge.properties,
+                length_m=edge.length_m,
+            )
+
+            # Check if segment violates vehicle physical clearance (inaccessible or unmeasured)
+            if not asmt.is_passable:
+                reason = asmt.notes or ("; ".join(asmt.limiting_factors) if asmt.limiting_factors else "Inaccessible corridor")
+                violations.append(
+                    RouteViolation(
+                        road_id=edge.road_id,
+                        reason=reason,
+                        width_m=asmt.width_m,
+                        required_m=vehicle.min_clearance_width_m,
+                    )
+                )
+
+        naive_would_fail = len(violations) > 0
+
+        # 3. Compute vehicle-aware defensible route using calculate_route
+        aware_req = RouteRequest(
+            origin_station_id=station_id,
+            destination_building_id=building_id,
+            destination_road_id=road_id,
+            vehicle_id=vehicle_id,
+        )
+        aware_resp = self.calculate_route(aware_req)
+
+        aware_summary = AwareRouteSummary(
+            road_ids=aware_resp.segments_traversed,
+            distance_m=aware_resp.total_distance_m,
+            classification=aware_resp.classification,
+        )
+
+        naive_summary = NaiveRouteSummary(
+            road_ids=naive_road_ids,
+            distance_m=naive_dist_m,
+            violations=violations,
+        )
+
+        # 4. Generate deterministic verdict template string
+        if naive_would_fail:
+            v0 = violations[0]
+            if v0.width_m is not None and v0.width_m < v0.required_m:
+                verdict = (
+                    f"A distance-only route would fail at {v0.road_id} "
+                    f"({v0.width_m} m < {v0.required_m} m required for {vehicle.name})"
+                )
+            else:
+                verdict = (
+                    f"A distance-only route would fail at {v0.road_id} "
+                    f"({v0.reason})"
+                )
+        elif not naive_road_ids and not aware_summary.road_ids:
+            verdict = "No route found between station and destination under either model."
+        elif naive_road_ids == aware_summary.road_ids:
+            verdict = (
+                f"Distance-only route and vehicle-aware route are identical "
+                f"({naive_dist_m} m); corridor satisfies {vehicle.name} clearance."
+            )
+        else:
+            verdict = (
+                f"Distance-only route is passable but vehicle-aware route takes a safer bypass "
+                f"({aware_summary.distance_m} m vs {naive_dist_m} m naive)."
+            )
+
+        return RouteCompareResponse(
+            naive=naive_summary,
+            aware=aware_summary,
+            verdict=verdict,
+            naive_would_fail=naive_would_fail,
+        )
+
     def assess_road_access(self, road_id: str, vehicle_id: str = "fire") -> RoadAccessResponse:
         """Evaluates direct accessibility of an individual road corridor for a vehicle."""
         vehicle = get_vehicle_profile(vehicle_id)
@@ -659,6 +883,275 @@ class AccessEngine:
             plain_language_explanation=asmt.notes or "",
         )
 
+    def simulate(self, request: SimulateRequest) -> SimulateResponse:
+        """Simulates hypothetical road network changes on an in-memory copy without mutating real data."""
+        vehicle_id = request.vehicle_id or "fire"
+        vehicle = get_vehicle_profile(vehicle_id)
+        if not vehicle:
+            raise ValueError(f"Unsupported vehicle profile: {vehicle_id}")
+
+        # 1. Evaluate BEFORE state on current unmodified data
+        fc_original = self.data_service.get_feature_collection()
+        features_original = fc_original.get("features", [])
+        building_features = [
+            f for f in features_original if f.get("properties", {}).get("feature_type") == "building"
+        ]
+
+        before_status_map: Dict[str, str] = {}
+        building_names: Dict[str, str] = {}
+        for b in building_features:
+            b_id = b.get("properties", {}).get("id") or b.get("id")
+            b_name = b.get("properties", {}).get("name", b_id)
+            building_names[b_id] = b_name
+            asmt = self.assess_building_access(building_id=b_id, vehicle_id=vehicle_id)
+            before_status_map[b_id] = asmt.classification.value
+
+        # 2. Deepcopy features for in-memory simulation
+        features_sim = copy.deepcopy(features_original)
+
+        # 3. Apply changes to in-memory copy
+        assumptions: List[str] = [
+            "Simulation is evaluated deterministically in-memory without persistent modifications.",
+            f"All access constraints verified against {vehicle.name} physical apparatus specifications.",
+        ]
+
+        for change in request.changes:
+            r_id = change.road_id
+            act = change.action
+            target_feat = None
+            for f in features_sim:
+                if (
+                    f.get("properties", {}).get("feature_type") == "road"
+                    and (f.get("properties", {}).get("id") == r_id or f.get("id") == r_id)
+                ):
+                    target_feat = f
+                    break
+
+            if not target_feat:
+                continue
+
+            r_props = target_feat.setdefault("properties", {})
+            r_name = r_props.get("name", r_id)
+
+            if act == "close":
+                r_props["obstruction"] = "Simulated closure / emergency incident block"
+                r_props["access_status"] = "infeasible"
+                assumptions.append(f"Road {r_name} ({r_id}) temporarily closed to emergency apparatus.")
+            elif act == "clear_obstruction":
+                r_props["obstruction"] = None
+                r_props["access_status"] = "feasible"
+                assumptions.append(f"Physical obstructions and wire bundles cleared from {r_name} ({r_id}).")
+            elif act == "set_width":
+                if change.value is not None:
+                    r_props["width_m"] = float(change.value)
+                    assumptions.append(f"Usable width of {r_name} ({r_id}) adjusted to {change.value}m.")
+
+        # 4. Create isolated in-memory DataService and AccessEngine for AFTER state
+        class InMemoryDataService(DataService):
+            def __init__(self, sim_fc: Dict[str, Any]):
+                self._cache = sim_fc
+
+            def load_data(self) -> Dict[str, Any]:
+                return self._cache
+
+        sim_ds = InMemoryDataService(
+            {
+                "type": "FeatureCollection",
+                "metadata": {**fc_original.get("metadata", {}), "simulation": True},
+                "features": features_sim,
+            }
+        )
+        sim_engine = AccessEngine(ds=sim_ds)
+
+        after_status_map: Dict[str, str] = {}
+        for b_id in before_status_map.keys():
+            sim_asmt = sim_engine.assess_building_access(building_id=b_id, vehicle_id=vehicle_id)
+            after_status_map[b_id] = sim_asmt.classification.value
+
+        # 5. Collate counts and changed buildings
+        before_counts: Dict[str, int] = {"accessible": 0, "constrained": 0, "inaccessible": 0, "unknown": 0}
+        after_counts: Dict[str, int] = {"accessible": 0, "constrained": 0, "inaccessible": 0, "unknown": 0}
+
+        for st in before_status_map.values():
+            before_counts[st] = before_counts.get(st, 0) + 1
+
+        for st in after_status_map.values():
+            after_counts[st] = after_counts.get(st, 0) + 1
+
+        changed_buildings: List[ChangedBuilding] = []
+        for b_id, b_status in before_status_map.items():
+            a_status = after_status_map[b_id]
+            if b_status != a_status:
+                changed_buildings.append(
+                    ChangedBuilding(
+                        id=b_id,
+                        name=building_names.get(b_id, b_id),
+                        before=b_status,
+                        after=a_status,
+                    )
+                )
+
+        return SimulateResponse(
+            before=before_counts,
+            after=after_counts,
+            changed_buildings=changed_buildings,
+            assumptions=assumptions,
+        )
+
+    def get_critical_roads(self, vehicle_id: str = "fire", limit: int = 5) -> List[CriticalRoad]:
+        """Calculates single-points-of-failure roads ranked by number of buildings whose access deteriorates when closed."""
+        vehicle = get_vehicle_profile(vehicle_id)
+        if not vehicle:
+            raise ValueError(f"Unsupported vehicle profile: {vehicle_id}")
+
+        fc = self.data_service.get_feature_collection()
+        features = fc.get("features", [])
+        roads = [f for f in features if f.get("properties", {}).get("feature_type") == "road"]
+
+        severity_rank = {
+            "accessible": 3,
+            "constrained": 2,
+            "unknown": 1,
+            "inaccessible": 0,
+        }
+
+        critical_list: List[CriticalRoad] = []
+
+        for road in roads:
+            r_props = road.get("properties", {})
+            r_id = r_props.get("id") or road.get("id")
+            r_name = r_props.get("name", r_id)
+
+            sim_req = SimulateRequest(
+                vehicle_id=vehicle_id,
+                changes=[SimulateChange(road_id=r_id, action="close")],
+            )
+            sim_resp = self.simulate(sim_req)
+
+            worsened_buildings: List[str] = []
+            for cb in sim_resp.changed_buildings:
+                # Deterioration: rank before > rank after (e.g. accessible -> inaccessible/constrained)
+                if severity_rank.get(cb.before, 0) > severity_rank.get(cb.after, 0):
+                    worsened_buildings.append(cb.id)
+
+            critical_list.append(
+                CriticalRoad(
+                    road_id=r_id,
+                    name=r_name,
+                    buildings_affected=len(worsened_buildings),
+                    building_ids=worsened_buildings,
+                )
+            )
+
+        critical_list.sort(key=lambda cr: cr.buildings_affected, reverse=True)
+        return critical_list[:limit]
+
+    def get_audit_work_order(self, vehicle_id: str = "fire") -> List["WorkOrderItem"]:
+        """Calculates prioritized audit work order for unknown/unverified road segments ranked by dependent buildings."""
+        vehicle = get_vehicle_profile(vehicle_id)
+        if not vehicle:
+            raise ValueError(f"Unsupported vehicle profile: {vehicle_id}")
+
+        fc = self.data_service.get_feature_collection()
+        features = fc.get("features", [])
+        roads = [f for f in features if f.get("properties", {}).get("feature_type") == "road"]
+
+        severity_rank = {
+            "accessible": 3,
+            "constrained": 2,
+            "unknown": 1,
+            "inaccessible": 0,
+        }
+
+        work_order: List[WorkOrderItem] = []
+
+        for road in roads:
+            r_props = road.get("properties", {})
+            r_id = r_props.get("id") or road.get("id")
+            r_name = r_props.get("name", r_id)
+            data_src = r_props.get("data_source")
+
+            asmt = self.evaluate_segment(road_id=r_id, vehicle=vehicle, props=r_props)
+            ver = str(r_props.get("verification_status") or r_props.get("verification") or "").lower()
+
+            is_unknown = (
+                asmt.status == AccessClassification.UNKNOWN
+                or r_props.get("access_status") == "unknown"
+                or r_props.get("width_m") is None
+            )
+            is_unverified = (
+                "unverified" in ver
+                or "uninspected" in ver
+                or ver in ["unverified", "unverified_survey", "uninspected"]
+            )
+
+            if not (is_unknown or is_unverified):
+                continue
+
+            # Reason derivation
+            if r_props.get("reason"):
+                reason = r_props["reason"]
+            elif is_unknown:
+                reason = (
+                    asmt.notes
+                    or r_props.get("notes")
+                    or "Width unmeasured in cadastre; clearance unverified."
+                )
+            elif is_unverified:
+                label = ver.replace("_", " ") if ver else "unverified"
+                reason = (
+                    r_props.get("notes")
+                    if (r_props.get("notes") and ("unverified" in r_props["notes"].lower() or "audit" in r_props["notes"].lower()))
+                    else f"Unverified cadastral survey ({label}): field ground truth audit required."
+                )
+            else:
+                reason = r_props.get("notes") or "Ground truth physical clearance audit required."
+
+            # Calculate buildings affected using the same method as critical-roads (simulation closure)
+            sim_req = SimulateRequest(
+                vehicle_id=vehicle_id,
+                changes=[SimulateChange(road_id=r_id, action="close")],
+            )
+            sim_resp = self.simulate(sim_req)
+
+            worsened_buildings: List[str] = []
+            for cb in sim_resp.changed_buildings:
+                if severity_rank.get(cb.before, 0) > severity_rank.get(cb.after, 0):
+                    worsened_buildings.append(cb.id)
+
+            work_order.append(
+                WorkOrderItem(
+                    road_id=r_id,
+                    name=r_name,
+                    reason=reason,
+                    buildings_affected=len(worsened_buildings),
+                    data_source=data_src,
+                )
+            )
+
+        # Ranked by buildings affected descending, secondary sort by road_id
+        work_order.sort(key=lambda item: (-item.buildings_affected, item.road_id))
+        return work_order
+
+
+from pydantic import BaseModel
+
+
+class WorkOrderItem(BaseModel):
+    """Prioritized work order item for ground truth road audit."""
+    road_id: str
+    name: str
+    reason: str
+    buildings_affected: int
+    data_source: Optional[str] = None
+
+
+# In-memory cache for critical roads by vehicle_id
+CRITICAL_ROADS_CACHE: Dict[str, List[CriticalRoad]] = {}
+
 
 # Singleton instance for route injection
 access_engine = AccessEngine()
+
+
+

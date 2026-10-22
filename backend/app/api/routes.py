@@ -6,22 +6,31 @@ from fastapi import APIRouter, HTTPException, Query, status
 from app.core.config import API_VERSION, SAMPLE_DATA_PATH
 from app.models.routing import (
     BuildingAccessResponse,
+    CriticalRoad,
     RoadAccessResponse,
+    RouteCompareResponse,
     RouteRequest,
     RouteResponse,
+    SimulateRequest,
+    SimulateResponse,
 )
 from app.models.schemas import (
+    ExplainRequest,
+    ExplainResponse,
     FeatureCollectionResponse,
     HealthResponse,
     StatsResponse,
+    VehicleGapResponse,
 )
 from app.models.vehicle import (
     SUPPORTED_VEHICLES,
     VehicleProfile,
     get_vehicle_profile,
 )
-from app.services.access_engine import access_engine
+from app.services.access_engine import WorkOrderItem, access_engine
 from app.services.data_service import data_service
+from app.services.explain_service import explain_service
+
 
 logger = logging.getLogger("unreachable.api")
 
@@ -99,10 +108,20 @@ def get_roads() -> FeatureCollectionResponse:
     summary="Get accessibility statistics",
     description="Returns calculated summary counts of buildings and road segments by feasibility state.",
 )
-def get_stats() -> StatsResponse:
-    """Calculates and returns summary statistics derived directly from sample dataset."""
+def get_stats(
+    vehicle_id: Optional[str] = Query(default=None, description="Optional vehicle profile ('fire', 'amb', 'rapid')"),
+) -> StatsResponse:
+    """Calculates and returns summary statistics derived directly from sample dataset or apparatus evaluation."""
+    if vehicle_id is not None and not isinstance(vehicle_id, str):
+        vehicle_id = None
+    if vehicle_id and vehicle_id not in SUPPORTED_VEHICLES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported vehicle profile '{vehicle_id}'. Supported: {list(SUPPORTED_VEHICLES.keys())}",
+        )
+
     try:
-        return data_service.get_stats()
+        return data_service.get_stats(vehicle_id=vehicle_id)
     except FileNotFoundError as exc:
         logger.error("Dataset not found: %s", exc)
         raise HTTPException(
@@ -115,6 +134,7 @@ def get_stats() -> StatsResponse:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to compute statistics: {exc}",
         )
+
 
 
 @router.get(
@@ -222,6 +242,39 @@ def get_route(
 
 
 @router.get(
+    "/routing/compare",
+    response_model=RouteCompareResponse,
+    summary="Compare naive shortest-path vs vehicle-aware routing",
+    description="Compares distance-only naive route against vehicle clearance rules and identifies bottlenecks.",
+)
+def compare_route(
+    station_id: str = Query(default="station-01", description="Origin station identifier"),
+    building_id: Optional[str] = Query(default=None, description="Target building identifier"),
+    vehicle_id: str = Query(default="fire", description="Selected vehicle profile ('fire', 'amb', 'rapid')"),
+    road_id: Optional[str] = Query(default=None, description="Target road identifier (optional alternative to building)"),
+) -> RouteCompareResponse:
+    """Evaluates naive shortest path vs vehicle-aware routing with explicit violations."""
+    try:
+        return access_engine.compare_routes(
+            station_id=station_id,
+            building_id=building_id,
+            vehicle_id=vehicle_id,
+            road_id=road_id,
+        )
+    except KeyError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except Exception as exc:
+        logger.error("Route comparison failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to compare routes: {exc}",
+        )
+
+
+
+@router.get(
     "/routing/building-access/{building_id}",
     response_model=BuildingAccessResponse,
     summary="Assess building-level emergency vehicle access",
@@ -274,3 +327,139 @@ def assess_road_access(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to assess road segment: {exc}",
         )
+
+
+# ============================================================================
+# Simulation & Vulnerability Analysis Endpoints
+# ============================================================================
+
+@router.post(
+    "/simulate",
+    response_model=SimulateResponse,
+    summary="Simulate hypothetical road network changes",
+    description="Evaluates building accessibility before and after road changes on an in-memory dataset copy.",
+)
+def post_simulate(request: SimulateRequest) -> SimulateResponse:
+    """Evaluates impact of hypothetical road network interventions or closures."""
+    try:
+        return access_engine.simulate(request)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except Exception as exc:
+        logger.error("Simulation failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to execute simulation: {exc}",
+        )
+
+
+@router.get(
+    "/analysis/critical-roads",
+    response_model=List[CriticalRoad],
+    summary="Identify critical single points of failure roads",
+    description="Ranks road corridors whose closure disconnects or degrades access to the highest number of buildings.",
+)
+def get_critical_roads(
+    vehicle_id: str = Query(default="fire", description="Emergency vehicle profile ('fire', 'amb', 'rapid')"),
+    limit: int = Query(default=5, ge=1, le=50, description="Maximum number of critical corridors to return"),
+) -> List[CriticalRoad]:
+    """Returns top N single points of failure road segments for a given vehicle profile."""
+    try:
+        from app.services.access_engine import CRITICAL_ROADS_CACHE
+        cache_key = f"{vehicle_id}_{limit}"
+        if cache_key in CRITICAL_ROADS_CACHE:
+            return CRITICAL_ROADS_CACHE[cache_key]
+
+        res = access_engine.get_critical_roads(vehicle_id=vehicle_id, limit=limit)
+        CRITICAL_ROADS_CACHE[cache_key] = res
+        return res
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except Exception as exc:
+        logger.error("Critical roads analysis failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to compute critical roads: {exc}",
+        )
+
+
+@router.get(
+    "/analysis/vehicle-gap",
+    response_model=VehicleGapResponse,
+    summary="Get comparative vehicle accessibility gap metrics",
+    description="Evaluates verified reachable percentage and evidence coverage for standard emergency apparatus.",
+)
+def get_vehicle_gap() -> VehicleGapResponse:
+    """Returns accessibility gap scorecard for fire, amb, and rapid apparatus.
+
+    Definitions:
+      evidence_coverage_pct = (feasible + constrained + infeasible) / total buildings * 100
+      verified_reachable_pct = feasible / (feasible + constrained + infeasible) * 100
+      (Unknown is excluded, never counted as reachable or unreachable)
+    """
+    try:
+        return data_service.get_vehicle_gap()
+    except FileNotFoundError as exc:
+        logger.error("Dataset not found: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Sample dataset file not found: {exc}",
+        )
+    except Exception as exc:
+        logger.error("Vehicle gap analysis failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to compute vehicle gap analysis: {exc}",
+        )
+
+
+@router.post(
+    "/explain",
+    response_model=ExplainResponse,
+    summary="Explain computed emergency access assessment",
+    description="Generates plain-language explanation of deterministic route evaluation using local LLM with guardrails or template fallback.",
+)
+def post_explain(request: ExplainRequest) -> ExplainResponse:
+    """Explains deterministic access result using local model with strict guardrails or template fallback."""
+    try:
+        return explain_service.explain(
+            station_id=request.station_id,
+            building_id=request.building_id,
+            vehicle_id=request.vehicle_id,
+        )
+    except KeyError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except Exception as exc:
+        logger.error("Explanation service failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate explanation: {exc}",
+        )
+
+
+@router.get(
+    "/audit/work-order",
+    response_model=List[WorkOrderItem],
+    summary="Generate prioritized field audit work order",
+    description="Ranks unknown/unverified road segments by the number of buildings that depend on them for emergency access.",
+)
+def get_audit_work_order(
+    vehicle_id: str = Query(default="fire", description="Emergency vehicle profile ('fire', 'amb', 'rapid')"),
+) -> List[WorkOrderItem]:
+    """Returns prioritized audit action list of unknown/unverified road corridors."""
+    try:
+        return access_engine.get_audit_work_order(vehicle_id=vehicle_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except Exception as exc:
+        logger.error("Audit work order generation failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate audit work order: {exc}",
+        )
+
+
+
+
