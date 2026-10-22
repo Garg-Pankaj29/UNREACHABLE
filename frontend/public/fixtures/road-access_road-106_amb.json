@@ -1,0 +1,41 @@
+{
+  "road_id": "road-106",
+  "road_name": "South Sector Spur",
+  "vehicle": {
+    "id": "amb",
+    "name": "Ambulance",
+    "category": "Emergency ambulance",
+    "min_clearance_width_m": 3.0,
+    "min_clearance_height_m": 2.5,
+    "turning_radius_m": 6.5,
+    "weight_tons": 4.5,
+    "description": "Standard emergency medical ambulance requiring \u2265 3.0m clearance corridor.",
+    "typical_equipment": "Stretcher, patient monitor, defibrillator, oxygen delivery kit",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "assessment": {
+    "road_id": "road-106",
+    "name": "South Sector Spur",
+    "road_class": "Residential Access",
+    "width_m": 3.8,
+    "required_width_m": 3.0,
+    "surface": "asphalt",
+    "obstruction": null,
+    "status": "accessible",
+    "is_passable": true,
+    "length_m": 0.0,
+    "limiting_factors": [],
+    "notes": "Adequate clearance for Ambulance (3.8m usable width)."
+  },
+  "plain_language_explanation": "Adequate clearance for Ambulance (3.8m usable width)."
+}

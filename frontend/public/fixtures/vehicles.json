@@ -1,0 +1,68 @@
+[
+  {
+    "id": "fire",
+    "name": "Fire tender",
+    "category": "Heavy apparatus",
+    "min_clearance_width_m": 3.5,
+    "min_clearance_height_m": 3.5,
+    "turning_radius_m": 8.5,
+    "weight_tons": 16.0,
+    "description": "Heavy municipal water tender requiring \u2265 3.5m clearance corridor.",
+    "typical_equipment": "4,500L water tank, high-pressure pump, extension ladders, rescue gear",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  {
+    "id": "amb",
+    "name": "Ambulance",
+    "category": "Emergency ambulance",
+    "min_clearance_width_m": 3.0,
+    "min_clearance_height_m": 2.5,
+    "turning_radius_m": 6.5,
+    "weight_tons": 4.5,
+    "description": "Standard emergency medical ambulance requiring \u2265 3.0m clearance corridor.",
+    "typical_equipment": "Stretcher, patient monitor, defibrillator, oxygen delivery kit",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  {
+    "id": "rapid",
+    "name": "Rapid response car",
+    "category": "Rapid response unit",
+    "min_clearance_width_m": 2.4,
+    "min_clearance_height_m": 2.0,
+    "turning_radius_m": 5.0,
+    "weight_tons": 2.2,
+    "description": "Agile quick response unit requiring \u2265 2.4m clearance corridor.",
+    "typical_equipment": "First responder trauma kit, portable fire suppression extinguisher, AED",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  }
+]

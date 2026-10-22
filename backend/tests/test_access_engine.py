@@ -2,7 +2,12 @@
 import unittest
 from typing import Any, Dict, List
 
-from app.models.routing import AccessClassification, RouteRequest
+from app.models.routing import (
+    AccessClassification,
+    RouteRequest,
+    SimulateChange,
+    SimulateRequest,
+)
 from app.models.vehicle import VehicleProfile, get_vehicle_profile
 from app.services.access_engine import AccessEngine
 from app.services.data_service import DataService
@@ -381,6 +386,282 @@ class TestAccessEngine(unittest.TestCase):
         self.assertIn("road-detour-1", resp.segments_traversed)
         self.assertIn("road-detour-2", resp.segments_traversed)
 
+    def test_11_compare_routes_naive_violates_and_aware_avoids(self):
+        """11. Comparison correctly detects when naive route violates clearance and aware route avoids it."""
+        triangle_features = [
+            {
+                "type": "Feature",
+                "id": "station-cmp",
+                "geometry": {"type": "Point", "coordinates": [77.0, 12.0]},
+                "properties": {
+                    "id": "station-cmp",
+                    "feature_type": "station",
+                    "name": "Comparison Station",
+                    "primary_access_road": "road-direct",
+                },
+            },
+            {
+                "type": "Feature",
+                "id": "road-direct",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[77.0, 12.0], [77.02, 12.0]],
+                },
+                "properties": {
+                    "id": "road-direct",
+                    "feature_type": "road",
+                    "name": "Direct Bottleneck Lane",
+                    "width_m": 2.5,
+                    "access_status": "infeasible",
+                },
+            },
+            {
+                "type": "Feature",
+                "id": "road-bypass-1",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[77.0, 12.0], [77.01, 12.01]],
+                },
+                "properties": {
+                    "id": "road-bypass-1",
+                    "feature_type": "road",
+                    "name": "Bypass 1",
+                    "width_m": 5.0,
+                    "access_status": "feasible",
+                },
+            },
+            {
+                "type": "Feature",
+                "id": "road-bypass-2",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[77.01, 12.01], [77.02, 12.0]],
+                },
+                "properties": {
+                    "id": "road-bypass-2",
+                    "feature_type": "road",
+                    "name": "Bypass 2",
+                    "width_m": 5.0,
+                    "access_status": "feasible",
+                },
+            },
+            {
+                "type": "Feature",
+                "id": "bldg-dest",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [77.019, 12.001],
+                            [77.021, 12.001],
+                            [77.021, 12.003],
+                            [77.019, 12.003],
+                            [77.019, 12.001],
+                        ]
+                    ],
+                },
+                "properties": {
+                    "id": "bldg-dest",
+                    "name": "Destination Hub",
+                    "feature_type": "building",
+                    "connected_road_id": "road-direct",
+                },
+            },
+        ]
+        cmp_engine = AccessEngine(ds=MockDataService(triangle_features))
+        comp = cmp_engine.compare_routes(
+            station_id="station-cmp",
+            building_id="bldg-dest",
+            vehicle_id="fire",
+        )
+
+        self.assertTrue(comp.naive_would_fail)
+        self.assertGreater(len(comp.naive.violations), 0)
+        self.assertEqual(comp.naive.violations[0].road_id, "road-direct")
+        self.assertEqual(comp.naive.violations[0].width_m, 2.5)
+        self.assertEqual(comp.naive.violations[0].required_m, 3.5)
+        self.assertIn("A distance-only route would fail at road-direct", comp.verdict)
+        self.assertFalse(comp.aware.road_ids)  # Since only access to destination road is blocked, aware finds no passable path
+
+        self.assertNotIn("road-direct", comp.aware.road_ids)
+
+    def test_12_compare_routes_identical(self):
+        """12. Comparison correctly identifies when naive and aware routes are identical."""
+        # In sample dataset, station-01 to bldg-201 via road-101 has adequate width (8.5m)
+        comp = self.engine.compare_routes(
+            station_id="station-01",
+            building_id="bldg-201",
+            vehicle_id="fire",
+        )
+        self.assertFalse(comp.naive_would_fail)
+        self.assertEqual(len(comp.naive.violations), 0)
+        self.assertEqual(comp.naive.road_ids, comp.aware.road_ids)
+        self.assertIn("identical", comp.verdict.lower())
+
+    def test_13_simulate_close_road_makes_building_inaccessible(self):
+        """13. Closing a road on the only route marks the building not-feasible."""
+        # Closing road-101 (primary egress from station-01) blocks bldg-201
+        sim_req = SimulateRequest(
+            vehicle_id="fire",
+            changes=[SimulateChange(road_id="road-101", action="close")],
+        )
+        res = self.engine.simulate(sim_req)
+        changed = [cb for cb in res.changed_buildings if cb.id == "bldg-201"]
+        self.assertEqual(len(changed), 1)
+        self.assertEqual(changed[0].before, "accessible")
+        self.assertNotEqual(changed[0].after, "accessible")
+
+    def test_14_simulate_does_not_mutate_stats(self):
+        """14. Running simulate does not alter a subsequent GET stats call."""
+        stats_before = self.engine.data_service.get_stats()
+        sim_req = SimulateRequest(
+            vehicle_id="fire",
+            changes=[
+                SimulateChange(road_id="road-101", action="close"),
+                SimulateChange(road_id="road-104", action="clear_obstruction"),
+            ],
+        )
+        self.engine.simulate(sim_req)
+        stats_after = self.engine.data_service.get_stats()
+        self.assertEqual(stats_before.buildings.feasible, stats_after.buildings.feasible)
+        self.assertEqual(stats_before.roads.feasible, stats_after.roads.feasible)
+
+    def test_15_simulate_clear_obstruction_improves_access(self):
+        """15. Clearing an obstruction improves at least one seeded building's access."""
+        # In sample data, road-104 has physical obstruction blocking bldg-204
+        sim_req = SimulateRequest(
+            vehicle_id="amb",
+            changes=[SimulateChange(road_id="road-104", action="clear_obstruction")],
+        )
+        res = self.engine.simulate(sim_req)
+        improved = [cb for cb in res.changed_buildings if cb.id == "bldg-204"]
+        self.assertEqual(len(improved), 1)
+        self.assertEqual(improved[0].before, "inaccessible")
+        self.assertEqual(improved[0].after, "accessible")
+
+    def test_16_audit_work_order_hand_computable_ranking(self):
+        """16. Audit work order ranks unknown/unverified roads by hand-computable building dependency count."""
+        features = [
+            {
+                "type": "Feature",
+                "id": "station-01",
+                "geometry": {"type": "Point", "coordinates": [77.0, 12.0]},
+                "properties": {
+                    "id": "station-01",
+                    "feature_type": "station",
+                    "name": "Central Station",
+                    "primary_access_road": "road-main",
+                },
+            },
+            {
+                "type": "Feature",
+                "id": "road-main",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[77.0, 12.0], [77.01, 12.0]],
+                },
+                "properties": {
+                    "id": "road-main",
+                    "feature_type": "road",
+                    "name": "Main Highway",
+                    "width_m": 8.0,
+                    "access_status": "feasible",
+                    "verification_status": "ground_verified",
+                    "data_source": "Certified Municipal Survey",
+                },
+            },
+            {
+                "type": "Feature",
+                "id": "road-unverified-high",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[77.01, 12.0], [77.02, 12.0]],
+                },
+                "properties": {
+                    "id": "road-unverified-high",
+                    "feature_type": "road",
+                    "name": "North Sector Corridor",
+                    "width_m": 4.0,
+                    "access_status": "feasible",
+                    "verification_status": "unverified_survey",
+                    "data_source": "Unverified Cadastre Map",
+                },
+            },
+            {
+                "type": "Feature",
+                "id": "road-unknown-low",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[77.01, 12.0], [77.01, 12.01]],
+                },
+                "properties": {
+                    "id": "road-unknown-low",
+                    "feature_type": "road",
+                    "name": "South Track",
+                    "width_m": None,
+                    "access_status": "unknown",
+                    "verification_status": "uninspected",
+                    "data_source": "Satellite Aerial Scan",
+                },
+            },
+            {
+                "type": "Feature",
+                "id": "bldg-h1",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[[77.015, 12.001], [77.018, 12.001], [77.018, 12.004], [77.015, 12.004], [77.015, 12.001]]],
+                },
+                "properties": {
+                    "id": "bldg-h1",
+                    "feature_type": "building",
+                    "name": "High Priority Facility 1",
+                    "connected_road_id": "road-unverified-high",
+                },
+            },
+            {
+                "type": "Feature",
+                "id": "bldg-h2",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[[77.019, 12.001], [77.020, 12.001], [77.020, 12.004], [77.019, 12.004], [77.019, 12.001]]],
+                },
+                "properties": {
+                    "id": "bldg-h2",
+                    "feature_type": "building",
+                    "name": "High Priority Facility 2",
+                    "connected_road_id": "road-unverified-high",
+                },
+            },
+            {
+                "type": "Feature",
+                "id": "bldg-l1",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[[77.011, 12.005], [77.013, 12.005], [77.013, 12.008], [77.011, 12.008], [77.011, 12.005]]],
+                },
+                "properties": {
+                    "id": "bldg-l1",
+                    "feature_type": "building",
+                    "name": "Low Priority Storage",
+                    "connected_road_id": "road-unknown-low",
+                },
+            },
+        ]
+        test_engine = AccessEngine(ds=MockDataService(features))
+        work_order = test_engine.get_audit_work_order(vehicle_id="fire")
+
+        self.assertEqual(len(work_order), 2)
+        self.assertEqual(work_order[0].road_id, "road-unverified-high")
+        self.assertEqual(work_order[0].buildings_affected, 2)
+        self.assertEqual(work_order[0].data_source, "Unverified Cadastre Map")
+
+        self.assertEqual(work_order[1].road_id, "road-unknown-low")
+        self.assertEqual(work_order[1].buildings_affected, 1)
+        self.assertEqual(work_order[1].data_source, "Satellite Aerial Scan")
+
 
 if __name__ == "__main__":
     unittest.main()
+
+
+

@@ -1,0 +1,86 @@
+{
+  "building_id": "bldg-204",
+  "building_name": "Prabhat Commercial Complex",
+  "use_type": "Commercial / Retail",
+  "connected_road_id": "road-104",
+  "estimated_setback_m": 2.0,
+  "entrance_status": "road_frontage_only",
+  "vehicle": {
+    "id": "rapid",
+    "name": "Rapid response car",
+    "category": "Rapid response unit",
+    "min_clearance_width_m": 2.4,
+    "min_clearance_height_m": 2.0,
+    "turning_radius_m": 5.0,
+    "weight_tons": 2.2,
+    "description": "Agile quick response unit requiring \u2265 2.4m clearance corridor.",
+    "typical_equipment": "First responder trauma kit, portable fire suppression extinguisher, AED",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "classification": "inaccessible",
+  "origin_station_id": "station-01",
+  "route": {
+    "origin_id": "station-01",
+    "destination_id": "bldg-204",
+    "destination_type": "building",
+    "vehicle": {
+      "id": "rapid",
+      "name": "Rapid response car",
+      "category": "Rapid response unit",
+      "min_clearance_width_m": 2.4,
+      "min_clearance_height_m": 2.0,
+      "turning_radius_m": 5.0,
+      "weight_tons": 2.2,
+      "description": "Agile quick response unit requiring \u2265 2.4m clearance corridor.",
+      "typical_equipment": "First responder trauma kit, portable fire suppression extinguisher, AED",
+      "evaluated_constraints": [
+        "width",
+        "physical_obstruction"
+      ],
+      "unevaluated_constraints": [
+        "overhead_clearance",
+        "turning_radius",
+        "gross_weight_limit",
+        "gate_restriction",
+        "entrance_doorway_access"
+      ]
+    },
+    "classification": "inaccessible",
+    "route_found": false,
+    "total_distance_m": 0.0,
+    "segments_traversed": [],
+    "steps": [],
+    "segment_assessments": [],
+    "limiting_segments": [
+      "road-104"
+    ],
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ],
+    "explanation": "All candidate routes for Rapid response car are blocked by physical constraints along: road-104. Reason: Confirmed physical obstruction: Simulated immovable physical bollards & low sagging overhead optical/power cable bundle (< 2.2m clearance)",
+    "disclaimer": "DETERMINISTIC EVALUATION FOR PROTOTYPE DEMONSTRATION. ROAD ARRIVAL DOES NOT GUARANTEE ENTRANCE ACCESS."
+  },
+  "limitations": [
+    "road-104"
+  ],
+  "plain_language_explanation": "Rapid response car cannot reach fronting corridor (road-104) due to physical blockage: All candidate routes for Rapid response car are blocked by physical constraints along: road-104. Reason: Confirmed physical obstruction: Simulated immovable physical bollards & low sagging overhead optical/power cable bundle (< 2.2m clearance)",
+  "disclaimer": "MUNICIPAL CADASTRE DEMONSTRATION. BUILDING ENTRANCE ACCESSIBILITY REQUIRES ON-SITE SETBACK SURVEY."
+}

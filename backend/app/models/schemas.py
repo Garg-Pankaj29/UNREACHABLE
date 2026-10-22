@@ -50,3 +50,39 @@ class StatsResponse(BaseModel):
     buildings: AccessStatusCounts
     roads: AccessStatusCounts
     disclaimer: str
+
+
+class VehicleGapStats(BaseModel):
+    """Vehicle-specific building accessibility breakdown and gap metrics.
+
+    Definitions:
+      evidence_coverage_pct = (feasible + constrained + infeasible) / total buildings * 100
+      verified_reachable_pct = feasible / (feasible + constrained + infeasible) * 100
+      (Unknown is excluded, never counted as reachable or unreachable)
+    """
+    counts: AccessStatusCounts
+    verified_reachable_pct: float
+    evidence_coverage_pct: float
+
+
+class VehicleGapResponse(BaseModel):
+    """Comparative vehicle accessibility gap across standard emergency apparatus."""
+    fire: VehicleGapStats
+    amb: VehicleGapStats
+    rapid: VehicleGapStats
+
+
+class ExplainRequest(BaseModel):
+    """Request payload for deterministic route assessment explanation."""
+    station_id: str = Field(default="station-01", description="Origin dispatch station identifier")
+    building_id: str = Field(description="Target destination building identifier")
+    vehicle_id: str = Field(default="fire", description="Emergency vehicle profile ('fire', 'amb', 'rapid')")
+
+
+class ExplainResponse(BaseModel):
+    """Response payload containing guardrail-verified explanation of access assessment."""
+    text: str = Field(description="3-sentence explanation based strictly on deterministic facts")
+    source: str = Field(description="Origin of explanation: 'local_llm' or 'template'")
+    validated: bool = Field(default=True, description="Whether the explanation passed strict numerical guardrails")
+
+

@@ -5,9 +5,15 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from app.core.config import SAMPLE_DATA_PATH
-from app.models.schemas import AccessStatusCounts, StatsResponse
+from app.models.schemas import (
+    AccessStatusCounts,
+    StatsResponse,
+    VehicleGapResponse,
+    VehicleGapStats,
+)
 
 logger = logging.getLogger("unreachable.data_service")
+
 
 
 class DataService:
@@ -101,8 +107,12 @@ class DataService:
             "features": station_features,
         }
 
-    def get_stats(self) -> StatsResponse:
-        """Calculates accessibility statistics for buildings and roads."""
+    def get_stats(self, vehicle_id: Optional[str] = None) -> StatsResponse:
+        """Calculates accessibility statistics for buildings and roads.
+        
+        If vehicle_id is provided, evaluations are determined dynamically for the apparatus profile.
+        Otherwise, default baseline GeoJSON properties are aggregated.
+        """
         data = self.load_data()
         features = data.get("features", [])
         metadata = data.get("metadata", {})
@@ -111,23 +121,64 @@ class DataService:
         r_counts = {"feasible": 0, "constrained": 0, "infeasible": 0, "unknown": 0}
         station_count = 0
 
-        for f in features:
-            props = f.get("properties", {})
-            f_type = props.get("feature_type")
-            status = props.get("access_status", "unknown")
+        if vehicle_id:
+            from app.services.access_engine import AccessEngine
+            engine = AccessEngine(ds=self)
+            status_map = {
+                "accessible": "feasible",
+                "feasible": "feasible",
+                "constrained": "constrained",
+                "inaccessible": "infeasible",
+                "infeasible": "infeasible",
+                "unknown": "unknown",
+            }
+            for f in features:
+                props = f.get("properties", {})
+                f_type = props.get("feature_type")
+                feat_id = props.get("id") or f.get("id")
 
-            if f_type == "building":
-                if status in b_counts:
-                    b_counts[status] += 1
-                else:
-                    b_counts["unknown"] += 1
-            elif f_type == "road":
-                if status in r_counts:
-                    r_counts[status] += 1
-                else:
-                    r_counts["unknown"] += 1
-            elif f_type == "station":
-                station_count += 1
+                if f_type == "building":
+                    try:
+                        asmt = engine.assess_building_access(building_id=feat_id, vehicle_id=vehicle_id)
+                        raw_st = asmt.classification.value if hasattr(asmt.classification, "value") else str(asmt.classification)
+                        st = status_map.get(raw_st, "unknown")
+                    except Exception:
+                        st = "unknown"
+                    if st in b_counts:
+                        b_counts[st] += 1
+                    else:
+                        b_counts["unknown"] += 1
+                elif f_type == "road":
+                    try:
+                        asmt = engine.assess_road_access(road_id=feat_id, vehicle_id=vehicle_id)
+                        raw_st = asmt.assessment.status.value if hasattr(asmt.assessment.status, "value") else str(asmt.assessment.status)
+                        st = status_map.get(raw_st, "unknown")
+                    except Exception:
+                        st = "unknown"
+                    if st in r_counts:
+                        r_counts[st] += 1
+                    else:
+                        r_counts["unknown"] += 1
+                elif f_type == "station":
+                    station_count += 1
+        else:
+            for f in features:
+                props = f.get("properties", {})
+                f_type = props.get("feature_type")
+                status = props.get("access_status", "unknown")
+
+                if f_type == "building":
+                    if status in b_counts:
+                        b_counts[status] += 1
+                    else:
+                        b_counts["unknown"] += 1
+                elif f_type == "road":
+                    if status in r_counts:
+                        r_counts[status] += 1
+                    else:
+                        r_counts["unknown"] += 1
+                elif f_type == "station":
+                    station_count += 1
 
         buildings_stat = AccessStatusCounts(
             feasible=b_counts["feasible"],
@@ -156,6 +207,87 @@ class DataService:
                 "PROTOTYPE DEMONSTRATION ONLY. NOT AN OFFICIAL EMERGENCY-ACCESS ASSESSMENT."
             ),
         )
+
+    def get_vehicle_gap(self) -> VehicleGapResponse:
+        """Calculates accessibility gap metrics across standard vehicle apparatus.
+
+        Definitions:
+          evidence_coverage_pct = (feasible + constrained + infeasible) / total buildings * 100
+          verified_reachable_pct = feasible / (feasible + constrained + infeasible) * 100
+          (Unknown is excluded, never counted as reachable or unreachable)
+        """
+        from app.services.access_engine import AccessEngine
+
+        engine = AccessEngine(ds=self)
+        buildings = self.get_building_features().get("features", [])
+        total_buildings = len(buildings)
+
+        status_map = {
+            "accessible": "feasible",
+            "feasible": "feasible",
+            "constrained": "constrained",
+            "inaccessible": "infeasible",
+            "infeasible": "infeasible",
+            "unknown": "unknown",
+        }
+
+        vehicles = ["fire", "amb", "rapid"]
+        gap_results: Dict[str, VehicleGapStats] = {}
+
+        for v_id in vehicles:
+            counts = {"feasible": 0, "constrained": 0, "infeasible": 0, "unknown": 0}
+            for b in buildings:
+                b_id = b.get("properties", {}).get("id") or b.get("id")
+                try:
+                    asmt = engine.assess_building_access(building_id=b_id, vehicle_id=v_id)
+                    raw_st = (
+                        asmt.classification.value
+                        if hasattr(asmt.classification, "value")
+                        else str(asmt.classification)
+                    )
+                    st = status_map.get(raw_st, "unknown")
+                except Exception:
+                    st = "unknown"
+                if st in counts:
+                    counts[st] += 1
+                else:
+                    counts["unknown"] += 1
+
+            evidence_count = counts["feasible"] + counts["constrained"] + counts["infeasible"]
+
+            # Definitions:
+            # evidence_coverage_pct = (feasible + constrained + infeasible) / total buildings * 100
+            # verified_reachable_pct = feasible / (feasible + constrained + infeasible) * 100
+            # (Unknown is excluded, never counted as reachable or unreachable)
+            cov_pct = (
+                round((evidence_count / total_buildings) * 100.0, 1)
+                if total_buildings > 0
+                else 0.0
+            )
+            reach_pct = (
+                round((counts["feasible"] / evidence_count) * 100.0, 1)
+                if evidence_count > 0
+                else 0.0
+            )
+
+            gap_results[v_id] = VehicleGapStats(
+                counts=AccessStatusCounts(
+                    feasible=counts["feasible"],
+                    constrained=counts["constrained"],
+                    infeasible=counts["infeasible"],
+                    unknown=counts["unknown"],
+                    total=total_buildings,
+                ),
+                verified_reachable_pct=reach_pct,
+                evidence_coverage_pct=cov_pct,
+            )
+
+        return VehicleGapResponse(
+            fire=gap_results["fire"],
+            amb=gap_results["amb"],
+            rapid=gap_results["rapid"],
+        )
+
 
 
 # Singleton instance for route injection

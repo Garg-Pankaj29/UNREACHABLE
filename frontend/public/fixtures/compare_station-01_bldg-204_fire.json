@@ -1,0 +1,31 @@
+{
+  "naive": {
+    "road_ids": [
+      "road-101",
+      "road-102",
+      "road-104"
+    ],
+    "distance_m": 667.5,
+    "violations": [
+      {
+        "road_id": "road-102",
+        "reason": "Corridor width 3.4m is insufficient for Fire tender (3.5m).",
+        "width_m": 3.4,
+        "required_m": 3.5
+      },
+      {
+        "road_id": "road-104",
+        "reason": "Physically impassable: Simulated immovable physical bollards & low sagging overhead optical/power cable bundle (< 2.2m clearance)",
+        "width_m": 4.0,
+        "required_m": 3.5
+      }
+    ]
+  },
+  "aware": {
+    "road_ids": [],
+    "distance_m": 0.0,
+    "classification": "inaccessible"
+  },
+  "verdict": "A distance-only route would fail at road-102 (3.4 m < 3.5 m required for Fire tender)",
+  "naive_would_fail": true
+}

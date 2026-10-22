@@ -1,0 +1,30 @@
+[
+  {
+    "road_id": "road-101",
+    "name": "Station Link Arterial (Main Road)",
+    "reason": "Unverified cadastral survey (unverified survey): field ground truth audit required.",
+    "buildings_affected": 3,
+    "data_source": "Synthetic Municipal Road Registry"
+  },
+  {
+    "road_id": "road-105",
+    "name": "East Perimeter By-lane (Unknown Width)",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "Synthetic Satellite Trace"
+  },
+  {
+    "road_id": "road-106",
+    "name": "South Sector Spur",
+    "reason": "Unverified cadastral survey (unverified survey): field ground truth audit required.",
+    "buildings_affected": 1,
+    "data_source": "Synthetic Municipal Road Registry"
+  },
+  {
+    "road_id": "road-102",
+    "name": "North Citizen Lane",
+    "reason": "Unverified cadastral survey (unverified survey): field ground truth audit required.",
+    "buildings_affected": 0,
+    "data_source": "Synthetic Municipal Road Registry"
+  }
+]

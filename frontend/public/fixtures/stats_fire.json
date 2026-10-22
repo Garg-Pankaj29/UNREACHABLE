@@ -1,0 +1,20 @@
+{
+  "area_name": "Ward 142 - Sector 7 (Synthetic Demonstration Area)",
+  "total_features": 13,
+  "station_count": 1,
+  "buildings": {
+    "feasible": 1,
+    "constrained": 1,
+    "infeasible": 3,
+    "unknown": 1,
+    "total": 6
+  },
+  "roads": {
+    "feasible": 1,
+    "constrained": 1,
+    "infeasible": 3,
+    "unknown": 1,
+    "total": 6
+  },
+  "disclaimer": "PROTOTYPE DEMONSTRATION ONLY. NOT AN OFFICIAL EMERGENCY-ACCESS ASSESSMENT."
+}

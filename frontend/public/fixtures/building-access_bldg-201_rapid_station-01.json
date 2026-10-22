@@ -1,0 +1,110 @@
+{
+  "building_id": "bldg-201",
+  "building_name": "Community Health Sub-Center (Ward 142)",
+  "use_type": "Healthcare / Critical",
+  "connected_road_id": "road-101",
+  "estimated_setback_m": 4.5,
+  "entrance_status": "road_frontage_only",
+  "vehicle": {
+    "id": "rapid",
+    "name": "Rapid response car",
+    "category": "Rapid response unit",
+    "min_clearance_width_m": 2.4,
+    "min_clearance_height_m": 2.0,
+    "turning_radius_m": 5.0,
+    "weight_tons": 2.2,
+    "description": "Agile quick response unit requiring \u2265 2.4m clearance corridor.",
+    "typical_equipment": "First responder trauma kit, portable fire suppression extinguisher, AED",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "classification": "accessible",
+  "origin_station_id": "station-01",
+  "route": {
+    "origin_id": "station-01",
+    "destination_id": "bldg-201",
+    "destination_type": "building",
+    "vehicle": {
+      "id": "rapid",
+      "name": "Rapid response car",
+      "category": "Rapid response unit",
+      "min_clearance_width_m": 2.4,
+      "min_clearance_height_m": 2.0,
+      "turning_radius_m": 5.0,
+      "weight_tons": 2.2,
+      "description": "Agile quick response unit requiring \u2265 2.4m clearance corridor.",
+      "typical_equipment": "First responder trauma kit, portable fire suppression extinguisher, AED",
+      "evaluated_constraints": [
+        "width",
+        "physical_obstruction"
+      ],
+      "unevaluated_constraints": [
+        "overhead_clearance",
+        "turning_radius",
+        "gross_weight_limit",
+        "gate_restriction",
+        "entrance_doorway_access"
+      ]
+    },
+    "classification": "accessible",
+    "route_found": true,
+    "total_distance_m": 216.7,
+    "segments_traversed": [
+      "road-101"
+    ],
+    "steps": [
+      {
+        "step_index": 1,
+        "from_node": "node_77.593000_12.971500",
+        "to_node": "node_77.595000_12.971500",
+        "road_id": "road-101",
+        "road_name": "Station Link Arterial (Main Road)",
+        "segment_length_m": 216.7,
+        "status": "accessible",
+        "reason": "Adequate clearance for Rapid response car (7.5m usable width)."
+      }
+    ],
+    "segment_assessments": [
+      {
+        "road_id": "road-101",
+        "name": "Station Link Arterial (Main Road)",
+        "road_class": "Secondary Arterial",
+        "width_m": 7.5,
+        "required_width_m": 2.4,
+        "surface": "asphalt",
+        "obstruction": null,
+        "status": "accessible",
+        "is_passable": true,
+        "length_m": 216.7,
+        "limiting_factors": [],
+        "notes": "Adequate clearance for Rapid response car (7.5m usable width)."
+      }
+    ],
+    "limiting_segments": [],
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ],
+    "explanation": "Verified accessible route (216.7m) via 1 corridor(s). All segments meet or exceed Rapid response car physical clearance requirements.",
+    "disclaimer": "DETERMINISTIC EVALUATION FOR PROTOTYPE DEMONSTRATION. ROAD ARRIVAL DOES NOT GUARANTEE ENTRANCE ACCESS."
+  },
+  "limitations": [],
+  "plain_language_explanation": "Rapid response car can reach the fronting road corridor (road-101). Note: Property entrance gate is unsurveyed; final 4.5m setback must be traversed via pedestrian access or hose relay.",
+  "disclaimer": "MUNICIPAL CADASTRE DEMONSTRATION. BUILDING ENTRANCE ACCESSIBILITY REQUIRES ON-SITE SETBACK SURVEY."
+}

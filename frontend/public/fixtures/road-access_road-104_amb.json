@@ -1,0 +1,43 @@
+{
+  "road_id": "road-104",
+  "road_name": "Temple Cross Link (Simulated Obstruction)",
+  "vehicle": {
+    "id": "amb",
+    "name": "Ambulance",
+    "category": "Emergency ambulance",
+    "min_clearance_width_m": 3.0,
+    "min_clearance_height_m": 2.5,
+    "turning_radius_m": 6.5,
+    "weight_tons": 4.5,
+    "description": "Standard emergency medical ambulance requiring \u2265 3.0m clearance corridor.",
+    "typical_equipment": "Stretcher, patient monitor, defibrillator, oxygen delivery kit",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "assessment": {
+    "road_id": "road-104",
+    "name": "Temple Cross Link (Simulated Obstruction)",
+    "road_class": "Local Link",
+    "width_m": 4.0,
+    "required_width_m": 3.0,
+    "surface": "asphalt",
+    "obstruction": "Simulated immovable physical bollards & low sagging overhead optical/power cable bundle (< 2.2m clearance)",
+    "status": "inaccessible",
+    "is_passable": false,
+    "length_m": 0.0,
+    "limiting_factors": [
+      "Confirmed physical obstruction: Simulated immovable physical bollards & low sagging overhead optical/power cable bundle (< 2.2m clearance)"
+    ],
+    "notes": "Physically impassable: Simulated immovable physical bollards & low sagging overhead optical/power cable bundle (< 2.2m clearance)"
+  },
+  "plain_language_explanation": "Physically impassable: Simulated immovable physical bollards & low sagging overhead optical/power cable bundle (< 2.2m clearance)"
+}

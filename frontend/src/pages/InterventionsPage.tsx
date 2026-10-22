@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IssueRecord } from '../types';
 import {
   calculateIssueScore,
   SEVERITY_NAMES,
   STATUS_NAMES,
 } from '../services/store';
+import { api, WorkOrderItem } from '../services/api';
 
 interface InterventionsPageProps {
   issues: IssueRecord[];
@@ -22,13 +23,72 @@ export const InterventionsPage: React.FC<InterventionsPageProps> = ({
   const [filterSeverity, setFilterSeverity] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
 
+  // Field Audit Work Order state
+  const [auditItems, setAuditItems] = useState<WorkOrderItem[]>([]);
+  const [loadingAudit, setLoadingAudit] = useState(false);
+  const [auditVehicle, setAuditVehicle] = useState('fire');
+  const [printMode, setPrintMode] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoadingAudit(true);
+    api
+      .fetchAuditWorkOrder(auditVehicle)
+      .then((items) => {
+        if (!cancelled) {
+          setAuditItems(items || []);
+          setLoadingAudit(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          console.error('Failed to load audit work order:', err);
+          setLoadingAudit(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [auditVehicle]);
+
+  const handleExportCSV = () => {
+    if (!auditItems || auditItems.length === 0) return;
+    const headers = [
+      'Priority',
+      'Road ID',
+      'Corridor Name',
+      'Ground Truth Deficiency / Reason',
+      'Buildings Dependent',
+      'Data Source',
+    ];
+    const rows = auditItems.map((item, idx) => [
+      idx + 1,
+      `"${item.road_id.replace(/"/g, '""')}"`,
+      `"${item.name.replace(/"/g, '""')}"`,
+      `"${item.reason.replace(/"/g, '""')}"`,
+      item.buildings_affected,
+      `"${(item.data_source || '').replace(/"/g, '""')}"`,
+    ]);
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `emergency_access_audit_work_order_${auditVehicle}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const openIssues = issues.filter((i) => i.st !== 'resolved');
   const awaitingVerification = issues.filter(
     (i) => i.st === 'open' || i.st === 'review'
   );
-  const resolvedIssues = issues.filter((i) => i.st === 'resolved');
+  const resolvedIssues = issues.filter((i) => i.st !== 'resolved');
 
   const filtered = issues
+
     .filter((i) => {
       if (filterSeverity !== 'all' && i.sev !== filterSeverity) return false;
       if (filterStatus !== 'all' && i.st !== filterStatus) return false;
@@ -65,6 +125,149 @@ export const InterventionsPage: React.FC<InterventionsPageProps> = ({
     }
   };
 
+  if (printMode) {
+    return (
+      <section
+        className="v"
+        style={{
+          background: '#ffffff',
+          color: '#111827',
+          padding: '24px',
+          borderRadius: '8px',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '20px',
+            borderBottom: '2px solid #111827',
+            paddingBottom: '12px',
+          }}
+        >
+          <div>
+            <h2 style={{ margin: 0, fontSize: '20px', color: '#111827' }}>
+              EMERGENCY ACCESS FIELD AUDIT WORK ORDER
+            </h2>
+            <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#4b5563' }}>
+              Jurisdiction: Ward 142 (Synthetic Cadastre) &bull; Vehicle Profile:{' '}
+              <b>{auditVehicle.toUpperCase()}</b> &bull; Priority Queue
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button className="btn pri" onClick={() => window.print()}>
+              Print document
+            </button>
+            <button className="btn" onClick={handleExportCSV}>
+              Export audit list (CSV)
+            </button>
+            <button className="btn" onClick={() => setPrintMode(false)}>
+              Exit print view
+            </button>
+          </div>
+        </div>
+
+        <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 16px' }}>
+          Field survey assignment: Measure Usable Corridor Width and Overhead
+          Clearances for ranked unmeasured / unverified road corridors.
+        </p>
+
+        <div
+          className="tw"
+          style={{ border: '1px solid #d1d5db', marginBottom: '20px' }}
+        >
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr
+                style={{
+                  background: '#f3f4f6',
+                  textAlign: 'left',
+                  borderBottom: '2px solid #9ca3af',
+                }}
+              >
+                <th style={{ padding: '8px' }}>#</th>
+                <th style={{ padding: '8px' }}>Road Segment</th>
+                <th style={{ padding: '8px' }}>Audit Reason / Cadastral Gap</th>
+                <th style={{ padding: '8px' }}>Buildings Dependent</th>
+                <th style={{ padding: '8px' }}>Data Source</th>
+                <th style={{ padding: '8px', minWidth: '180px' }}>
+                  Surveyor Verification
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {auditItems.map((item, idx) => (
+                <tr
+                  key={item.road_id}
+                  style={{ borderBottom: '1px solid #e5e7eb' }}
+                >
+                  <td style={{ padding: '8px', fontWeight: 'bold' }}>
+                    {idx + 1}
+                  </td>
+                  <td style={{ padding: '8px' }}>
+                    <b>{item.name}</b>
+                    <div style={{ fontSize: '11px', color: '#6b7280' }}>
+                      ID: {item.road_id}
+                    </div>
+                  </td>
+                  <td style={{ padding: '8px', fontSize: '13px' }}>
+                    {item.reason}
+                  </td>
+                  <td
+                    style={{
+                      padding: '8px',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {item.buildings_affected}
+                  </td>
+                  <td
+                    style={{
+                      padding: '8px',
+                      fontSize: '12px',
+                      color: '#4b5563',
+                    }}
+                  >
+                    {item.data_source || 'Synthetic Cadastre'}
+                  </td>
+                  <td style={{ padding: '8px', fontSize: '12px' }}>
+                    <div>[ &nbsp; ] Pass &nbsp; [ &nbsp; ] Fail</div>
+                    <div style={{ marginTop: '4px' }}>Width: ________m</div>
+                    <div style={{ marginTop: '4px' }}>
+                      Sign: ________________
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {auditItems.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={6}
+                    style={{ padding: '16px', textAlign: 'center' }}
+                  >
+                    {loadingAudit
+                      ? 'Generating audit work order...'
+                      : 'No unknown or unverified road corridors found.'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <p
+          className="dis"
+          style={{ color: '#6b7280', fontSize: '11px', marginTop: '16px' }}
+        >
+          PROTOTYPE DEMONSTRATION WORK ORDER. Generated deterministically from
+          synthetic municipal test data.
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section className="v">
       <h2>Interventions and issues</h2>
@@ -87,6 +290,140 @@ export const InterventionsPage: React.FC<InterventionsPageProps> = ({
           <b>{issues.length * 2}</b>
           <small>Buildings affected</small>
         </div>
+      </div>
+
+      {/* Field Audit Action List (Turning Unknown into Action) */}
+      <div
+        style={{
+          background: 'rgba(255, 255, 255, 0.04)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          borderRadius: '8px',
+          padding: '16px',
+          margin: '0 0 24px',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            flexWrap: 'wrap',
+            gap: '12px',
+          }}
+        >
+          <div>
+            <h3 style={{ margin: 0, fontSize: '16px' }}>
+              Field audit work order (Actionable "Unknowns")
+            </h3>
+            <p
+              style={{
+                margin: '4px 0 0',
+                fontSize: '13px',
+                color: 'var(--c-muted, #94a3b8)',
+              }}
+            >
+              Deterministic ranking of unknown and unverified corridors by
+              dependent building counts. Unknown is turned into a prioritized field
+              survey queue.
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div className="fld" style={{ margin: 0 }}>
+              <select
+                id="audit-veh"
+                value={auditVehicle}
+                onChange={(e) => setAuditVehicle(e.target.value)}
+                style={{ padding: '6px 10px', fontSize: '13px' }}
+              >
+                <option value="fire">Fire Engine (&ge;3.5m)</option>
+                <option value="amb">Ambulance (&ge;3.0m)</option>
+                <option value="rapid">Rapid Response (&ge;2.4m)</option>
+              </select>
+            </div>
+            <button
+              className="btn pri"
+              onClick={handleExportCSV}
+              title="Download CSV work order"
+            >
+              Export audit list (CSV)
+            </button>
+            <button
+              className="btn"
+              onClick={() => setPrintMode(true)}
+              title="Open print-friendly checklist"
+            >
+              Print-friendly view
+            </button>
+          </div>
+        </div>
+
+        {loadingAudit ? (
+          <p className="nf" style={{ margin: '16px 0 0' }}>
+            Evaluating corridor dependency rankings...
+          </p>
+        ) : (
+          <div className="tw" style={{ margin: '16px 0 0' }}>
+            <table>
+              <thead>
+                <tr>
+                  <th style={{ width: '60px' }}>Rank</th>
+                  <th>Corridor</th>
+                  <th>Audit reason / Cadastral gap</th>
+                  <th style={{ textAlign: 'center' }}>Buildings dependent</th>
+                  <th>Data source</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {auditItems.map((item, idx) => (
+                  <tr key={item.road_id}>
+                    <td className="sc">#{idx + 1}</td>
+                    <td>
+                      <b>{item.name}</b>
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          color: 'var(--c-muted, #94a3b8)',
+                        }}
+                      >
+                        {item.road_id}
+                      </div>
+                    </td>
+                    <td style={{ fontSize: '13px' }}>{item.reason}</td>
+                    <td style={{ textAlign: 'center' }}>
+                      <b className="pl c-constrained">
+                        {item.buildings_affected}
+                      </b>
+                    </td>
+                    <td
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--c-muted, #94a3b8)',
+                      }}
+                    >
+                      {item.data_source || 'Synthetic Cadastre'}
+                    </td>
+                    <td>
+                      <span
+                        className="pl c-unknown"
+                        style={{ fontSize: '11px' }}
+                      >
+                        Survey Required
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {auditItems.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="nf">
+                      No corridors requiring audit under current apparatus profile.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Filter Toolbar */}

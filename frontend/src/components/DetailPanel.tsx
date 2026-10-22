@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Building2,
   Route,
@@ -14,7 +14,8 @@ import {
   AlertOctagon,
   FileText,
 } from 'lucide-react';
-import { GeoJSONFeature } from '../types';
+import { GeoJSONFeature, SimulateResponse } from '../types';
+import { api } from '../services/api';
 
 interface DetailPanelProps {
   feature: GeoJSONFeature | null;
@@ -22,6 +23,27 @@ interface DetailPanelProps {
 }
 
 export const DetailPanel: React.FC<DetailPanelProps> = ({ feature, onClose }) => {
+  const [blocking, setBlocking] = useState(false);
+  const [simResult, setSimResult] = useState<SimulateResponse | null>(null);
+
+  const handleBlockRoad = async () => {
+    if (!feature) return;
+    const roadId = feature.properties?.id;
+    if (!roadId) return;
+    setBlocking(true);
+    try {
+      const res = await api.simulate({
+        vehicle_id: 'fire',
+        changes: [{ road_id: roadId, action: 'close' }],
+      });
+      setSimResult(res);
+    } catch (err) {
+      console.warn('Simulation failed:', err);
+    } finally {
+      setBlocking(false);
+    }
+  };
+
   if (!feature) {
     return (
       <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-xs text-center text-slate-500 h-full flex flex-col items-center justify-center min-h-[320px]">
@@ -160,6 +182,45 @@ export const DetailPanel: React.FC<DetailPanelProps> = ({ feature, onClose }) =>
                 <p className="text-[11px] leading-relaxed">{properties.obstruction}</p>
               </div>
             )}
+
+            {/* Block This Road Simulation Action */}
+            <div className="mt-3 pt-2 border-t border-slate-100">
+              <button
+                onClick={handleBlockRoad}
+                disabled={blocking}
+                className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 transition-colors shadow-xs"
+              >
+                <AlertOctagon className="w-3.5 h-3.5" />
+                {blocking ? 'Simulating impact...' : 'Block this road (Simulate)'}
+              </button>
+
+              {simResult && (
+                <div className="mt-2.5 p-2 bg-slate-50 border border-slate-200 rounded text-[11px]">
+                  <div className="font-bold text-slate-800 flex items-center justify-between">
+                    <span>Impact Projection:</span>
+                    <span className="text-red-600 font-extrabold">
+                      {simResult.changed_buildings.length} affected
+                    </span>
+                  </div>
+                  {simResult.changed_buildings.length > 0 ? (
+                    <div className="mt-1 space-y-1 max-h-28 overflow-y-auto">
+                      {simResult.changed_buildings.map((cb) => (
+                        <div key={cb.id} className="flex items-center justify-between text-[10px] text-slate-600">
+                          <span className="font-mono">{cb.id}</span>
+                          <span className="text-red-700 font-medium">
+                            {cb.before} → {cb.after}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 mt-1 text-[10px]">
+                      No building accessibility changes detected with this road blocked.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           </>
         )}
 

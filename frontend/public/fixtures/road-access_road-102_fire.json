@@ -1,0 +1,43 @@
+{
+  "road_id": "road-102",
+  "road_name": "North Citizen Lane",
+  "vehicle": {
+    "id": "fire",
+    "name": "Fire tender",
+    "category": "Heavy apparatus",
+    "min_clearance_width_m": 3.5,
+    "min_clearance_height_m": 3.5,
+    "turning_radius_m": 8.5,
+    "weight_tons": 16.0,
+    "description": "Heavy municipal water tender requiring \u2265 3.5m clearance corridor.",
+    "typical_equipment": "4,500L water tank, high-pressure pump, extension ladders, rescue gear",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "assessment": {
+    "road_id": "road-102",
+    "name": "North Citizen Lane",
+    "road_class": "Collector Lane",
+    "width_m": 3.4,
+    "required_width_m": 3.5,
+    "surface": "paved_concrete",
+    "obstruction": null,
+    "status": "inaccessible",
+    "is_passable": false,
+    "length_m": 0.0,
+    "limiting_factors": [
+      "Width deficit of 0.1m (usable width 3.4m < required 3.5m)"
+    ],
+    "notes": "Corridor width 3.4m is insufficient for Fire tender (3.5m)."
+  },
+  "plain_language_explanation": "Corridor width 3.4m is insufficient for Fire tender (3.5m)."
+}

@@ -1,0 +1,18 @@
+{
+  "naive": {
+    "road_ids": [
+      "road-101"
+    ],
+    "distance_m": 216.7,
+    "violations": []
+  },
+  "aware": {
+    "road_ids": [
+      "road-101"
+    ],
+    "distance_m": 216.7,
+    "classification": "accessible"
+  },
+  "verdict": "Distance-only route and vehicle-aware route are identical (216.7 m); corridor satisfies Rapid response car clearance.",
+  "naive_would_fail": false
+}

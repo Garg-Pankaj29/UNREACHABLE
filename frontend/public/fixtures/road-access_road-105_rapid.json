@@ -1,0 +1,43 @@
+{
+  "road_id": "road-105",
+  "road_name": "East Perimeter By-lane (Unknown Width)",
+  "vehicle": {
+    "id": "rapid",
+    "name": "Rapid response car",
+    "category": "Rapid response unit",
+    "min_clearance_width_m": 2.4,
+    "min_clearance_height_m": 2.0,
+    "turning_radius_m": 5.0,
+    "weight_tons": 2.2,
+    "description": "Agile quick response unit requiring \u2265 2.4m clearance corridor.",
+    "typical_equipment": "First responder trauma kit, portable fire suppression extinguisher, AED",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "assessment": {
+    "road_id": "road-105",
+    "name": "East Perimeter By-lane (Unknown Width)",
+    "road_class": "Unclassified Byway",
+    "width_m": null,
+    "required_width_m": 2.4,
+    "surface": "unpaved_gravel",
+    "obstruction": null,
+    "status": "unknown",
+    "is_passable": true,
+    "length_m": 0.0,
+    "limiting_factors": [
+      "Unmeasured corridor width in cadastre: ground truth audit required"
+    ],
+    "notes": "Width unmeasured in cadastre; clearance unverified."
+  },
+  "plain_language_explanation": "Width unmeasured in cadastre; clearance unverified."
+}

@@ -1,0 +1,86 @@
+{
+  "building_id": "bldg-203",
+  "building_name": "Old Quarter Tenement Block A",
+  "use_type": "High-Density Residential",
+  "connected_road_id": "road-103",
+  "estimated_setback_m": 1.2,
+  "entrance_status": "road_frontage_only",
+  "vehicle": {
+    "id": "amb",
+    "name": "Ambulance",
+    "category": "Emergency ambulance",
+    "min_clearance_width_m": 3.0,
+    "min_clearance_height_m": 2.5,
+    "turning_radius_m": 6.5,
+    "weight_tons": 4.5,
+    "description": "Standard emergency medical ambulance requiring \u2265 3.0m clearance corridor.",
+    "typical_equipment": "Stretcher, patient monitor, defibrillator, oxygen delivery kit",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "classification": "inaccessible",
+  "origin_station_id": "station-01",
+  "route": {
+    "origin_id": "station-01",
+    "destination_id": "bldg-203",
+    "destination_type": "building",
+    "vehicle": {
+      "id": "amb",
+      "name": "Ambulance",
+      "category": "Emergency ambulance",
+      "min_clearance_width_m": 3.0,
+      "min_clearance_height_m": 2.5,
+      "turning_radius_m": 6.5,
+      "weight_tons": 4.5,
+      "description": "Standard emergency medical ambulance requiring \u2265 3.0m clearance corridor.",
+      "typical_equipment": "Stretcher, patient monitor, defibrillator, oxygen delivery kit",
+      "evaluated_constraints": [
+        "width",
+        "physical_obstruction"
+      ],
+      "unevaluated_constraints": [
+        "overhead_clearance",
+        "turning_radius",
+        "gross_weight_limit",
+        "gate_restriction",
+        "entrance_doorway_access"
+      ]
+    },
+    "classification": "inaccessible",
+    "route_found": false,
+    "total_distance_m": 0.0,
+    "segments_traversed": [],
+    "steps": [],
+    "segment_assessments": [],
+    "limiting_segments": [
+      "road-103"
+    ],
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ],
+    "explanation": "All candidate routes for Ambulance are blocked by physical constraints along: road-103. Reason: Confirmed physical obstruction: Physical bottleneck: Road width is 2.1m (below standard 2.5m heavy vehicle clearance). Accessible only to QRV / two-wheelers.",
+    "disclaimer": "DETERMINISTIC EVALUATION FOR PROTOTYPE DEMONSTRATION. ROAD ARRIVAL DOES NOT GUARANTEE ENTRANCE ACCESS."
+  },
+  "limitations": [
+    "road-103"
+  ],
+  "plain_language_explanation": "Ambulance cannot reach fronting corridor (road-103) due to physical blockage: All candidate routes for Ambulance are blocked by physical constraints along: road-103. Reason: Confirmed physical obstruction: Physical bottleneck: Road width is 2.1m (below standard 2.5m heavy vehicle clearance). Accessible only to QRV / two-wheelers.",
+  "disclaimer": "MUNICIPAL CADASTRE DEMONSTRATION. BUILDING ENTRANCE ACCESSIBILITY REQUIRES ON-SITE SETBACK SURVEY."
+}

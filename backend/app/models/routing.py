@@ -111,3 +111,80 @@ class RoadAccessResponse(BaseModel):
     vehicle: VehicleProfile
     assessment: SegmentAssessment
     plain_language_explanation: str
+
+
+class RouteViolation(BaseModel):
+    """A segment clearance violation identified along a naive shortest-path route."""
+    road_id: str
+    reason: str
+    width_m: Optional[float] = None
+    required_m: float
+
+
+class NaiveRouteSummary(BaseModel):
+    """Summary of a distance-only naive route ignoring vehicle constraints."""
+    road_ids: List[str] = Field(default_factory=list)
+    distance_m: float
+    violations: List[RouteViolation] = Field(default_factory=list)
+
+
+class AwareRouteSummary(BaseModel):
+    """Summary of a vehicle-aware defensible route."""
+    road_ids: List[str] = Field(default_factory=list)
+    distance_m: float
+    classification: AccessClassification
+
+
+class RouteCompareResponse(BaseModel):
+    """Comparison between naive shortest-path and vehicle-aware emergency routing."""
+    naive: NaiveRouteSummary
+    aware: AwareRouteSummary
+    verdict: str
+    naive_would_fail: bool
+
+
+class SimulateChange(BaseModel):
+    """Intervention change to apply to a road segment during simulation."""
+    road_id: str
+    action: str = Field(description="'close' | 'clear_obstruction' | 'set_width'")
+    value: Optional[float] = None
+
+
+class SimulateRequest(BaseModel):
+    """Simulation request with vehicle profile and list of hypothetical road changes."""
+    vehicle_id: str = "fire"
+    changes: List[SimulateChange] = Field(default_factory=list)
+
+
+class ChangedBuilding(BaseModel):
+    """Building whose access classification changed between before and after simulation."""
+    id: str
+    name: str
+    before: str
+    after: str
+
+
+class StatusCounts(BaseModel):
+    """Counts of buildings by access classification status."""
+    accessible: int = 0
+    constrained: int = 0
+    inaccessible: int = 0
+    unknown: int = 0
+
+
+class SimulateResponse(BaseModel):
+    """Simulation result showing before and after building accessibility."""
+    before: Dict[str, int]
+    after: Dict[str, int]
+    changed_buildings: List[ChangedBuilding]
+    assumptions: List[str]
+
+
+class CriticalRoad(BaseModel):
+    """Single point of failure road ranking."""
+    road_id: str
+    name: str
+    buildings_affected: int
+    building_ids: List[str]
+
+

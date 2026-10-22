@@ -1,0 +1,104 @@
+{
+  "origin_id": "station-01",
+  "destination_id": "bldg-206",
+  "destination_type": "building",
+  "vehicle": {
+    "id": "fire",
+    "name": "Fire tender",
+    "category": "Heavy apparatus",
+    "min_clearance_width_m": 3.5,
+    "min_clearance_height_m": 3.5,
+    "turning_radius_m": 8.5,
+    "weight_tons": 16.0,
+    "description": "Heavy municipal water tender requiring \u2265 3.5m clearance corridor.",
+    "typical_equipment": "4,500L water tank, high-pressure pump, extension ladders, rescue gear",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "classification": "constrained",
+  "route_found": true,
+  "total_distance_m": 405.7,
+  "segments_traversed": [
+    "road-101",
+    "road-106"
+  ],
+  "steps": [
+    {
+      "step_index": 1,
+      "from_node": "node_77.593000_12.971500",
+      "to_node": "node_77.595000_12.971500",
+      "road_id": "road-101",
+      "road_name": "Station Link Arterial (Main Road)",
+      "segment_length_m": 216.7,
+      "status": "accessible",
+      "reason": "Adequate clearance for Fire tender (7.5m usable width)."
+    },
+    {
+      "step_index": 2,
+      "from_node": "node_77.595000_12.971500",
+      "to_node": "node_77.595000_12.969800",
+      "road_id": "road-106",
+      "road_name": "South Sector Spur",
+      "segment_length_m": 189.0,
+      "status": "constrained",
+      "reason": "Narrow corridor: 0.3m clearance margin."
+    }
+  ],
+  "segment_assessments": [
+    {
+      "road_id": "road-101",
+      "name": "Station Link Arterial (Main Road)",
+      "road_class": "Secondary Arterial",
+      "width_m": 7.5,
+      "required_width_m": 3.5,
+      "surface": "asphalt",
+      "obstruction": null,
+      "status": "accessible",
+      "is_passable": true,
+      "length_m": 216.7,
+      "limiting_factors": [],
+      "notes": "Adequate clearance for Fire tender (7.5m usable width)."
+    },
+    {
+      "road_id": "road-106",
+      "name": "South Sector Spur",
+      "road_class": "Residential Access",
+      "width_m": 3.8,
+      "required_width_m": 3.5,
+      "surface": "asphalt",
+      "obstruction": null,
+      "status": "constrained",
+      "is_passable": true,
+      "length_m": 189.0,
+      "limiting_factors": [
+        "Marginal clearance: only 0.3m buffer beyond vehicle width"
+      ],
+      "notes": "Narrow corridor: 0.3m clearance margin."
+    }
+  ],
+  "limiting_segments": [
+    "road-106"
+  ],
+  "evaluated_constraints": [
+    "width",
+    "physical_obstruction"
+  ],
+  "unevaluated_constraints": [
+    "overhead_clearance",
+    "turning_radius",
+    "gross_weight_limit",
+    "gate_restriction",
+    "entrance_doorway_access"
+  ],
+  "explanation": "Route is passable (405.7m), but includes constrained segment(s): road-106 with narrow safety margins.",
+  "disclaimer": "DETERMINISTIC EVALUATION FOR PROTOTYPE DEMONSTRATION. ROAD ARRIVAL DOES NOT GUARANTEE ENTRANCE ACCESS."
+}

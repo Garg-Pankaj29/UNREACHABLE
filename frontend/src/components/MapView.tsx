@@ -5,11 +5,12 @@ import {
   GeoJSON as LeafletGeoJSON,
   Marker,
   Popup,
+  Polyline,
   ZoomControl,
   useMap,
 } from 'react-leaflet';
 import L, { LatLngExpression, PathOptions } from 'leaflet';
-import { GeoJSONFeature, IssueRecord, VehicleProfile } from '../types';
+import { GeoJSONFeature, IssueRecord, RouteViolation, VehicleProfile } from '../types';
 import { RefreshCw, AlertTriangle } from 'lucide-react';
 
 interface MapViewProps {
@@ -19,12 +20,16 @@ interface MapViewProps {
   issues?: IssueRecord[];
   selectedFeature: GeoJSONFeature | null;
   selectedVehicle?: VehicleProfile;
+  naiveRoadIds?: string[];
+  awareRoadIds?: string[];
+  violations?: RouteViolation[];
   layers?: {
     roads: boolean;
     buildings: boolean;
     stations: boolean;
     issues?: boolean;
   };
+
   statusFilters?: {
     ok?: boolean;
     feasible?: boolean;
@@ -100,6 +105,36 @@ const createIssueIcon = (sev: string = 'high') => {
     popupAnchor: [0, -14],
   });
 };
+
+// Red violation marker for naive route failure points
+const createViolationIcon = () =>
+  L.divIcon({
+    className: 'custom-violation-marker',
+    html: `
+      <div style="
+        background: #d7263d;
+        color: #ffffff;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #ffffff;
+        box-shadow: 0 0 10px rgba(215,38,61,0.8);
+        font-weight: 900;
+        font-size: 13px;
+        cursor: pointer;
+        animation: pulse 1.5s infinite;
+      " title="Route Clearance Violation Point">
+        <span>✕</span>
+      </div>
+    `,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -14],
+  });
+
 
 function MapViewportManager({
   features,
@@ -216,6 +251,9 @@ export const MapView: React.FC<MapViewProps> = ({
   issues = [],
   selectedFeature,
   selectedVehicle,
+  naiveRoadIds = [],
+  awareRoadIds = [],
+  violations = [],
   layers = { roads: true, buildings: true, stations: true, issues: true },
   statusFilters = { ok: true, feasible: true, constrained: true, infeasible: true, unknown: true },
   searchQuery = '',
@@ -617,6 +655,89 @@ export const MapView: React.FC<MapViewProps> = ({
               </Marker>
             );
           })}
+
+        {/* Reality Check: Aware Route Polyline (Solid blue/teal) */}
+        {awareRoadIds.length > 0 &&
+          awareRoadIds.map((rId) => {
+            const road = roads.find((r) => r.properties?.id === rId);
+            if (!road || road.geometry?.type !== 'LineString') return null;
+            const positions: [number, number][] = (road.geometry.coordinates || []).map((c: any) => [c[1], c[0]]);
+            return (
+              <Polyline
+                key={`aware-${rId}`}
+                positions={positions}
+                pathOptions={{
+                  color: '#2a9d8f',
+                  weight: 6,
+                  opacity: 0.9,
+                  lineCap: 'round',
+                  lineJoin: 'round',
+                }}
+              />
+            );
+          })}
+
+        {/* Reality Check: Naive Route Polyline (Grey dashed) */}
+        {naiveRoadIds.length > 0 &&
+          naiveRoadIds.map((rId) => {
+            const road = roads.find((r) => r.properties?.id === rId);
+            if (!road || road.geometry?.type !== 'LineString') return null;
+            const positions: [number, number][] = (road.geometry.coordinates || []).map((c: any) => [c[1], c[0]]);
+            return (
+              <Polyline
+                key={`naive-${rId}`}
+                positions={positions}
+                pathOptions={{
+                  color: '#6c757d',
+                  weight: 4,
+                  opacity: 0.85,
+                  dashArray: '8, 8',
+                  lineCap: 'round',
+                }}
+              />
+            );
+          })}
+
+        {/* Reality Check: Red Violation Markers along Naive Path */}
+        {violations.map((violation) => {
+          const road = roads.find((r) => r.properties?.id === violation.road_id);
+          if (!road || road.geometry?.type !== 'LineString') return null;
+          const coords = road.geometry.coordinates;
+          if (!Array.isArray(coords) || coords.length < 2) return null;
+          const mid = coords[Math.floor(coords.length / 2)];
+          return (
+            <Marker
+              key={`violation-${violation.road_id}`}
+              position={[mid[1], mid[0]]}
+              icon={createViolationIcon()}
+            >
+              <Popup>
+                <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif', minWidth: 200 }}>
+                  <div
+                    style={{
+                      fontSize: '11px',
+                      textTransform: 'uppercase',
+                      fontWeight: 800,
+                      color: '#d7263d',
+                      marginBottom: '2px',
+                    }}
+                  >
+                    Clearance Violation · {violation.road_id}
+                  </div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink)' }}>
+                    {violation.reason}
+                  </div>
+                  {violation.width_m !== null && violation.width_m !== undefined && (
+                    <div style={{ fontSize: '12px', color: 'var(--mute)', marginTop: '4px' }}>
+                      Measured: <b>{violation.width_m}m</b> · Required: <b>{violation.required_m}m</b>
+                    </div>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+
       </MapContainer>
     </div>
   );

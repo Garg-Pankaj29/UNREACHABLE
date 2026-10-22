@@ -1,0 +1,25 @@
+{
+  "naive": {
+    "road_ids": [
+      "road-101",
+      "road-102",
+      "road-104"
+    ],
+    "distance_m": 667.5,
+    "violations": [
+      {
+        "road_id": "road-104",
+        "reason": "Physically impassable: Simulated immovable physical bollards & low sagging overhead optical/power cable bundle (< 2.2m clearance)",
+        "width_m": 4.0,
+        "required_m": 2.4
+      }
+    ]
+  },
+  "aware": {
+    "road_ids": [],
+    "distance_m": 0.0,
+    "classification": "inaccessible"
+  },
+  "verdict": "A distance-only route would fail at road-104 (Physically impassable: Simulated immovable physical bollards & low sagging overhead optical/power cable bundle (< 2.2m clearance))",
+  "naive_would_fail": true
+}
