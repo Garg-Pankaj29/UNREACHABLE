@@ -155,9 +155,10 @@ export const IssueDetailPage: React.FC<IssueDetailPageProps> = ({
           </p>
         </div>
 
-        {/* Right Column: Map Preview */}
         <div>
-          <SvgMap nohit={true} />
+          <div style={{ border: '1.5px solid var(--line)', borderRadius: '16px', overflow: 'hidden', background: 'var(--glass)' }}>
+            <SvgMap nohit={true} selectedKind="e" selectedId={issue.edge} />
+          </div>
         </div>
       </div>
     </section>

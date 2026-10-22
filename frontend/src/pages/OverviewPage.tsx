@@ -129,7 +129,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         </div>
 
         <a className="prev" href="#/map" aria-label="Open Access Atlas">
-          <SvgMap nohit={true} />
+          <SvgMap nohit={true} vehicleId={selectedVehicle} />
           <span>Open Access Atlas</span>
         </a>
       </div>
@@ -148,7 +148,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h2 style={{ margin: 0, fontSize: '18px', letterSpacing: '-0.01em' }}>Vehicle Gap Scorecard</h2>
+              <h2 style={{ margin: 0, fontSize: '20px', letterSpacing: '-0.01em' }}>Vehicle Gap Scorecard</h2>
               <span
                 title={FORMULA_TOOLTIP}
                 style={{
@@ -168,7 +168,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
                 ⓘ
               </span>
             </div>
-            <p className="lede" style={{ fontSize: '13px', margin: '4px 0 0 0' }}>
+            <p className="lede" style={{ fontSize: '14px', margin: '4px 0 0 0' }}>
               One memorable number per apparatus. Click a column to filter citywide KPIs and vulnerability analysis.
             </p>
           </div>
@@ -319,7 +319,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
 
       {/* KPI Numbers Grid (updates with selected vehicle) */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '0 0 8px 4px' }}>
-        <small style={{ fontSize: '12px', fontWeight: 700, color: 'var(--mute)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        <small style={{ fontSize: '14px', fontWeight: 700, color: 'var(--mute)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           CU Gharuan Sector Assessment for {selectedVehicle === 'fire' ? 'Fire Engine (≥3.5m)' : selectedVehicle === 'amb' ? 'Ambulance (≥3.0m)' : 'Rapid Response (≥2.4m)'}
         </small>
       </div>
@@ -351,9 +351,9 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
       <div style={{ margin: '24px 0', background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '16px', padding: '18px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '18px' }}>Top 5 Single Points of Failure</h2>
-            <p className="lede" style={{ fontSize: '13px', margin: '4px 0 0 0' }}>
-              Critical corridors ranked by number of buildings whose access deteriorates if blocked (evaluated for Fire Tender).
+            <h2 style={{ margin: 0, fontSize: '20px' }}>Top 5 Single Points of Failure</h2>
+            <p className="lede" style={{ fontSize: '14px', margin: '4px 0 0 0' }}>
+              Critical corridors ranked by number of buildings whose access deteriorates if blocked (evaluated for {selectedVehicle === 'fire' ? 'Fire Engine ≥3.5m' : selectedVehicle === 'amb' ? 'Ambulance ≥3.0m' : 'Rapid Response ≥2.4m'}).
             </p>
           </div>
           <span style={{ fontSize: '11px', textTransform: 'uppercase', fontWeight: 800, color: 'var(--sig)', background: 'rgba(215,38,61,0.08)', padding: '3px 8px', borderRadius: '6px' }}>
@@ -362,7 +362,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         </div>
 
         {criticalLoading ? (
-          <p style={{ color: 'var(--mute)', fontSize: '13px', margin: '12px 0' }}>Analyzing topological single points of failure...</p>
+          <p style={{ color: 'var(--mute)', fontSize: '14px', margin: '12px 0' }}>Analyzing topological single points of failure...</p>
         ) : criticalRoads.length === 0 ? (
           <p style={{ color: 'var(--mute)', fontSize: '13px', margin: '14px 0' }}>
             No critical single points of failure detected for this vehicle profile.
@@ -464,19 +464,19 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
             <h3 style={{ marginBottom: '10px' }}>Quick actions</h3>
             <div className="quickgrid">
               <a className="quicklink" href="#/map">
-                <b>⌖ Access Atlas</b>
+                <b>Access Atlas</b>
                 <small>Inspect roads and building access</small>
               </a>
               <a className="quicklink" href="#/routes">
-                <b>↗ Route analysis</b>
+                <b>Route Analysis</b>
                 <small>Check vehicle-specific approach</small>
               </a>
               <a className="quicklink" href="#/inspector">
-                <b>◈ AI Inspector</b>
+                <b>AI Inspector</b>
                 <small>Review street photos for hazards</small>
               </a>
               <a className="quicklink" href="#/interventions">
-                <b>▲ Interventions</b>
+                <b>Interventions</b>
                 <small>Prioritize physical bottlenecks</small>
               </a>
             </div>

@@ -72,24 +72,65 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
     typicalEquipment: 'Standard emergency equipment',
   };
 
+  const props = selectedFeature?.properties;
+  const isBuilding = props?.feature_type === 'building';
+  const isRoad = props?.feature_type === 'road';
+  const isStation = props?.feature_type === 'station';
+  const isIssue = (props?.feature_type as string) === 'issue';
+
+  // Compute effective vehicle-aware status matching map visuals
+  let effectiveStatus = props?.access_status || 'unknown';
+  if (isRoad) {
+    const reqW = currentVeh.w;
+    const roadWidth = props?.width_m;
+    const hasObstruction = props?.obstruction && String(props.obstruction).trim() && String(props.obstruction).toLowerCase() !== 'null';
+    if (hasObstruction) {
+      effectiveStatus = 'infeasible';
+    } else if (roadWidth !== null && roadWidth !== undefined) {
+      if (roadWidth < reqW) {
+        effectiveStatus = 'infeasible';
+      } else if (roadWidth < reqW + 0.4) {
+        effectiveStatus = 'constrained';
+      } else {
+        effectiveStatus = 'ok';
+      }
+    } else {
+      effectiveStatus = 'unknown';
+    }
+  } else if (isBuilding) {
+    const connRoad = roads.find((r) => r.properties?.id === props?.connected_road_id);
+    if (connRoad) {
+      const roadW = connRoad.properties?.width_m;
+      const roadObs = connRoad.properties?.obstruction && String(connRoad.properties.obstruction).trim() && String(connRoad.properties.obstruction).toLowerCase() !== 'null';
+      if (roadObs) {
+        effectiveStatus = 'infeasible';
+      } else if (roadW !== null && roadW !== undefined) {
+        if (roadW < currentVeh.w) {
+          effectiveStatus = 'infeasible';
+        } else if (roadW < currentVeh.w + 0.4) {
+          effectiveStatus = 'constrained';
+        } else {
+          effectiveStatus = 'ok';
+        }
+      } else {
+        effectiveStatus = 'unknown';
+      }
+    }
+  }
+
   const getPill = (status?: string) => {
     switch (status) {
       case 'feasible':
       case 'ok':
         return <b className="pl c-ok">● Verified accessible</b>;
       case 'constrained':
-        return <b className="pl c-constrained">▲ Constrained</b>;
+        return <b className="pl c-constrained">▲ Constrained ({currentVeh.n})</b>;
       case 'infeasible':
-        return <b className="pl c-infeasible">✕ Potentially inaccessible</b>;
+        return <b className="pl c-infeasible">✕ Inaccessible ({currentVeh.n})</b>;
       default:
-        return <b className="pl c-unknown">? Unknown</b>;
+        return <b className="pl c-unknown">? Unknown (Unsurveyed)</b>;
     }
   };
-
-  const props = selectedFeature?.properties;
-  const isBuilding = props?.feature_type === 'building';
-  const isRoad = props?.feature_type === 'road';
-  const isStation = props?.feature_type === 'station';
 
   return (
     <div className="stage">
@@ -242,7 +283,48 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
             </button>
           </div>
 
-          <div className="pan-status">{getPill(props.access_status)}</div>
+          <div className="pan-status">{getPill(effectiveStatus)}</div>
+
+          {/* Issue Hazard Details */}
+          {isIssue && (
+            <>
+              <div className="pan-props">
+                <div className="pan-prop-row">
+                  <span className="pan-prop-label">Hazard type</span>
+                  <span className="pan-prop-val">{props.type || 'Physical bottleneck'}</span>
+                </div>
+                <div className="pan-prop-row">
+                  <span className="pan-prop-label">Corridor link</span>
+                  <span className="pan-prop-val">{props.edge} ({props.road_name})</span>
+                </div>
+                <div className="pan-prop-row">
+                  <span className="pan-prop-label">Priority level</span>
+                  <span className="pan-prop-val" style={{ textTransform: 'uppercase', fontWeight: 800, color: props.severity === 'high' ? '#d7263d' : '#e8710a' }}>
+                    {props.severity}
+                  </span>
+                </div>
+                <div className="pan-prop-row">
+                  <span className="pan-prop-label">Verification</span>
+                  <span className="pan-prop-val">{props.verification_status || 'Unverified report'}</span>
+                </div>
+              </div>
+
+              {props.ai && (
+                <div style={{ fontSize: '13px', background: 'var(--bg)', border: '1px solid var(--line)', borderRadius: '10px', padding: '10px 12px', margin: '12px 0' }}>
+                  <b>AI Inspector Notes:</b> {props.ai}
+                </div>
+              )}
+
+              <div className="cta" style={{ marginTop: '16px' }}>
+                <a className="btn pri sm" href={`#/i/${props.id}`}>
+                  Inspect Issue
+                </a>
+                <a className="btn sm" href="#/simulation">
+                  Simulate Remedy
+                </a>
+              </div>
+            </>
+          )}
 
           {/* Building Details */}
           {isBuilding && (

@@ -191,9 +191,10 @@ export const BuildingDetailPage: React.FC<BuildingDetailPageProps> = ({
           </div>
         </div>
 
-        {/* Right Column */}
         <div>
-          <SvgMap nohit={true} />
+          <div style={{ border: '1.5px solid var(--line)', borderRadius: '16px', overflow: 'hidden', background: 'var(--glass)' }}>
+            <SvgMap nohit={true} selectedKind="b" selectedId={building.properties.id} />
+          </div>
         </div>
       </div>
     </section>
