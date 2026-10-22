@@ -42,8 +42,8 @@ interface MapViewProps {
   fullHeight?: boolean;
 }
 
-// Center of Ward 142 Sector 7 synthetic neighborhood
-const DEFAULT_CENTER: LatLngExpression = [12.9723, 77.5955];
+// Center of Chandigarh University Gharuan sector synthetic neighborhood
+const DEFAULT_CENTER: LatLngExpression = [30.7686, 76.5750];
 const DEFAULT_ZOOM = 16;
 
 // Compact, recognizable emergency station marker

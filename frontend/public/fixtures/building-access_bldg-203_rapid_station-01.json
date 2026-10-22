@@ -1,7 +1,7 @@
 {
   "building_id": "bldg-203",
-  "building_name": "Old Quarter Tenement Block A",
-  "use_type": "High-Density Residential",
+  "building_name": "Old Gharuan Residential Cluster Block A",
+  "use_type": "High-Density Village Settlement",
   "connected_road_id": "road-103",
   "estimated_setback_m": 1.2,
   "entrance_status": "road_frontage_only",

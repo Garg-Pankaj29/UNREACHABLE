@@ -1,6 +1,6 @@
 {
   "building_id": "bldg-205",
-  "building_name": "East Industrial Depot 3",
+  "building_name": "Gharuan Logistics Depot & Agro Storage",
   "use_type": "Storage / Light Industrial",
   "connected_road_id": "road-105",
   "estimated_setback_m": 5.0,
@@ -57,7 +57,7 @@
     },
     "classification": "unknown",
     "route_found": true,
-    "total_distance_m": 721.1,
+    "total_distance_m": 721.2,
     "segments_traversed": [
       "road-101",
       "road-105"
@@ -65,30 +65,30 @@
     "steps": [
       {
         "step_index": 1,
-        "from_node": "node_77.593000_12.971500",
-        "to_node": "node_77.595000_12.971500",
+        "from_node": "node_76.571881_30.767850",
+        "to_node": "node_76.574149_30.767850",
         "road_id": "road-101",
-        "road_name": "Station Link Arterial (Main Road)",
+        "road_name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
         "segment_length_m": 216.7,
         "status": "accessible",
         "reason": "Adequate clearance for Ambulance (7.5m usable width)."
       },
       {
         "step_index": 2,
-        "from_node": "node_77.595000_12.971500",
-        "to_node": "node_77.597500_12.971500",
+        "from_node": "node_76.574149_30.767850",
+        "to_node": "node_76.576985_30.767850",
         "road_id": "road-101",
-        "road_name": "Station Link Arterial (Main Road)",
-        "segment_length_m": 270.9,
+        "road_name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
+        "segment_length_m": 271.0,
         "status": "accessible",
         "reason": "Adequate clearance for Ambulance (7.5m usable width)."
       },
       {
         "step_index": 3,
-        "from_node": "node_77.597500_12.971500",
-        "to_node": "node_77.597500_12.973600",
+        "from_node": "node_76.576985_30.767850",
+        "to_node": "node_76.576985_30.769950",
         "road_id": "road-105",
-        "road_name": "East Perimeter By-lane (Unknown Width)",
+        "road_name": "Gharuan East Rural By-lane (Unknown Width)",
         "segment_length_m": 233.5,
         "status": "unknown",
         "reason": "Width unmeasured in cadastre; clearance unverified."
@@ -97,8 +97,8 @@
     "segment_assessments": [
       {
         "road_id": "road-101",
-        "name": "Station Link Arterial (Main Road)",
-        "road_class": "Secondary Arterial",
+        "name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
+        "road_class": "Primary Access Arterial",
         "width_m": 7.5,
         "required_width_m": 3.0,
         "surface": "asphalt",
@@ -111,8 +111,8 @@
       },
       {
         "road_id": "road-105",
-        "name": "East Perimeter By-lane (Unknown Width)",
-        "road_class": "Unclassified Byway",
+        "name": "Gharuan East Rural By-lane (Unknown Width)",
+        "road_class": "Unclassified Rural Byway",
         "width_m": null,
         "required_width_m": 3.0,
         "surface": "unpaved_gravel",
@@ -140,7 +140,7 @@
       "gate_restriction",
       "entrance_doorway_access"
     ],
-    "explanation": "Route identified (721.1m across 2 segments), but contains unmeasured segment(s): road-105. Access cannot be confirmed accessible without ground truth width survey.",
+    "explanation": "Route identified (721.2m across 2 segments), but contains unmeasured segment(s): road-105. Access cannot be confirmed accessible without ground truth width survey.",
     "disclaimer": "DETERMINISTIC EVALUATION FOR PROTOTYPE DEMONSTRATION. ROAD ARRIVAL DOES NOT GUARANTEE ENTRANCE ACCESS."
   },
   "limitations": [

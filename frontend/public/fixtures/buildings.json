@@ -1,8 +1,8 @@
 {
   "type": "FeatureCollection",
   "metadata": {
-    "name": "Ward 142 - Sector 7 (Synthetic Demonstration Area)",
-    "description": "Synthetic municipal emergency access test dataset for UNREACHABLE platform demonstration. All features, measurements, and coordinates are simulated for prototype verification.",
+    "name": "Chandigarh University & Gharuan Sector (Synthetic Demonstration Area)",
+    "description": "Synthetic emergency access intelligence dataset for Chandigarh University (CU) Gharuan campus & surrounding rural-urban fringe, SAS Nagar Mohali. All features, road clearances, and bottlenecks are simulated for demonstration.",
     "crs": "urn:ogc:def:crs:OGC:1.3:CRS84",
     "disclaimer": "PROTOTYPE DEMONSTRATION ONLY. NOT AN OFFICIAL EMERGENCY-ACCESS ASSESSMENT.",
     "filter": "building",
@@ -17,24 +17,24 @@
         "coordinates": [
           [
             [
-              77.5936,
-              12.9718
+              76.572562,
+              30.76815
             ],
             [
-              77.5944,
-              12.9718
+              76.573469,
+              30.76815
             ],
             [
-              77.5944,
-              12.9724
+              76.573469,
+              30.76875
             ],
             [
-              77.5936,
-              12.9724
+              76.572562,
+              30.76875
             ],
             [
-              77.5936,
-              12.9718
+              76.572562,
+              30.76815
             ]
           ]
         ]
@@ -42,7 +42,7 @@
       "properties": {
         "id": "bldg-201",
         "feature_type": "building",
-        "name": "Community Health Sub-Center (Ward 142)",
+        "name": "CU Student Health & Medical Sub-Center",
         "use_type": "Healthcare / Critical",
         "floors": 3,
         "access_status": "feasible",
@@ -50,7 +50,7 @@
         "estimated_setback_m": 4.5,
         "data_source": "Synthetic Municipal Cadastre",
         "verification_status": "unverified",
-        "notes": "Direct front ingress to road-101 (7.5m width). No identified bottlenecks between station and gate."
+        "notes": "Direct front ingress to NH-05 campus arterial (7.5m width). Feasible access from campus fire station."
       }
     },
     {
@@ -61,24 +61,24 @@
         "coordinates": [
           [
             [
-              77.5952,
-              12.9723
+              76.574376,
+              30.76865
             ],
             [
-              77.596,
-              12.9723
+              76.575284,
+              30.76865
             ],
             [
-              77.596,
-              12.973
+              76.575284,
+              30.76935
             ],
             [
-              77.5952,
-              12.973
+              76.574376,
+              30.76935
             ],
             [
-              77.5952,
-              12.9723
+              76.574376,
+              30.76865
             ]
           ]
         ]
@@ -86,15 +86,15 @@
       "properties": {
         "id": "bldg-202",
         "feature_type": "building",
-        "name": "Ward Civic Center & Library",
-        "use_type": "Public Facility",
+        "name": "Central Library & Administrative Block (CU)",
+        "use_type": "Public & Educational Facility",
         "floors": 2,
         "access_status": "feasible",
         "connected_road_id": "road-102",
         "estimated_setback_m": 3.0,
         "data_source": "Synthetic Municipal Cadastre",
         "verification_status": "unverified",
-        "notes": "Accessible via road-102 (3.4m width). Clear straight alignment from Station Link Arterial."
+        "notes": "Accessible via Academic Spine road-102 (3.4m width). Clear straight alignment from station arterial."
       }
     },
     {
@@ -105,24 +105,24 @@
         "coordinates": [
           [
             [
-              77.5937,
-              12.974
+              76.572675,
+              30.77035
             ],
             [
-              77.5945,
-              12.974
+              76.573582,
+              30.77035
             ],
             [
-              77.5945,
-              12.9746
+              76.573582,
+              30.77095
             ],
             [
-              77.5937,
-              12.9746
+              76.572675,
+              30.77095
             ],
             [
-              77.5937,
-              12.974
+              76.572675,
+              30.77035
             ]
           ]
         ]
@@ -130,15 +130,15 @@
       "properties": {
         "id": "bldg-203",
         "feature_type": "building",
-        "name": "Old Quarter Tenement Block A",
-        "use_type": "High-Density Residential",
+        "name": "Old Gharuan Residential Cluster Block A",
+        "use_type": "High-Density Village Settlement",
         "floors": 4,
         "access_status": "constrained",
         "connected_road_id": "road-103",
         "estimated_setback_m": 1.2,
         "data_source": "Synthetic Municipal Cadastre",
         "verification_status": "unverified",
-        "notes": "Sole road access is Old Bazaar Gully (road-103, width 2.1m). Cannot be reached directly by standard Type 1 or Type 2 water tenders."
+        "notes": "Sole road access is Old Gharuan Village Bypass (road-103, width 2.1m). Constrained: cannot be reached directly by heavy fire tenders."
       }
     },
     {
@@ -149,24 +149,24 @@
         "coordinates": [
           [
             [
-              77.5958,
-              12.974
+              76.575057,
+              30.77035
             ],
             [
-              77.5966,
-              12.974
+              76.575964,
+              30.77035
             ],
             [
-              77.5966,
-              12.9747
+              76.575964,
+              30.77105
             ],
             [
-              77.5958,
-              12.9747
+              76.575057,
+              30.77105
             ],
             [
-              77.5958,
-              12.974
+              76.575057,
+              30.77035
             ]
           ]
         ]
@@ -174,15 +174,15 @@
       "properties": {
         "id": "bldg-204",
         "feature_type": "building",
-        "name": "Prabhat Commercial Complex",
-        "use_type": "Commercial / Retail",
+        "name": "University Student Mall & Commercial Complex",
+        "use_type": "Commercial / Student Amenities",
         "floors": 3,
         "access_status": "infeasible",
         "connected_road_id": "road-104",
         "estimated_setback_m": 2.0,
         "data_source": "Synthetic Municipal Cadastre",
         "verification_status": "unverified",
-        "notes": "Access cut off by physical bollards and low overhead cables on road-104. No verified rear evacuation lane exists."
+        "notes": "Access cut off by physical security bollards and low overhead cables on road-104. Infeasible for standard response vehicles."
       }
     },
     {
@@ -193,24 +193,24 @@
         "coordinates": [
           [
             [
-              77.5977,
-              12.9723
+              76.577212,
+              30.76865
             ],
             [
-              77.5985,
-              12.9723
+              76.578119,
+              30.76865
             ],
             [
-              77.5985,
-              12.9731
+              76.578119,
+              30.76945
             ],
             [
-              77.5977,
-              12.9731
+              76.577212,
+              30.76945
             ],
             [
-              77.5977,
-              12.9723
+              76.577212,
+              30.76865
             ]
           ]
         ]
@@ -218,7 +218,7 @@
       "properties": {
         "id": "bldg-205",
         "feature_type": "building",
-        "name": "East Industrial Depot 3",
+        "name": "Gharuan Logistics Depot & Agro Storage",
         "use_type": "Storage / Light Industrial",
         "floors": 1,
         "access_status": "unknown",
@@ -226,7 +226,7 @@
         "estimated_setback_m": 5.0,
         "data_source": "Synthetic Satellite Trace",
         "verification_status": "uninspected",
-        "notes": "Connected to road-105 whose road-width and overhead clearances are unmeasured. Accessibility is unverified."
+        "notes": "Connected to road-105 whose road-width and overhead clearances are unmeasured. Accessibility is unknown/unverified."
       }
     },
     {
@@ -237,24 +237,24 @@
         "coordinates": [
           [
             [
-              77.5952,
-              12.9699
+              76.574376,
+              30.76625
             ],
             [
-              77.596,
-              12.9699
+              76.575284,
+              30.76625
             ],
             [
-              77.596,
-              12.9707
+              76.575284,
+              30.76705
             ],
             [
-              77.5952,
-              12.9707
+              76.574376,
+              30.76705
             ],
             [
-              77.5952,
-              12.9699
+              76.574376,
+              30.76625
             ]
           ]
         ]
@@ -262,7 +262,7 @@
       "properties": {
         "id": "bldg-206",
         "feature_type": "building",
-        "name": "Surya Nilaya Apartments",
+        "name": "Faculty Residences & International Hostel Towers",
         "use_type": "Multi-Family Residential",
         "floors": 3,
         "access_status": "feasible",
@@ -270,7 +270,7 @@
         "estimated_setback_m": 3.0,
         "data_source": "Synthetic Municipal Cadastre",
         "verification_status": "unverified",
-        "notes": "Frontage on road-106 (3.8m width). Open access for fire engines and basic medical responder units."
+        "notes": "Frontage on Sports Arena Spur road-106 (3.8m width). Open access for fire engines and basic medical responder units."
       }
     }
   ]
