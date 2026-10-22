@@ -6,12 +6,16 @@ interface BuildingDetailPageProps {
   buildingId: string;
   buildings: GeoJSONFeature[];
   roads: GeoJSONFeature[];
+  loading?: boolean;
+  error?: string | null;
 }
 
 export const BuildingDetailPage: React.FC<BuildingDetailPageProps> = ({
   buildingId,
   buildings,
   roads,
+  loading = false,
+  error = null,
 }) => {
   const building = buildings.find(
     (b) =>
@@ -21,6 +25,33 @@ export const BuildingDetailPage: React.FC<BuildingDetailPageProps> = ({
   );
 
   if (!building) {
+    if (loading) {
+      return (
+        <section className="v nf">
+          <h2>Loading building records...</h2>
+          <p className="lede">
+            Fetching municipal cadastre and access network from backend...
+          </p>
+        </section>
+      );
+    }
+
+    if (error) {
+      return (
+        <section className="v nf">
+          <h2>Unable to load building</h2>
+          <p className="lede">
+            {error || 'Connection to backend service failed.'}
+          </p>
+          <div className="cta">
+            <a className="btn pri" href="#/map">
+              Open Access Atlas
+            </a>
+          </div>
+        </section>
+      );
+    }
+
     return (
       <section className="v nf">
         <h2>Building not found</h2>
