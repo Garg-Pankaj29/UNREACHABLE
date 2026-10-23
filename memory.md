@@ -23,7 +23,7 @@
 - Access & multi-route: `backend/app/services/access_engine.py` (calculate_route, compare_routes)
 - Explain & guardrails: `backend/app/services/explain_service.py` (strict numeric guardrail)
 - Stats & vehicle gap: `backend/app/services/data_service.py`
-- Ingestion script: `backend/scripts/fetch_osm.py` (urllib Overpass extractor)
+- Pipelines: `backend/scripts/fetch_osm.py`, `backend/scripts/osm_to_geojson.py`
 - Endpoints: /api/health, /api/stats, /api/routing/route, /api/routing/compare, /api/simulate, /api/analysis/critical-roads, /api/explain, /api/audit/work-order
 
 ## 5. Phase status
@@ -31,10 +31,11 @@
 |---|---|---|
 | 0 | Real-mode baseline audit, tag demo-safe | done |
 | 1 | Real data ingestion (fetch_osm.py) | done |
-| 2 | Real network routing & validation | pending |
+| 2 | Real OSM to GeoJSON (osm_to_geojson.py) | done |
 | 3 | Frontend real-mode integration | pending |
 
 ## 6. Recent changes (newest first, MAX 5 lines: date | phase | what | files)
+- 2026-10-24 | Phase 2 | Implemented osm_to_geojson.py & test_osm_converter.py; tests 67/67 OK, build OK | osm_to_geojson.py, test_osm_converter.py, neighbourhood.geojson, memory.md
 - 2026-10-24 | Phase 1 | Implemented fetch_osm.py, queried Overpass bbox into data/real/raw/; tests 62/62 OK, build OK | fetch_osm.py, overpass.json, manifest.json, memory.md
 - 2026-10-23 | Phase 0 | Initialized real-mode branch & demo-safe tag; backend 62/62 OK, build OK | memory.md, requirements.txt
 
