@@ -92,4 +92,16 @@ desktop.ini
 *.bak
 *.orig
 
+# Agent & AI tool artifacts
+.gemini/
+.agents/
+.agent/
+*.log*
+
+# Tunneling / local proxies
+ngrok
+.ngrok*
+ngrok.yml
+
+
 
