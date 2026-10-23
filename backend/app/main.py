@@ -3,12 +3,16 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+
 from app.api.routes import router as api_router
 from app.core.config import (
     ALLOWED_ORIGINS,
     PROJECT_NAME,
     PROJECT_TAGLINE,
     API_VERSION,
+    REPO_ROOT,
 )
 
 # Standard logging configuration
@@ -36,18 +40,25 @@ app.add_middleware(
 # Mount API endpoints under /api
 app.include_router(api_router, prefix="/api")
 
+# Serve built frontend from FastAPI if dist/ exists
+frontend_dist = REPO_ROOT / "frontend" / "dist"
+if frontend_dist.is_dir() and (frontend_dist / "index.html").is_file():
+    logger.info("Serving built frontend SPA from %s", frontend_dist)
+    app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="frontend")
+else:
+    logger.info("Frontend dist not found at %s; serving API root info", frontend_dist)
 
-@app.get("/", tags=["Root"])
-def root_info():
-    """Root info endpoint providing basic platform details."""
-    return {
-        "project": PROJECT_NAME,
-        "tagline": PROJECT_TAGLINE,
-        "version": API_VERSION,
-        "docs_url": "/docs",
-        "health_url": "/api/health",
-        "status": "operational",
-    }
+    @app.get("/", tags=["Root"])
+    def root_info():
+        """Root info endpoint providing basic platform details."""
+        return {
+            "project": PROJECT_NAME,
+            "tagline": PROJECT_TAGLINE,
+            "version": API_VERSION,
+            "docs_url": "/docs",
+            "health_url": "/api/health",
+            "status": "operational",
+        }
 
 
 if __name__ == "__main__":
