@@ -18,11 +18,35 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
-# Environment and Secrets (retain examples)
+# Environment, Credentials, and Secrets (retain examples)
 .env
-.env.local
-.env.*.local
+.env.*
 !.env.example
+*.env
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+*.pkcs*
+id_rsa*
+id_ed25519*
+*credentials*.json
+*secret*.json
+token*.json
+auth*.json
+service-account*.json
+
+# SQLite runtime locks and journals
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
+
+# Large Raw OSM Binary Extracts (>100MB exceeds GitHub push limits)
+data/raw/*.osm.pbf
+data/raw/*.pbf
+*.pbf
 
 # Frontend build output
 dist/
