@@ -82,7 +82,7 @@ class ExplainRequest(BaseModel):
 class ExplainResponse(BaseModel):
     """Response payload containing guardrail-verified explanation of access assessment."""
     text: str = Field(description="3-sentence explanation based strictly on deterministic facts")
-    source: str = Field(description="Origin of explanation: 'local_llm' or 'template'")
+    source: str = Field(description="Origin of explanation: 'gemini_api', 'local_llm', or 'template'")
     validated: bool = Field(default=True, description="Whether the explanation passed strict numerical guardrails")
 
 
