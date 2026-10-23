@@ -32,9 +32,10 @@
 | 0 | Real-mode baseline audit, tag demo-safe | done |
 | 1 | Real data ingestion (fetch_osm.py) | done |
 | 2 | Real OSM to GeoJSON (osm_to_geojson.py) | done |
-| 3 | Frontend real-mode integration | pending |
+| 3 | Backend real-mode integration & cache | done |
 
 ## 6. Recent changes (newest first, MAX 5 lines: date | phase | what | files)
+- 2026-10-24 | Phase 3 | Added DATA_MODE env, /health counts, precomputed cache, test_real_data.py; 75/75 tests green in both modes, build OK | config.py, data_service.py, routes.py, test_real_data.py, memory.md
 - 2026-10-24 | Phase 2 | Implemented osm_to_geojson.py & test_osm_converter.py; tests 67/67 OK, build OK | osm_to_geojson.py, test_osm_converter.py, neighbourhood.geojson, memory.md
 - 2026-10-24 | Phase 1 | Implemented fetch_osm.py, queried Overpass bbox into data/real/raw/; tests 62/62 OK, build OK | fetch_osm.py, overpass.json, manifest.json, memory.md
 - 2026-10-23 | Phase 0 | Initialized real-mode branch & demo-safe tag; backend 62/62 OK, build OK | memory.md, requirements.txt

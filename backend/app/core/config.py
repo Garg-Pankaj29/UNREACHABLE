@@ -14,8 +14,23 @@ load_dotenv(REPO_ROOT / ".env")
 load_dotenv(BASE_DIR / ".env")
 
 
-# Relative path to sample GeoJSON demonstration dataset
+import os
+
+# Data mode configuration ('demo' by default, or 'real')
+DATA_MODE = os.getenv("DATA_MODE", "demo").lower()
+
+# Paths to datasets
 SAMPLE_DATA_PATH = REPO_ROOT / "data" / "sample" / "neighbourhood.geojson"
+REAL_DATA_PATH = REPO_ROOT / "data" / "real" / "neighbourhood.geojson"
+REAL_CACHE_DIR = REPO_ROOT / "data" / "real" / "cache"
+
+
+def get_active_data_path() -> Path:
+    """Returns active dataset path based on DATA_MODE env variable."""
+    mode = os.getenv("DATA_MODE", "demo").lower()
+    if mode == "real" and REAL_DATA_PATH.exists():
+        return REAL_DATA_PATH
+    return SAMPLE_DATA_PATH
 
 # Application metadata
 PROJECT_NAME = "UNREACHABLE"

@@ -1,12 +1,27 @@
-"""Tests for Building-Level Emergency Access Assessment."""
+import os
 import unittest
 from app.models.routing import AccessClassification
 from app.services.access_engine import access_engine
+from app.services.data_service import data_service
 from app.services.pilot_service import pilot_data_service
 
 
 class TestBuildingEmergencyAccess(unittest.TestCase):
     """Verifies building proximity, connected road access point, and vehicle routing."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._orig_mode = os.environ.get("DATA_MODE")
+        os.environ["DATA_MODE"] = "demo"
+        data_service._cache = None
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls._orig_mode is not None:
+            os.environ["DATA_MODE"] = cls._orig_mode
+        else:
+            os.environ.pop("DATA_MODE", None)
+        data_service._cache = None
 
     def test_sample_building_assessment(self):
         """Assessing a sample building returns road connectivity, setbacks, and honest ingress caveats."""

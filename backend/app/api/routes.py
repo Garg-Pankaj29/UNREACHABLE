@@ -42,20 +42,31 @@ logger = logging.getLogger("unreachable.api")
 router = APIRouter()
 
 
+class ExtendedHealthResponse(HealthResponse):
+    """Extended health response schema including data_mode and feature counts."""
+    data_mode: str = "demo"
+    counts: Optional[dict] = None
+
+
 @router.get(
     "/health",
-    response_model=HealthResponse,
+    response_model=ExtendedHealthResponse,
     summary="Health check endpoint",
-    description="Returns backend service health status and dataset availability.",
+    description="Returns backend service health status, dataset availability, data mode, and counts.",
 )
-def get_health() -> HealthResponse:
-    """Verifies backend is operating and dataset is reachable."""
+def get_health() -> ExtendedHealthResponse:
+    """Verifies backend is operating, dataset is reachable, and reports active mode & counts."""
     is_loaded = data_service.is_loaded()
-    return HealthResponse(
+    mode = data_service.get_data_mode()
+    counts = data_service.get_counts() if is_loaded else {}
+    active_path = data_service.data_path
+    return ExtendedHealthResponse(
         status="healthy" if is_loaded else "degraded",
         version=API_VERSION,
         dataset_loaded=is_loaded,
-        sample_file_path=str(SAMPLE_DATA_PATH.name),
+        sample_file_path=str(active_path.name),
+        data_mode=mode,
+        counts=counts,
     )
 
 
@@ -491,8 +502,16 @@ def get_critical_roads(
 ) -> List[CriticalRoad]:
     """Returns top N single points of failure road segments for a given vehicle profile."""
     try:
+        from app.core.config import REAL_CACHE_DIR
+        cache_file = REAL_CACHE_DIR / f"critical_roads_{vehicle_id}.json"
+        if data_service.get_data_mode() == "real" and cache_file.exists():
+            import json
+            with open(cache_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return [CriticalRoad(**item) for item in data[:limit]]
+
         from app.services.access_engine import CRITICAL_ROADS_CACHE
-        cache_key = f"{vehicle_id}_{limit}"
+        cache_key = f"{data_service.get_data_mode()}_{vehicle_id}_{limit}"
         if cache_key in CRITICAL_ROADS_CACHE:
             return CRITICAL_ROADS_CACHE[cache_key]
 
@@ -576,6 +595,14 @@ def get_audit_work_order(
 ) -> List[WorkOrderItem]:
     """Returns prioritized audit action list of unknown/unverified road corridors."""
     try:
+        from app.core.config import REAL_CACHE_DIR
+        cache_file = REAL_CACHE_DIR / f"audit_work_order_{vehicle_id}.json"
+        if data_service.get_data_mode() == "real" and cache_file.exists():
+            import json
+            with open(cache_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return [WorkOrderItem(**item) for item in data]
+
         return access_engine.get_audit_work_order(vehicle_id=vehicle_id)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))

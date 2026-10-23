@@ -19,28 +19,63 @@ logger = logging.getLogger("unreachable.data_service")
 class DataService:
     """Service to load and query sample neighbourhood GeoJSON data."""
 
-    def __init__(self, data_path: Path = SAMPLE_DATA_PATH):
-        self.data_path = data_path
+    def __init__(self, data_path: Optional[Path] = None):
+        self._custom_path = data_path
         self._cache: Optional[Dict[str, Any]] = None
+        self._cached_mode: Optional[str] = None
+
+    @property
+    def data_mode(self) -> str:
+        import os
+        return os.getenv("DATA_MODE", "demo").lower()
+
+    @property
+    def data_path(self) -> Path:
+        if self._custom_path is not None:
+            return self._custom_path
+        from app.core.config import get_active_data_path
+        return get_active_data_path()
+
+    def get_data_mode(self) -> str:
+        """Returns the active data mode ('demo' or 'real')."""
+        return self.data_mode
+
+    def get_counts(self) -> Dict[str, int]:
+        """Returns feature counts grouped by type."""
+        data = self.load_data()
+        features = data.get("features", [])
+        roads = sum(1 for f in features if f.get("properties", {}).get("feature_type") == "road")
+        buildings = sum(1 for f in features if f.get("properties", {}).get("feature_type") == "building")
+        stations = sum(1 for f in features if f.get("properties", {}).get("feature_type") == "station")
+        return {
+            "roads": roads,
+            "buildings": buildings,
+            "stations": stations,
+            "total": len(features),
+        }
 
     def load_data(self) -> Dict[str, Any]:
-        """Loads and parses the GeoJSON sample dataset from repository-relative path."""
-        if self._cache is not None:
+        """Loads and parses the GeoJSON dataset from active repository path."""
+        current_mode = self.data_mode
+        active_path = self.data_path
+
+        if self._cache is not None and self._cached_mode == current_mode:
             return self._cache
 
-        if not self.data_path.exists():
-            error_msg = f"Sample dataset not found at expected path: {self.data_path}"
+        if not active_path.exists():
+            error_msg = f"Dataset not found at expected path: {active_path}"
             logger.error(error_msg)
             raise FileNotFoundError(error_msg)
 
         try:
-            with open(self.data_path, "r", encoding="utf-8") as f:
+            with open(active_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            logger.info("Successfully loaded sample GeoJSON from %s", self.data_path)
+            logger.info("Successfully loaded GeoJSON from %s (mode=%s)", active_path, current_mode)
             self._cache = data
+            self._cached_mode = current_mode
             return data
         except json.JSONDecodeError as exc:
-            error_msg = f"Failed to parse GeoJSON file {self.data_path}: {exc}"
+            error_msg = f"Failed to parse GeoJSON file {active_path}: {exc}"
             logger.error(error_msg)
             raise ValueError(error_msg) from exc
 

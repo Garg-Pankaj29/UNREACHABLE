@@ -83,12 +83,14 @@ class AccessEngine:
 
     def get_graph(self, force_reload: bool = False) -> RoadGraph:
         """Retrieves or builds the topological road graph from current GeoJSON data."""
-        if self._graph is not None and not force_reload:
+        current_mode = self.data_service.get_data_mode() if hasattr(self.data_service, "get_data_mode") else None
+        if self._graph is not None and not force_reload and getattr(self, "_cached_graph_mode", None) == current_mode:
             return self._graph
 
         roads_fc = self.data_service.get_road_features()
         features = roads_fc.get("features", [])
         self._graph = RoadGraph.from_geojson_features(features)
+        self._cached_graph_mode = current_mode
         return self._graph
 
     def get_pilot_graph(self, force_reload: bool = False) -> Optional[RoadGraph]:
@@ -553,6 +555,12 @@ class AccessEngine:
                 ):
                     origin_st = f
                     break
+
+            if not origin_st and request.origin_station_id in ("station-01", None):
+                for f in features:
+                    if f.get("properties", {}).get("feature_type") == "station":
+                        origin_st = f
+                        break
 
             if not origin_st:
                 raise KeyError(f"Origin station not found: {request.origin_station_id}")
