@@ -35,11 +35,10 @@
 | 3 | Backend real-mode integration & cache | done |
 | 4 | Frontend real-mode & vector basemap | done |
 
+- 2026-10-24 | Phase 4 | Expanded to state-wide Punjab emergency network (497 facilities across 23 districts); 75/75 tests OK, build OK | MapView.tsx, TopHeader.tsx, memory.md
 - 2026-10-24 | Phase 4 | Added clinics/doctors to visibleStations (teal '+' markers at all zooms); 75/75 tests OK, build OK | MapView.tsx, memory.md
 - 2026-10-24 | Phase 4 | Fixed zoom overlap (bottom: 204px) and stopped LOD auto-zoom-out; 75/75 tests OK, build OK | MapView.tsx, AccessAtlasPage.tsx, memory.md
 - 2026-10-24 | Phase 4 | Restored OpenStreetMap TileLayer, sanitized relation bounds, auto-fit viewport; 75/75 tests OK, build OK | MapView.tsx, osm_to_geojson.py, memory.md
-- 2026-10-24 | Phase 4 | Fixed map visibility: decluttered facility markers, enhanced vector roads/buildings, centered bounds | MapView.tsx, memory.md
-- 2026-10-24 | Phase 4 | Removed external URLs, bundled local fonts, vector-only basemap, dynamic banner; build OK | MapView.tsx, DisclaimerBanner.tsx, index.css, index.html, memory.md
 
 ## 7. Rules for agents
 - Additive changes only; keep demo mode intact; never modify data/sample/.

@@ -55,8 +55,8 @@ interface MapViewProps {
   datasetMode?: 'pilot' | 'sample';
 }
 
-// Default center: Chandigarh University / Gharuan / Kharar pilot corridor
-const DEFAULT_PILOT_CENTER: LatLngExpression = [30.7686, 76.5750];
+// Default center: Punjab & Chandigarh State-wide Emergency Network
+const DEFAULT_PILOT_CENTER: LatLngExpression = [31.05, 75.75];
 const DEFAULT_CENTER: LatLngExpression = [30.7686, 76.5750];
 const DEFAULT_ZOOM = 13;
 
@@ -474,7 +474,7 @@ export const MapView: React.FC<MapViewProps> = ({
 
   const isPilotMode = stations.length > 5 || roads.length > 50;
   const mapCenter = center || (isPilotMode ? DEFAULT_PILOT_CENTER : DEFAULT_CENTER);
-  const mapZoom = zoom || (isPilotMode ? 13 : DEFAULT_ZOOM);
+  const mapZoom = zoom || (isPilotMode ? 8 : DEFAULT_ZOOM);
 
   // Filter features based on status
   const visibleRoads = layers.roads
@@ -527,12 +527,12 @@ export const MapView: React.FC<MapViewProps> = ({
       }
     }
 
-    // 3. Balanced sample of major hospitals across the region (up to 25)
+    // 3. Balanced sample of major hospitals across the region (up to 40)
     const hospitals = stations.filter((s) => {
       const ft = (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase();
       return ft === 'hospital';
     });
-    const hStep = Math.max(1, Math.floor(hospitals.length / 25));
+    const hStep = Math.max(1, Math.floor(hospitals.length / 40));
     for (let i = 0; i < hospitals.length; i += hStep) {
       const h = hospitals[i];
       const id = h.properties?.id || h.id;
@@ -542,12 +542,12 @@ export const MapView: React.FC<MapViewProps> = ({
       }
     }
 
-    // 4. Prominently include medical clinics across the sectors (up to 30)
+    // 4. Prominently include medical clinics across the sectors (up to 40)
     const clinics = stations.filter((s) => {
       const ft = (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase();
       return ft === 'clinic';
     });
-    const cStep = Math.max(1, Math.floor(clinics.length / 30));
+    const cStep = Math.max(1, Math.floor(clinics.length / 40));
     for (let i = 0; i < clinics.length; i += cStep) {
       const c = clinics[i];
       const id = c.properties?.id || c.id;
@@ -557,12 +557,12 @@ export const MapView: React.FC<MapViewProps> = ({
       }
     }
 
-    // 5. Doctors and health dispensaries across the sectors (up to 12)
+    // 5. Doctors and health dispensaries across the sectors (up to 20)
     const doctors = stations.filter((s) => {
       const ft = (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase();
       return ft === 'doctors' || ft === 'dispensary';
     });
-    const dStep = Math.max(1, Math.floor(doctors.length / 12));
+    const dStep = Math.max(1, Math.floor(doctors.length / 20));
     for (let i = 0; i < doctors.length; i += dStep) {
       const d = doctors[i];
       const id = d.properties?.id || d.id;
@@ -576,12 +576,8 @@ export const MapView: React.FC<MapViewProps> = ({
   }, [layers.stations, stations, selectedFeature, currentZoom]);
 
   // All active features for bounding box calculation
-  // When roads exist, prioritize roads & buildings so map zooms to the street grid rather than region-wide clinics
   const allFeatures = useMemo(() => {
-    if (visibleRoads.length > 0) {
-      return [...visibleRoads, ...visibleBuildings];
-    }
-    return [...visibleBuildings, ...visibleRoads, ...visibleStations];
+    return [...visibleStations, ...visibleRoads, ...visibleBuildings];
   }, [visibleRoads, visibleBuildings, visibleStations]);
 
   // Refined GIS Road styling: clean stroke widths, clear contrast, restrained

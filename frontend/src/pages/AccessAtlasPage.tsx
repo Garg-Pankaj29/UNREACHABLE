@@ -388,9 +388,9 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
                 className={`chip ${datasetMode === 'pilot' ? 'on' : ''}`}
                 onClick={() => onToggleDataset('pilot')}
                 style={{ fontSize: '11px', padding: '2px 8px' }}
-                title="Real Pilot corridor (Chandigarh-Mohali-Gharuan)"
+                title="Real Pilot state-wide network (Punjab & Chandigarh)"
               >
-                ● Real Pilot
+                ● Real Pilot (Punjab)
               </button>
               <button
                 type="button"

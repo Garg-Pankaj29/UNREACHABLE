@@ -41,7 +41,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
               color: '#168a5c',
               cursor: onToggleDataset ? 'pointer' : 'default',
             }}
-            title="Real Pilot: Chandigarh-Mohali-Gharuan (Click to toggle Demo dataset)"
+            title="Real Pilot: Punjab & Chandigarh State-wide Network (Click to toggle Demo dataset)"
           >
             <span
               style={{
@@ -53,7 +53,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
                 boxShadow: '0 0 6px #168a5c',
               }}
             />
-            <span>Real Pilot: Chandigarh (82k+ features)</span>
+            <span>Real Pilot: Punjab & Chandigarh</span>
           </button>
         ) : (
           <button
