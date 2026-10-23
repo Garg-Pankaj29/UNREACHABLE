@@ -2,16 +2,16 @@ import React from 'react';
 
 export const AboutPage: React.FC = () => {
   return (
-    <section className="v">
+    <section className="v" style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '90px' }}>
       <h2>About and methodology</h2>
-      <p className="lede">
+      <p className="lede" style={{ maxWidth: '100%', marginBottom: '32px' }}>
         Distance is not the same as access. UNREACHABLE combines verified municipal road geometry,
         standardized emergency vehicle clearance profiles, citizen hazard reports, and AI-assisted
         street-level imagery analysis to reveal where access is uncertain or blocked before an emergency occurs.
       </p>
 
       {/* 4 Steps */}
-      <div className="stp">
+      <div className="stp" style={{ marginBottom: '40px' }}>
         <div>
           <b>1</b>
           <p>
@@ -41,36 +41,44 @@ export const AboutPage: React.FC = () => {
         </div>
       </div>
 
-      <h3>Three kinds of information</h3>
-      <p className="lede" style={{ marginBottom: '20px' }}>
-        <b>Unknown</b> means no measurement exists in records. Unknown is never treated as inaccessible;
-        it flags an urgent need for an in-person field check. <b>AI-observed</b> indicates an automated vision
-        model identified an anomaly that has not yet been audited. <b>Verified</b> means an authorized human surveyor
-        or emergency official confirmed the ground truth.
-      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px', marginBottom: '36px' }}>
+        <div style={{ background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '12px', padding: '24px' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '12px', fontSize: '18px' }}>Three kinds of information</h3>
+          <p style={{ margin: 0, color: 'var(--mute)', fontSize: '15px', lineHeight: 1.65 }}>
+            <b>Unknown</b> means no measurement exists in records. Unknown is never treated as inaccessible;
+            it flags an urgent need for an in-person field check. <b>AI-observed</b> indicates an automated vision
+            model identified an anomaly that has not yet been audited. <b>Verified</b> means an authorized human surveyor
+            or emergency official confirmed the ground truth.
+          </p>
+        </div>
 
-      <h3>Shared bottlenecks</h3>
-      <p className="lede" style={{ marginBottom: '20px' }}>
-        A single choked arterial, illegally parked delivery van, or low sagging optical cable bundle can
-        sever emergency ingress for dozens of interior residential buildings. UNREACHABLE models these shared
-        network dependencies so municipal planners can fix the single link that delivers the highest public safety return.
-      </p>
+        <div style={{ background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '12px', padding: '24px' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '12px', fontSize: '18px' }}>Shared bottlenecks</h3>
+          <p style={{ margin: 0, color: 'var(--mute)', fontSize: '15px', lineHeight: 1.65 }}>
+            A single choked arterial, illegally parked delivery van, or low sagging optical cable bundle can
+            sever emergency ingress for dozens of interior residential buildings. UNREACHABLE models these shared
+            network dependencies so municipal planners can fix the single link that delivers the highest public safety return.
+          </p>
+        </div>
 
-      <h3>System limits & design philosophy</h3>
-      <p className="lede" style={{ marginBottom: '20px' }}>
-        The current dataset is a synthetic demonstration model calibrated for Indian urban conditions.
-        Vehicle width profiles are illustrative benchmarks. Travel times and real-time dynamic traffic delays
-        are deliberately omitted until defensible telematics models are validated. UNREACHABLE supports emergency
-        professionals and municipal authorities; it never supersedes them.
-      </p>
+        <div style={{ background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '12px', padding: '24px' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '12px', fontSize: '18px' }}>System limits & design philosophy</h3>
+          <p style={{ margin: 0, color: 'var(--mute)', fontSize: '15px', lineHeight: 1.65 }}>
+            The current dataset is a synthetic demonstration model calibrated for Indian urban conditions.
+            Vehicle width profiles are illustrative benchmarks. Travel times and real-time dynamic traffic delays
+            are deliberately omitted until defensible telematics models are validated. UNREACHABLE supports emergency
+            professionals and municipal authorities; it never supersedes them.
+          </p>
+        </div>
+      </div>
 
-      <div className="cta" style={{ marginTop: '24px' }}>
+      <div className="cta" style={{ marginTop: '28px' }}>
         <a className="btn pri" href="#/">
           Back to overview
         </a>
       </div>
 
-      <p className="dis">
+      <p className="dis" style={{ maxWidth: '100%', marginTop: '36px' }}>
         Decision-support prototype for urban emergency preparedness. Not a replacement for emergency
         dispatch (112 / Fire / EMS) or statutory municipal safety certifications.
       </p>

@@ -76,12 +76,12 @@ const createStationIcon = (isSelected: boolean, facilityType?: string) => {
   } else if (ft === 'fire_station' || ft === 'fire') {
     bg = '#dc2626'; // Red
     border = '#fca5a5';
-    label = '🔥';
+    label = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3.5z"/></svg>';
     title = 'Fire Station';
   } else if (ft === 'clinic') {
     bg = '#0d9488'; // Teal
     border = '#99f6e4';
-    label = '✚';
+    label = '+';
     title = 'Medical Clinic';
   } else if (ft === 'doctors') {
     bg = '#0284c7'; // Sky
@@ -91,7 +91,7 @@ const createStationIcon = (isSelected: boolean, facilityType?: string) => {
   } else if (ft === 'place' || ft === 'landmark' || ft === 'location') {
     bg = '#d97706'; // Amber
     border = '#fde68a';
-    label = '📍';
+    label = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
     title = 'Search Location / Landmark';
   }
 
@@ -156,7 +156,7 @@ const createDestinationIcon = (label: string = 'Destination') => {
         white-space: nowrap;
         font-family: 'Bricolage Grotesque', system-ui, sans-serif;
       ">
-        <span>📍</span>
+        <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
         <span>${label}</span>
       </div>
     `,
@@ -582,18 +582,18 @@ export const MapView: React.FC<MapViewProps> = ({
 
     const isOutsidePilot = props.inside_pilot_area === false;
     const statusBadge = isOutsidePilot
-      ? '<span style="color:#d97706; font-weight:700;">⚠ Outside Pilot Boundary</span>'
+      ? '<span style="color:#d97706; font-weight:700;">Outside Pilot Boundary</span>'
       : props.access_status === 'feasible' || props.access_status === 'ok'
-      ? '<span style="color:#168a5c; font-weight:700;">● Verified accessible</span>'
+      ? '<span style="color:#168a5c; font-weight:700;">Verified accessible</span>'
       : props.access_status === 'constrained'
-      ? '<span style="color:#e8710a; font-weight:700;">▲ Constrained</span>'
+      ? '<span style="color:#e8710a; font-weight:700;">Constrained</span>'
       : props.access_status === 'infeasible'
-      ? '<span style="color:#d7263d; font-weight:700;">✕ Potentially inaccessible</span>'
-      : '<span style="color:#7d837a; font-weight:700;">? Unknown (Unsurveyed)</span>';
+      ? '<span style="color:#d7263d; font-weight:700;">Potentially inaccessible</span>'
+      : '<span style="color:#7d837a; font-weight:700;">Unknown (Unsurveyed)</span>';
 
     const coverageWarningHtml = isOutsidePilot
       ? `<div style="margin-bottom: 6px; padding: 5px 7px; background: rgba(217, 119, 6, 0.14); border: 1px solid #d97706; border-radius: 4px; font-size: 11px; color: #92400e; font-weight: 600; line-height: 1.3;">
-          ⚠ Outside pilot coverage • Detailed access analysis unavailable
+          Outside pilot coverage • Detailed access analysis unavailable
          </div>`
       : '';
 
@@ -1104,18 +1104,18 @@ export const MapView: React.FC<MapViewProps> = ({
             left: '16px',
             zIndex: 850,
             background: 'var(--glass)',
-            backdropFilter: 'blur(14px)',
-            WebkitBackdropFilter: 'blur(14px)',
-            border: '1px solid var(--line)',
-            borderRadius: '10px',
-            padding: '8px 12px',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: '1.5px solid var(--line)',
+            borderRadius: '12px',
+            padding: '12px 14px',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.28)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '6px',
-            fontSize: '11px',
-            fontFamily: 'Bricolage Grotesque, system-ui, sans-serif',
-            maxWidth: '300px',
+            gap: '8px',
+            fontSize: '13px',
+            fontFamily: 'Inter, system-ui, sans-serif',
+            maxWidth: '340px',
             pointerEvents: 'auto',
           }}
           aria-label="Map Accessibility Legend"
@@ -1126,8 +1126,8 @@ export const MapView: React.FC<MapViewProps> = ({
               alignItems: 'center',
               justifyContent: 'space-between',
               borderBottom: '1px solid var(--line)',
-              paddingBottom: '4px',
-              gap: '12px',
+              paddingBottom: '6px',
+              gap: '14px',
             }}
           >
             <span
@@ -1136,20 +1136,20 @@ export const MapView: React.FC<MapViewProps> = ({
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px',
                 color: 'var(--ink)',
-                fontSize: '10px',
+                fontSize: '12px',
               }}
             >
               Accessibility Legend
             </span>
-            <span style={{ fontSize: '9px', color: 'var(--mute)' }}>Deterministic Engine</span>
+            <span style={{ fontSize: '11px', color: 'var(--mute)' }}>Deterministic Engine</span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 10px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span
                 style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: '2px',
+                  width: 12,
+                  height: 12,
+                  borderRadius: '3px',
                   background: '#059669',
                   border: '1px solid #047857',
                   flexShrink: 0,
@@ -1157,12 +1157,12 @@ export const MapView: React.FC<MapViewProps> = ({
               />
               <span style={{ color: 'var(--ink)', fontWeight: 600 }}>Feasible</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span
                 style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: '2px',
+                  width: 12,
+                  height: 12,
+                  borderRadius: '3px',
                   background: '#d97706',
                   border: '1px solid #b45309',
                   flexShrink: 0,
@@ -1170,12 +1170,12 @@ export const MapView: React.FC<MapViewProps> = ({
               />
               <span style={{ color: 'var(--ink)', fontWeight: 600 }}>Constrained</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span
                 style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: '2px',
+                  width: 12,
+                  height: 12,
+                  borderRadius: '3px',
                   background: '#dc2626',
                   border: '1px solid #b91c1c',
                   flexShrink: 0,
@@ -1183,12 +1183,12 @@ export const MapView: React.FC<MapViewProps> = ({
               />
               <span style={{ color: 'var(--ink)', fontWeight: 600 }}>Inaccessible</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span
                 style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: '2px',
+                  width: 12,
+                  height: 12,
+                  borderRadius: '3px',
                   background: '#64748b',
                   border: '1px solid #475569',
                   flexShrink: 0,
@@ -1197,6 +1197,7 @@ export const MapView: React.FC<MapViewProps> = ({
               <span style={{ color: 'var(--mute)', fontWeight: 600 }}>Unknown</span>
             </div>
           </div>
+
         </div>
       )}
     </div>
