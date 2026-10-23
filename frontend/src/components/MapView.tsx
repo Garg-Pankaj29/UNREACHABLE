@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   MapContainer,
   GeoJSON as LeafletGeoJSON,
@@ -65,36 +65,43 @@ const createStationIcon = (isSelected: boolean, facilityType?: string) => {
   let label = '+';
   let title = 'Emergency Response Base';
   let badgeColor = '#ffffff';
+  let size = 20;
 
   const ft = (facilityType || '').toLowerCase();
   if (ft === 'hospital') {
-    bg = '#1d4ed8'; // Blue
-    border = '#93c5fd';
+    bg = '#2563eb'; // Blue
+    border = '#bfdbfe';
     label = 'H';
     title = 'Hospital';
+    size = 20;
   } else if (ft === 'fire_station' || ft === 'fire') {
     bg = '#dc2626'; // Red
-    border = '#fca5a5';
-    label = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3.5z"/></svg>';
+    border = '#fecaca';
+    label = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3.5z"/></svg>';
     title = 'Fire Station';
+    size = 24;
   } else if (ft === 'clinic') {
     bg = '#0d9488'; // Teal
     border = '#99f6e4';
     label = '+';
     title = 'Medical Clinic';
+    size = 16;
   } else if (ft === 'doctors') {
     bg = '#0284c7'; // Sky
     border = '#bae6fd';
     label = 'Dr';
     title = 'Health Clinic / Doctor';
+    size = 16;
   } else if (ft === 'place' || ft === 'landmark' || ft === 'location') {
     bg = '#d97706'; // Amber
     border = '#fde68a';
-    label = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
+    label = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
     title = 'Search Location / Landmark';
+    size = 20;
   }
 
   if (isSelected) {
+    size = 28;
     border = '#ffd60a';
     if (ft !== 'place' && ft !== 'landmark' && ft !== 'location') {
       bg = '#ffd60a';
@@ -105,32 +112,34 @@ const createStationIcon = (isSelected: boolean, facilityType?: string) => {
     }
   }
 
+  const half = Math.round(size / 2);
+
   return L.divIcon({
     className: `custom-station-marker custom-facility-${ft || 'base'}`,
     html: `
       <div style="
         background: ${bg};
         color: ${badgeColor};
-        width: 28px;
-        height: 28px;
-        border-radius: 8px;
+        width: ${size}px;
+        height: ${size}px;
+        border-radius: ${size > 20 ? '7px' : '5px'};
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px solid ${border};
-        box-shadow: ${isSelected ? '0 0 12px rgba(255, 214, 10, 0.85)' : '0 4px 12px rgba(0,0,0,0.35)'};
+        border: ${isSelected ? '2.5px' : '1.5px'} solid ${border};
+        box-shadow: ${isSelected ? '0 0 14px rgba(255, 214, 10, 0.9)' : '0 2px 6px rgba(0,0,0,0.3)'};
         cursor: pointer;
         font-family: system-ui, sans-serif;
         font-weight: 800;
-        font-size: ${label.length > 1 ? '11px' : '13px'};
+        font-size: ${size < 18 ? '10px' : label.length > 1 ? '11px' : '12px'};
         transition: transform 0.15s ease;
       " title="${title}">
         <span>${label}</span>
       </div>
     `,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-    popupAnchor: [0, -16],
+    iconSize: [size, size],
+    iconAnchor: [half, half],
+    popupAnchor: [0, -half - 2],
   });
 };
 
@@ -283,11 +292,9 @@ function MapViewportManager({
       });
 
       if (bounds.isValid()) {
-        const isMobile = window.innerWidth <= 768;
         map.fitBounds(bounds, {
-          paddingTopLeft: isMobile ? [16, 90] : [320, 80],
-          paddingBottomRight: isMobile ? [16, 120] : [60, 90],
-          maxZoom: 17,
+          padding: [24, 24],
+          maxZoom: 16,
         });
       }
     } catch (err) {
@@ -461,10 +468,59 @@ export const MapView: React.FC<MapViewProps> = ({
       })
     : [];
 
-  const visibleStations = layers.stations ? stations : [];
+  const visibleStations = useMemo(() => {
+    if (!layers.stations) return [];
+    if (stations.length <= 20) return stations;
+
+    const selectedId = selectedFeature?.properties?.id || selectedFeature?.id;
+    const prioritized: GeoJSONFeature[] = [];
+    const seen = new Set<string>();
+
+    // 1. Always prioritize fire stations (primary emergency dispatch origins)
+    stations.forEach((s) => {
+      const ft = (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase();
+      if (ft === 'fire_station' || ft === 'fire') {
+        const id = s.properties?.id || s.id;
+        if (id) seen.add(id);
+        prioritized.push(s);
+      }
+    });
+
+    // 2. Always include selected station
+    if (selectedId) {
+      const sel = stations.find((s) => (s.properties?.id || s.id) === selectedId);
+      if (sel && !seen.has(selectedId)) {
+        seen.add(selectedId);
+        prioritized.push(sel);
+      }
+    }
+
+    // 3. Keep a balanced, uncluttered sample of hospitals (up to 15) so roads remain visible
+    const hospitals = stations.filter((s) => {
+      const ft = (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase();
+      return ft === 'hospital';
+    });
+    const step = Math.max(1, Math.floor(hospitals.length / 15));
+    for (let i = 0; i < hospitals.length && prioritized.length < 25; i += step) {
+      const h = hospitals[i];
+      const id = h.properties?.id || h.id;
+      if (id && !seen.has(id)) {
+        seen.add(id);
+        prioritized.push(h);
+      }
+    }
+
+    return prioritized;
+  }, [layers.stations, stations, selectedFeature]);
 
   // All active features for bounding box calculation
-  const allFeatures = [...visibleBuildings, ...visibleRoads, ...visibleStations];
+  // When roads exist, prioritize roads & buildings so map zooms to the street grid rather than region-wide clinics
+  const allFeatures = useMemo(() => {
+    if (visibleRoads.length > 0) {
+      return [...visibleRoads, ...visibleBuildings];
+    }
+    return [...visibleBuildings, ...visibleRoads, ...visibleStations];
+  }, [visibleRoads, visibleBuildings, visibleStations]);
 
   // Refined GIS Road styling: clean stroke widths, clear contrast, restrained
   const getRoadStyle = (feature: any): PathOptions => {
@@ -481,39 +537,42 @@ export const MapView: React.FC<MapViewProps> = ({
     const hasRestriction = accessTag === 'no' || accessTag === 'private' || vehicleTag === 'no' || vehicleTag === 'private';
     const hasObstruction = Boolean(props.obstruction && String(props.obstruction).trim() && String(props.obstruction).toLowerCase() !== 'null');
 
-    let color = '#7d837a'; // unknown or unmeasured (Grey)
-    let dashArray: string | undefined = '4, 6';
-    let weight = isTraversed ? 5.0 : 3.5;
+    // Vector-only basemap requires crisp, continuous road lines with solid visual presence
+    let color = '#64748b'; // solid visible road corridor
+    let dashArray: string | undefined = undefined; // Solid line so streets are continuous!
+    let weight = isTraversed ? 5.5 : 3.5;
     let opacity = isTraversed ? 1.0 : 0.85;
 
     if (hasRestriction || hasObstruction || status === 'infeasible' || status === 'inaccessible') {
       color = '#d7263d'; // red — confirmed inaccessible
-      dashArray = undefined;
+      weight = 4.0;
     } else if (width !== null && width !== undefined && reqW !== undefined) {
       if (width < reqW) {
         color = '#d7263d'; // red — confirmed inaccessible
-        dashArray = undefined;
+        weight = 4.0;
       } else if (width < reqW + 0.4) {
         color = '#e8710a'; // amber — constrained
-        dashArray = '5, 5';
+        weight = 4.0;
       } else {
         color = '#168a5c'; // green — confirmed feasible
-        dashArray = undefined;
+        weight = 4.0;
       }
     } else if (status === 'constrained') {
       color = '#e8710a'; // amber — constrained
-      dashArray = '5, 5';
+      weight = 4.0;
     } else if (status === 'feasible' || status === 'ok' || status === 'accessible') {
       color = '#168a5c'; // green — confirmed feasible
-      dashArray = undefined;
+      weight = 4.0;
     } else {
-      color = '#7d837a'; // grey — unknown or insufficient evidence
-      dashArray = '4, 6';
+      // Unmeasured / unknown status: solid visible slate road
+      color = '#64748b';
+      weight = 3.5;
+      opacity = 0.85;
     }
 
     if (isSelected) {
       color = '#ffd60a'; // highlight accent
-      weight = 6.0;
+      weight = 6.5;
       opacity = 1.0;
       dashArray = undefined;
     }
@@ -534,8 +593,8 @@ export const MapView: React.FC<MapViewProps> = ({
     const status = props.access_status;
     const isSelected = selectedFeature?.properties?.id === props.id;
 
-    let fillColor = '#7d837a';
-    let borderColor = '#5d635a';
+    let fillColor = '#475569';
+    let borderColor = '#64748b';
 
     if (status === 'feasible' || status === 'ok') {
       fillColor = '#168a5c';
@@ -550,10 +609,10 @@ export const MapView: React.FC<MapViewProps> = ({
 
     return {
       fillColor,
-      fillOpacity: isSelected ? 0.40 : 0.22,
+      fillOpacity: isSelected ? 0.60 : 0.35,
       color: isSelected ? '#ffd60a' : borderColor,
-      weight: isSelected ? 2.5 : 1.5,
-      opacity: isSelected ? 1 : 0.85,
+      weight: isSelected ? 2.5 : 1.2,
+      opacity: isSelected ? 1 : 0.8,
     };
   };
 
