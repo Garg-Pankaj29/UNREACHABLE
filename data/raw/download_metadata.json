@@ -1,0 +1,14 @@
+{
+  "source_url": "https://download.geofabrik.de/asia/india/northern-zone-latest.osm.pbf",
+  "source_provider": "Geofabrik GmbH",
+  "dataset_name": "Northern Zone OpenStreetMap Regional Extract",
+  "filename": "northern-zone-latest.osm.pbf",
+  "file_size_bytes": 224091116,
+  "source_last_modified": "Tue, 20 Oct 2026 23:14:55 GMT",
+  "download_timestamp_utc": "2026-10-22T20:43:13.069134+00:00",
+  "md5_checksum": "7147d0e86e929e5bbdaab84028966c25",
+  "sha256_checksum": "9e90b57eefc0d5b4d71ec81ef164caf620d2bb6e21042576788b1bfbc0ea2949",
+  "licence": "Open Data Commons Open Database License (ODbL) 1.0",
+  "attribution": "\u00a9 OpenStreetMap contributors",
+  "verification_status": "checksum_verified"
+}

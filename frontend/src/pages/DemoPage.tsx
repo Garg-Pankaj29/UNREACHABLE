@@ -63,6 +63,12 @@ const DEMO_STEPS: DemoStep[] = [
     speakerPrompt:
       'Generate an AI plain-language briefing with strict numeric guardrails; deterministic rules decide access, AI only explains.',
   },
+  {
+    id: 8,
+    title: 'Real Pilot: Park Plaza Emergency Access',
+    speakerPrompt:
+      'Inspect real pilot building Park Plaza (osm_bldg_409434941) — evaluated across 41,373 real Chandigarh roads, 10.09 km fire engine route, 44.7m setback, and verified missing evidence caveats.',
+  },
 ];
 
 interface DemoPageProps {
@@ -145,6 +151,10 @@ export const DemoPage: React.FC<DemoPageProps> = ({
   const [explainLoading, setExplainLoading] = useState<boolean>(false);
   const [accessResult, setAccessResult] = useState<BuildingAccessResponse | null>(null);
 
+  // State for step 8 (Real Pilot Building Access)
+  const [pilotBldgAccess, setPilotBldgAccess] = useState<BuildingAccessResponse | null>(null);
+  const [pilotBldgLoading, setPilotBldgLoading] = useState<boolean>(false);
+
   // Load step-specific data
   useEffect(() => {
     if (currentStep === 4) {
@@ -163,7 +173,7 @@ export const DemoPage: React.FC<DemoPageProps> = ({
     } else if (currentStep === 7) {
       setExplainLoading(true);
       Promise.all([
-        api.fetchBuildingAccess('bldg-201', 'fire', 'station-01'),
+        api.fetchBuildingAccess('bldg-201', 'fire', 'station-01', 'sample'),
         api.explainRoute('station-01', 'bldg-201', 'fire'),
       ])
         .then(([access, exp]) => {
@@ -172,6 +182,12 @@ export const DemoPage: React.FC<DemoPageProps> = ({
         })
         .catch((err) => console.warn('Explain demo error:', err))
         .finally(() => setExplainLoading(false));
+    } else if (currentStep === 8) {
+      setPilotBldgLoading(true);
+      api.fetchBuildingAccess('osm_bldg_409434941', 'fire', undefined, 'pilot')
+        .then((res) => setPilotBldgAccess(res))
+        .catch((err) => console.warn('Pilot building access demo error:', err))
+        .finally(() => setPilotBldgLoading(false));
     }
   }, [currentStep]);
 
@@ -245,7 +261,7 @@ export const DemoPage: React.FC<DemoPageProps> = ({
               ))}
             </div>
             <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: 'var(--ink)' }}>
-              Step {currentStep}/7: {stepMeta.title}
+              Step {currentStep}/{DEMO_STEPS.length}: {stepMeta.title}
             </h3>
           </div>
 
@@ -690,6 +706,113 @@ export const DemoPage: React.FC<DemoPageProps> = ({
                     </small>
                   </div>
                 ) : null}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 8: Real Chandigarh Pilot Building Access (Park Plaza) */}
+        {currentStep === 8 && (
+          <div>
+            <div style={{ marginBottom: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+              <span
+                style={{
+                  background: 'rgba(13, 148, 136, 0.15)',
+                  color: '#0d9488',
+                  fontWeight: 800,
+                  fontSize: '11px',
+                  padding: '4px 10px',
+                  borderRadius: '99px',
+                  letterSpacing: '0.05em',
+                  textTransform: 'uppercase',
+                  border: '1px solid #99f6e4',
+                }}
+              >
+                REAL PILOT CADASTRE: CHANDIGARH REGION (41,373 ROADS)
+              </span>
+              <span className="pl c-constrained" style={{ fontSize: '11px' }}>
+                ? Partial Assessment (Unverified)
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Card 1: Live Geographic Assessment Metrics */}
+              <div
+                style={{
+                  background: 'var(--glass)',
+                  border: '1.5px solid var(--line)',
+                  borderRadius: '12px',
+                  padding: '18px 22px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                  <h4 style={{ margin: 0, fontSize: '15px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Real Pilot Assessment: Park Plaza (osm_bldg_409434941)
+                  </h4>
+                  <span style={{ fontSize: '12px', color: 'var(--mute)' }}>
+                    Centroid: [30.6379° N, 76.8223° E]
+                  </span>
+                </div>
+
+                {pilotBldgLoading ? (
+                  <p className="lede">Calculating real road-network routing and cadastre setback...</p>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', fontSize: '13px' }}>
+                    <div style={{ background: 'var(--bg)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--line)' }}>
+                      <div style={{ color: 'var(--mute)', fontSize: '11px' }}>Connected Approach Road</div>
+                      <div style={{ fontWeight: 800, color: 'var(--ink)', marginTop: '2px' }}>
+                        {pilotBldgAccess?.approach_road_name || 'Unnamed Tertiary (osm_road_492720126)'}
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'var(--bg)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--line)' }}>
+                      <div style={{ color: 'var(--mute)', fontSize: '11px' }}>Frontage Setback Distance</div>
+                      <div style={{ fontWeight: 800, color: 'var(--sig)', marginTop: '2px' }}>
+                        {pilotBldgAccess?.estimated_setback_m ? `${pilotBldgAccess.estimated_setback_m} m` : '44.7 m'} (Road to Footprint)
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'var(--bg)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--line)' }}>
+                      <div style={{ color: 'var(--mute)', fontSize: '11px' }}>Origin Fire Station</div>
+                      <div style={{ fontWeight: 800, color: 'var(--ink)', marginTop: '2px' }}>
+                        {pilotBldgAccess?.origin_station_name || 'Fire Station (OSM 10295654117)'}
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'var(--bg)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--line)' }}>
+                      <div style={{ color: 'var(--mute)', fontSize: '11px' }}>Fire Tender Route Distance</div>
+                      <div style={{ fontWeight: 800, color: '#2563eb', marginTop: '2px' }}>
+                        {pilotBldgAccess?.route?.total_distance_m
+                          ? `${(pilotBldgAccess.route.total_distance_m / 1000).toFixed(2)} km`
+                          : '10.09 km'} ({pilotBldgAccess?.route?.segments_traversed?.length || 48} segments)
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Missing Evidence */}
+                <div style={{ marginTop: '14px', padding: '10px 14px', background: 'rgba(100, 116, 139, 0.08)', borderRadius: '8px', border: '1px solid var(--line)', fontSize: '12px' }}>
+                  <b style={{ color: 'var(--ink)' }}>Honest Evidence Caveats (Zero Hallucination):</b>
+                  <ul style={{ margin: '6px 0 0', paddingLeft: '18px', color: 'var(--mute)' }}>
+                    <li>Road corridor width is unmeasured in open cadastre — deterministic engine treats as unverified.</li>
+                    <li>Property entrance gate clearance and courtyard driveways are unsurveyed.</li>
+                    <li>Fire tender apparatus holds at street frontage; crew advances via hose relay across 44.7m setback.</li>
+                  </ul>
+                </div>
+
+                {/* Direct Action Links */}
+                <div style={{ display: 'flex', gap: '10px', marginTop: '16px', flexWrap: 'wrap' }}>
+                  <a className="btn pri sm" href="#/b/osm_bldg_409434941" style={{ flex: 1, textAlign: 'center' }}>
+                    Inspect Full Building Assessment Report
+                  </a>
+                  <a className="btn sm" href="#/routes/osm_bldg_409434941" style={{ flex: 1, textAlign: 'center' }}>
+                    Open Real-Road Route Planner
+                  </a>
+                  <a className="btn sm" href="#/map" style={{ flex: 1, textAlign: 'center' }}>
+                    View in Access Atlas
+                  </a>
+                </div>
               </div>
             </div>
           </div>

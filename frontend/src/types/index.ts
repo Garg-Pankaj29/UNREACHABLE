@@ -1,6 +1,6 @@
-export type AccessStatus = 'feasible' | 'constrained' | 'infeasible' | 'unknown' | 'ok';
+export type AccessStatus = 'feasible' | 'constrained' | 'infeasible' | 'unknown' | 'ok' | 'accessible' | 'inaccessible';
 
-export type FeatureType = 'building' | 'road' | 'station';
+export type FeatureType = 'building' | 'road' | 'station' | 'facility' | 'place';
 
 export interface GeoJSONGeometry {
   type: string;
@@ -133,13 +133,19 @@ export interface RouteStep {
 
 export interface RouteResponse {
   origin_id: string;
+  origin_name?: string;
   destination_id: string;
-  destination_type: 'building' | 'road';
+  destination_name?: string;
+  destination_type: 'building' | 'road' | 'location';
   vehicle: VehicleProfile;
   classification: AccessStatus;
   route_found: boolean;
   total_distance_m: number;
   segments_traversed: string[];
+  geometry_geojson?: {
+    type: string;
+    coordinates: [number, number][];
+  };
   steps: RouteStep[];
   segment_assessments: SegmentAssessment[];
   limiting_segments: string[];
@@ -154,13 +160,20 @@ export interface BuildingAccessResponse {
   building_name: string;
   use_type?: string | null;
   connected_road_id?: string | null;
+  approach_road_name?: string | null;
   estimated_setback_m?: number | null;
   entrance_status: string;
+  assessment_status?: string;
   vehicle: VehicleProfile;
   classification: AccessStatus;
   origin_station_id: string;
+  origin_station_name?: string | null;
+  origin_facility_type?: string | null;
+  road_access_coordinates?: [number, number] | null;
+  building_coordinates?: [number, number] | null;
   route?: RouteResponse | null;
   limitations: string[];
+  missing_evidence?: string[];
   plain_language_explanation: string;
   disclaimer: string;
 }
@@ -266,4 +279,46 @@ export interface ExplainResponse {
   source: 'local_llm' | 'template';
   validated: boolean;
 }
+
+export interface AlternativeRoute {
+  route_id: string;
+  route_index: number;
+  name: string;
+  color: string;
+  classification: AccessStatus;
+  route_found: boolean;
+  total_distance_m: number;
+  segment_count: number;
+  segments_traversed: string[];
+  geometry_geojson?: {
+    type: string;
+    coordinates: [number, number][];
+  };
+  steps: RouteStep[];
+  segment_assessments: SegmentAssessment[];
+  limiting_segments: string[];
+  known_restrictions: string[];
+  unknown_evidence_segments: string[];
+  explanation: string;
+  is_recommended: boolean;
+}
+
+export interface MultiRouteResponse {
+  origin_id: string;
+  origin_name: string;
+  origin_facility_type?: string | null;
+  origin_coordinates?: [number, number] | null;
+  destination_id: string;
+  destination_name: string;
+  destination_type: 'building' | 'road' | 'location';
+  destination_coordinates?: [number, number] | null;
+  vehicle: VehicleProfile;
+  requested_count: number;
+  routes_found_count: number;
+  status: 'multiple_found' | 'fewer_found' | 'single_found' | 'none_found' | 'outside_pilot' | 'disconnected' | 'blocked';
+  routes: AlternativeRoute[];
+  notes: string;
+  disclaimer: string;
+}
+
 

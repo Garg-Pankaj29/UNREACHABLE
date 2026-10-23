@@ -4,6 +4,7 @@ import {
   ExplainResponse,
   FeatureCollection,
   HealthResponse,
+  MultiRouteResponse,
   RoadAccessResponse,
   RouteCompareResponse,
   RouteResponse,
@@ -71,7 +72,9 @@ async function fetchWithFallback<T>(
     }
     return await handleResponse<T>(res, url);
   } catch (liveErr: any) {
-    activateReplay();
+    if (liveErr.name === 'TypeError' || liveErr.message?.includes('Failed to fetch') || liveErr.message?.includes('NetworkError')) {
+      activateReplay();
+    }
     for (const cand of fixtureCandidates) {
       try {
         const fixUrl = `${FIXTURES_BASE}/${cand}`;
@@ -145,6 +148,45 @@ export const api = {
     );
   },
 
+  async fetchPilotSummary(): Promise<any> {
+    return fetchWithFallback<any>(
+      `${API_BASE_URL}/pilot/summary`,
+      ['pilot_summary.json']
+    );
+  },
+
+  async fetchPilotFeatures(params?: {
+    bbox?: string;
+    zoom?: number;
+    layer?: string;
+    limit?: number;
+  }): Promise<FeatureCollection> {
+    const q = new URLSearchParams();
+    if (params?.bbox) q.append('bbox', params.bbox);
+    if (params?.zoom !== undefined) q.append('zoom', params.zoom.toString());
+    if (params?.layer) q.append('layer', params.layer);
+    if (params?.limit) q.append('limit', params.limit.toString());
+    const qs = q.toString();
+    const url = qs ? `${API_BASE_URL}/pilot/features?${qs}` : `${API_BASE_URL}/pilot/features`;
+    return fetchWithFallback<FeatureCollection>(url, ['neighbourhood.json']);
+  },
+
+  async fetchPilotFacilities(category?: string): Promise<FeatureCollection> {
+    const q = category ? `?category=${encodeURIComponent(category)}` : '';
+    return fetchWithFallback<FeatureCollection>(
+      `${API_BASE_URL}/pilot/facilities${q}`,
+      ['neighbourhood.json']
+    );
+  },
+
+  async searchPilot(query: string, limit: number = 15): Promise<SearchResponse> {
+    const q = new URLSearchParams({ q: query, limit: limit.toString() });
+    return fetchWithFallback<SearchResponse>(
+      `${API_BASE_URL}/pilot/search?${q.toString()}`,
+      ['neighbourhood.json']
+    );
+  },
+
   async fetchVehicles(): Promise<VehicleProfile[]> {
     return fetchWithFallback<VehicleProfile[]>(
       `${API_BASE_URL}/vehicles`,
@@ -156,7 +198,10 @@ export const api = {
     origin: string,
     destinationBuilding?: string,
     vehicle: string = 'fire',
-    destinationRoad?: string
+    destinationRoad?: string,
+    destinationCoords?: [number, number],
+    destinationName?: string,
+    datasetMode?: string
   ): Promise<RouteResponse> {
     const params = new URLSearchParams({
       origin,
@@ -164,6 +209,9 @@ export const api = {
     });
     if (destinationBuilding) params.append('destination_building', destinationBuilding);
     if (destinationRoad) params.append('destination_road', destinationRoad);
+    if (destinationCoords) params.append('destination_coords', `${destinationCoords[0]},${destinationCoords[1]}`);
+    if (destinationName) params.append('destination_name', destinationName);
+    if (datasetMode) params.append('mode', datasetMode);
 
     const candidates = [
       `route_${origin}_${destinationBuilding || ''}_${destinationRoad || ''}_${vehicle}.json`,
@@ -178,22 +226,49 @@ export const api = {
     );
   },
 
+  async fetchAlternativeRoutes(
+    origin: string,
+    destinationBuilding?: string,
+    vehicle: string = 'fire',
+    destinationRoad?: string,
+    destinationCoords?: [number, number],
+    destinationName?: string,
+    datasetMode?: string,
+    k: number = 3
+  ): Promise<MultiRouteResponse> {
+    const params = new URLSearchParams({
+      origin,
+      vehicle,
+      k: k.toString(),
+    });
+    if (destinationBuilding) params.append('destination_building', destinationBuilding);
+    if (destinationRoad) params.append('destination_road', destinationRoad);
+    if (destinationCoords) params.append('destination_coords', `${destinationCoords[0]},${destinationCoords[1]}`);
+    if (destinationName) params.append('destination_name', destinationName);
+    if (datasetMode) params.append('mode', datasetMode);
+
+    return fetchWithFallback<MultiRouteResponse>(
+      `${API_BASE_URL}/routing/alternatives?${params.toString()}`,
+      ['neighbourhood.json']
+    );
+  },
+
   async fetchBuildingAccess(
     buildingId: string,
     vehicle: string = 'fire',
-    origin: string = 'station-01'
+    origin?: string,
+    datasetMode?: 'pilot' | 'sample'
   ): Promise<BuildingAccessResponse> {
-    const params = new URLSearchParams({
-      vehicle,
-      origin,
-    });
+    const params = new URLSearchParams({ vehicle });
+    if (origin) params.append('origin', origin);
+    if (datasetMode) params.append('dataset_mode', datasetMode);
     const candidates = [
-      `building-access_${buildingId}_${vehicle}_${origin}.json`,
-      `building-access_${buildingId}_fire_${origin}.json`,
+      `building-access_${buildingId}_${vehicle}_${origin || 'default'}.json`,
+      `building-access_${buildingId}_fire_station-01.json`,
       `building-access_bldg-201_fire_station-01.json`,
     ];
     return fetchWithFallback<BuildingAccessResponse>(
-      `${API_BASE_URL}/routing/building-access/${buildingId}?${params.toString()}`,
+      `${API_BASE_URL}/routing/building-access/${encodeURIComponent(buildingId)}?${params.toString()}`,
       candidates
     );
   },
@@ -218,7 +293,10 @@ export const api = {
     stationId: string = 'station-01',
     buildingId?: string,
     vehicleId: string = 'fire',
-    roadId?: string
+    roadId?: string,
+    destinationCoords?: [number, number],
+    destinationName?: string,
+    datasetMode?: string
   ): Promise<RouteCompareResponse> {
     const params = new URLSearchParams({
       station_id: stationId,
@@ -226,6 +304,9 @@ export const api = {
     });
     if (buildingId) params.append('building_id', buildingId);
     if (roadId) params.append('road_id', roadId);
+    if (destinationCoords) params.append('destination_coords', `${destinationCoords[0]},${destinationCoords[1]}`);
+    if (destinationName) params.append('destination_name', destinationName);
+    if (datasetMode) params.append('mode', datasetMode);
 
     const candidates = [
       `compare_${stationId}_${buildingId || ''}_${vehicleId}.json`,
@@ -345,6 +426,31 @@ export interface WorkOrderItem {
   reason: string;
   buildings_affected: number;
   data_source?: string | null;
+}
+
+export interface SearchResultItem {
+  id: string;
+  osm_id?: number;
+  name: string;
+  feature_type: 'facility' | 'road' | 'building' | 'place' | 'station' | 'landmark';
+  sub_type?: string;
+  details?: string;
+  coordinates?: [number, number];
+  geometry?: any;
+  properties?: any;
+  source?: 'local_pilot' | 'sample_demo' | 'online_osm';
+  inside_pilot_area?: boolean;
+  coverage_notice?: string;
+  verification_status?: string;
+}
+
+export interface SearchResponse {
+  query: string;
+  count: number;
+  local_count?: number;
+  online_count?: number;
+  online_available?: boolean;
+  results: SearchResultItem[];
 }
 
 

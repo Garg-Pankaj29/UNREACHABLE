@@ -86,3 +86,29 @@ class ExplainResponse(BaseModel):
     validated: bool = Field(default=True, description="Whether the explanation passed strict numerical guardrails")
 
 
+class SearchResultItem(BaseModel):
+    """Represents a matched geographic feature from pilot data, demonstration dataset, or online geocoding."""
+    id: str
+    osm_id: Optional[int] = None
+    name: str
+    feature_type: str = Field(description="'facility', 'road', 'building', 'place', or 'landmark'")
+    sub_type: Optional[str] = None
+    details: Optional[str] = None
+    coordinates: Optional[List[float]] = None
+    geometry: Optional[Dict[str, Any]] = None
+    properties: Dict[str, Any] = Field(default_factory=dict)
+    source: str = Field(default="local_pilot", description="'local_pilot', 'sample_demo', or 'online_osm'")
+    inside_pilot_area: bool = Field(default=True, description="Whether location falls within Chandigarh pilot bounds")
+    verification_status: Optional[str] = None
+
+
+class SearchResponse(BaseModel):
+    """Search query response containing matched features from local DB and online geocoding."""
+    query: str
+    count: int
+    local_count: int = 0
+    online_count: int = 0
+    online_available: bool = True
+    results: List[SearchResultItem]
+
+

@@ -27,27 +27,25 @@
 
 ## 4. API map (existing)
 GET /api/health, /api/stats?vehicle_id=, /api/buildings, /api/roads, /api/neighbourhood, /api/vehicles, /api/vehicles/{id}
-GET|POST /api/routing/route | GET /api/routing/building-access/{id} | GET /api/routing/road-access/{id}
-GET /api/routing/compare?station_id=&building_id=&vehicle_id=
+GET|POST /api/routing/route | GET|POST /api/routing/alternatives | GET /api/routing/building-access/{id}
+GET /api/routing/compare?station_id=&building_id=&vehicle_id= | GET /api/pilot/facilities?category=
 POST /api/simulate | GET /api/analysis/critical-roads?vehicle_id=&limit=5 | GET /api/analysis/vehicle-gap
 POST /api/explain (station_id, building_id, vehicle_id) -> {text, source, validated}
 GET /api/audit/work-order?vehicle_id= -> [{road_id,name,reason,buildings_affected,data_source}]
 
 ## 5. Verified code map (fill in Phase 0)
+- Multi-route computation: `backend/app/services/access_engine.py`: `AccessEngine.calculate_alternative_routes(...) -> MultiRouteResponse`
 - Route computation: `backend/app/services/access_engine.py`: `AccessEngine.calculate_route(request: RouteRequest) -> RouteResponse`
 - Route comparison: `backend/app/services/access_engine.py`: `AccessEngine.compare_routes(...) -> RouteCompareResponse`
-- Route explanation: `backend/app/services/explain_service.py`: `ExplainService.explain(...) -> ExplainResponse`
+- Route explanation: `backend/app/services/explain_service.py`: `AccessEngine.explain(...) -> ExplainResponse`
 - Simulation: `backend/app/services/access_engine.py`: `AccessEngine.simulate(request: SimulateRequest) -> SimulateResponse`
 - Critical roads: `backend/app/services/access_engine.py`: `AccessEngine.get_critical_roads(...) -> List[CriticalRoad]`
 - Audit work order: `backend/app/services/access_engine.py`: `AccessEngine.get_audit_work_order(...) -> List[WorkOrderItem]`
 - Per-building assessment: `backend/app/services/access_engine.py`: `AccessEngine.assess_building_access(...) -> BuildingAccessResponse`
 - Road segment assessment: `backend/app/services/access_engine.py`: `AccessEngine.evaluate_segment(...) -> SegmentAssessment`
 - Stats & vehicle gap: `backend/app/services/data_service.py`: `DataService.get_stats()`, `get_vehicle_gap()`
-- Constraints actually evaluated: width (`width_m` vs `min_clearance_width_m`, margin < 0.4m constrained), physical obstruction (`obstruction`). Unevaluated in code: surface, turning radius, gross weight, vertical clearance, gate restrictions.
-- Simulation computed in: backend (`POST /api/simulate`) on in-memory dataset copy; UI in `SimulationPage.tsx` and `DetailPanel.tsx`.
-- AI/LM Studio: local OpenAI-compatible endpoint at LM_STUDIO_URL (default 127.0.0.1:1234/v1) with strict numeric guardrail & template fallback.
-- Demo entry frontend: React app at `http://127.0.0.1:5173` (`frontend/index.html` -> `src/App.tsx`). Guided demo at `#/demo` (`DemoPage.tsx`).
-- Replay fallback: `backend/scripts/snapshot_fixtures.py` -> `frontend/public/fixtures/`, offline fallback in `frontend/src/services/api.ts`.
+- Pilot facilities: `backend/app/services/pilot_service.py`: `PilotService.get_emergency_facilities(category)`
+- Constraints actually evaluated: width (`width_m` vs `min_clearance_width_m`, margin < 0.4m constrained), physical obstruction (`obstruction`), barrier tags, pedestrian tags. Unknown widths remain unknown.
 
 ## 6. Phase status
 | Phase | Task | Status |
@@ -60,16 +58,17 @@ GET /api/audit/work-order?vehicle_id= -> [{road_id,name,reason,buildings_affecte
 | 5 | Demo mode + replay fallback | done |
 | 6 | Freeze + README truth | done |
 | 7 | Audit work order (optional) | done |
+| 8 | Emergency Centre Selection + Multiple Routes | done |
 
 ## 7. Recent changes (newest first, MAX 8 lines, one line each: date | phase | what | files)
+- 2026-10-23 | Security | Hardened .gitignore: envs, certificates, keys, service tokens, sqlite WAL, and raw OSM PBFs | .gitignore, memory.md
+- 2026-10-23 | Phase 8 | Emergency Centre selection + multi-colour alternative routing + 9 UI states; tests 62/62 OK, build OK | access_engine.py, pilot_service.py, routes.py, RoutesPage.tsx, MapView.tsx, api.ts, memory.md
 - 2026-10-22 | Polish | Updated dataset to Chandigarh University & Gharuan Sector (lat 30.7686, lon 76.5750) and refreshed all fixtures; tests 32/32 OK, build OK | neighbourhood.geojson, MapView.tsx, OverviewPage.tsx, InterventionsPage.tsx, DemoPage.tsx, memory.md
 - 2026-10-22 | Polish | Fixed light mode synthetic badge contrast and swapped all emojis for Lucide React icons; tests 32/32 OK, build OK | index.css, TopHeader.tsx, App.tsx, DashboardPage.tsx, DemoPage.tsx, RoutesPage.tsx, SimulationPage.tsx, memory.md
 - 2026-10-22 | Polish | Fixed navbar overlap with frosted opacity/blur, integrated badges, friendly theme toggle; tests 32/32 OK, build OK | index.css, TopHeader.tsx, App.tsx, memory.md
 - 2026-10-22 | Phase 7 | Added GET /api/audit/work-order, CSV export & print view in InterventionsPage; tests 30/30 OK, build OK | access_engine.py, routes.py, test_access_engine.py, InterventionsPage.tsx, api.ts, memory.md
 - 2026-10-22 | Phase 6 | Added loading/empty/error states, universal ribbon, aligned README claims & added Hackathon update; tests 29/29 OK, build OK | App.tsx, TopHeader.tsx, BuildingDetailPage.tsx, RoutesPage.tsx, SimulationPage.tsx, OverviewPage.tsx, AIInspectorPage.tsx, AccessAtlasPage.tsx, README.md, memory.md
 - 2026-10-22 | Phase 5 | Added DemoPage (7-step presenter bar), snapshot_fixtures script, api replay fallback & visible badge; tests 29/29 OK, build OK | DemoPage.tsx, App.tsx, api.ts, snapshot_fixtures.py, memory.md
-- 2026-10-22 | Phase 4 | Added POST /api/explain, explain_service with strict guardrails, UI Explain & two cards; tests 29/29 OK, build OK | explain_service.py, routes.py, schemas.py, test_explain.py, RoutesPage.tsx, AIInspectorPage.tsx, api.ts, index.ts, App.tsx, memory.md
-- 2026-10-22 | Phase 3 | Added ?vehicle_id= to /api/stats, GET /api/analysis/vehicle-gap, Vehicle gap strip in OverviewPage; tests 20/20 OK, build OK | data_service.py, schemas.py, routes.py, test_vehicle_gap.py, OverviewPage.tsx, api.ts, index.ts, memory.md
 
 
 ## 8. Known issues / README-vs-code gaps

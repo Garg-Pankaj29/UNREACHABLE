@@ -57,14 +57,18 @@ class RoadGraph:
         self.adjacency: Dict[str, List[RoadEdge]] = {}  # node_id -> [RoadEdge]
         self.road_to_edges: Dict[str, List[RoadEdge]] = {}  # road_id -> [RoadEdge]
         self.road_to_nodes: Dict[str, Set[str]] = {}  # road_id -> {node_id}
+        self.grid: Dict[Tuple[int, int], List[str]] = {}  # (cell_x, cell_y) -> [node_id] (~1km bins)
         self.total_roads_loaded: int = 0
 
     def add_node(self, coord: Tuple[float, float]) -> str:
         """Registers a junction node if not already present, returning its unique key."""
         nid = node_key(coord)
         if nid not in self.nodes:
-            self.nodes[nid] = (round(coord[0], 6), round(coord[1], 6))
+            lon, lat = round(coord[0], 6), round(coord[1], 6)
+            self.nodes[nid] = (lon, lat)
             self.adjacency[nid] = []
+            cell = (int(lon * 100), int(lat * 100))
+            self.grid.setdefault(cell, []).append(nid)
         return nid
 
     def add_edge(
@@ -134,7 +138,7 @@ class RoadGraph:
 
     @classmethod
     def from_geojson_features(cls, features: List[Dict[str, Any]]) -> "RoadGraph":
-        """Builds a RoadGraph from GeoJSON road features."""
+        """Builds a RoadGraph from GeoJSON road features, respecting mapped one-way restrictions."""
         graph = cls()
         road_count = 0
 
@@ -169,6 +173,12 @@ class RoadGraph:
             obstruction = props.get("obstruction")
             access_status = props.get("access_status", "unknown")
 
+            # Respect mapped one-way rules
+            oneway_val = props.get("oneway")
+            is_forward = oneway_val in (1, "1", "yes", True)
+            is_reverse = oneway_val in (-1, "-1")
+            bidirectional = not (is_forward or is_reverse)
+
             # Add each consecutive line subsegment
             for i in range(len(coords) - 1):
                 p1 = coords[i]
@@ -179,19 +189,38 @@ class RoadGraph:
                     and len(p1) >= 2
                     and len(p2) >= 2
                 ):
-                    graph.add_edge(
-                        u_coord=(float(p1[0]), float(p1[1])),
-                        v_coord=(float(p2[0]), float(p2[1])),
-                        road_id=road_id,
-                        name=name,
-                        road_class=road_class,
-                        width_m=width_m,
-                        surface=surface,
-                        obstruction=obstruction,
-                        access_status=access_status,
-                        properties=props,
-                        bidirectional=True,
-                    )
+                    u_pt = (float(p1[0]), float(p1[1]))
+                    v_pt = (float(p2[0]), float(p2[1]))
+
+                    if is_reverse:
+                        # Reverse one-way: traverse v -> u only
+                        graph.add_edge(
+                            u_coord=v_pt,
+                            v_coord=u_pt,
+                            road_id=road_id,
+                            name=name,
+                            road_class=road_class,
+                            width_m=width_m,
+                            surface=surface,
+                            obstruction=obstruction,
+                            access_status=access_status,
+                            properties=props,
+                            bidirectional=False,
+                        )
+                    else:
+                        graph.add_edge(
+                            u_coord=u_pt,
+                            v_coord=v_pt,
+                            road_id=road_id,
+                            name=name,
+                            road_class=road_class,
+                            width_m=width_m,
+                            surface=surface,
+                            obstruction=obstruction,
+                            access_status=access_status,
+                            properties=props,
+                            bidirectional=bidirectional,
+                        )
 
             road_count += 1
 
@@ -205,16 +234,42 @@ class RoadGraph:
         return graph
 
     def get_closest_node(self, coord: Tuple[float, float]) -> Optional[str]:
-        """Finds closest node in the graph to given (lon, lat) coordinates."""
+        """Finds closest node in the graph to given (lon, lat) coordinates with spatial indexing."""
         if not self.nodes:
             return None
+
+        target_lon, target_lat = coord
+        cell_x = int(target_lon * 100)
+        cell_y = int(target_lat * 100)
+
+        # Check immediate 9 grid cells first
+        candidates: List[str] = []
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                c_key = (cell_x + dx, cell_y + dy)
+                if c_key in self.grid:
+                    candidates.extend(self.grid[c_key])
+
+        # If not found nearby, expand to 25 cells
+        if not candidates:
+            for dx in (-2, -1, 0, 1, 2):
+                for dy in (-2, -1, 0, 1, 2):
+                    c_key = (cell_x + dx, cell_y + dy)
+                    if c_key in self.grid:
+                        candidates.extend(self.grid[c_key])
+
+        # Fallback to all nodes if outside indexed clusters
+        search_set = candidates if candidates else self.nodes.keys()
+
         best_node = None
         best_dist = float("inf")
-        for nid, n_coord in self.nodes.items():
+        for nid in search_set:
+            n_coord = self.nodes[nid]
             dist = haversine_distance_m(coord, n_coord)
             if dist < best_dist:
                 best_dist = dist
                 best_node = nid
+
         return best_node
 
     def get_nodes_for_road(self, road_id: str) -> Set[str]:
