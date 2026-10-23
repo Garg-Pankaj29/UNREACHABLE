@@ -87,13 +87,13 @@ const createStationIcon = (isSelected: boolean, facilityType?: string) => {
     border = '#99f6e4';
     label = '+';
     title = 'Medical Clinic';
-    size = 16;
+    size = 18;
   } else if (ft === 'doctors') {
     bg = '#0284c7'; // Sky
     border = '#bae6fd';
     label = 'Dr';
     title = 'Health Clinic / Doctor';
-    size = 16;
+    size = 18;
   } else if (ft === 'place' || ft === 'landmark' || ft === 'location') {
     bg = '#d97706'; // Amber
     border = '#fde68a';
@@ -416,17 +416,21 @@ function MapViewportManager({
 
 function MapEventsWatcher({
   onViewportChange,
+  onZoomChange,
 }: {
   onViewportChange?: (bbox: string, zoom: number) => void;
+  onZoomChange?: (zoom: number) => void;
 }) {
   const map = useMapEvents({
     moveend: () => {
+      onZoomChange?.(map.getZoom());
       if (!onViewportChange) return;
       const b = map.getBounds();
       const bboxStr = `${b.getWest().toFixed(4)},${b.getSouth().toFixed(4)},${b.getEast().toFixed(4)},${b.getNorth().toFixed(4)}`;
       onViewportChange(bboxStr, map.getZoom());
     },
     zoomend: () => {
+      onZoomChange?.(map.getZoom());
       if (!onViewportChange) return;
       const b = map.getBounds();
       const bboxStr = `${b.getWest().toFixed(4)},${b.getSouth().toFixed(4)},${b.getEast().toFixed(4)},${b.getNorth().toFixed(4)}`;
@@ -466,6 +470,7 @@ export const MapView: React.FC<MapViewProps> = ({
 }) => {
   const [tileError, setTileError] = useState(false);
   const [resetCount, setResetCount] = useState(0);
+  const [currentZoom, setCurrentZoom] = useState<number>(zoom || DEFAULT_ZOOM);
 
   const isPilotMode = stations.length > 5 || roads.length > 50;
   const mapCenter = center || (isPilotMode ? DEFAULT_PILOT_CENTER : DEFAULT_CENTER);
@@ -494,19 +499,22 @@ export const MapView: React.FC<MapViewProps> = ({
 
   const visibleStations = useMemo(() => {
     if (!layers.stations) return [];
-    if (stations.length <= 20) return stations;
+    // At neighborhood zoom (>= 14) or for compact datasets, show all facilities
+    if (stations.length <= 40 || currentZoom >= 14) return stations;
 
     const selectedId = selectedFeature?.properties?.id || selectedFeature?.id;
     const prioritized: GeoJSONFeature[] = [];
     const seen = new Set<string>();
 
-    // 1. Always prioritize fire stations (primary emergency dispatch origins)
+    // 1. Always prioritize all fire stations (primary emergency dispatch origins)
     stations.forEach((s) => {
       const ft = (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase();
       if (ft === 'fire_station' || ft === 'fire') {
         const id = s.properties?.id || s.id;
-        if (id) seen.add(id);
-        prioritized.push(s);
+        if (id) {
+          seen.add(id);
+          prioritized.push(s);
+        }
       }
     });
 
@@ -519,13 +527,13 @@ export const MapView: React.FC<MapViewProps> = ({
       }
     }
 
-    // 3. Keep a balanced, uncluttered sample of hospitals (up to 15) so roads remain visible
+    // 3. Balanced sample of major hospitals across the region (up to 25)
     const hospitals = stations.filter((s) => {
       const ft = (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase();
       return ft === 'hospital';
     });
-    const step = Math.max(1, Math.floor(hospitals.length / 15));
-    for (let i = 0; i < hospitals.length && prioritized.length < 25; i += step) {
+    const hStep = Math.max(1, Math.floor(hospitals.length / 25));
+    for (let i = 0; i < hospitals.length; i += hStep) {
       const h = hospitals[i];
       const id = h.properties?.id || h.id;
       if (id && !seen.has(id)) {
@@ -534,8 +542,38 @@ export const MapView: React.FC<MapViewProps> = ({
       }
     }
 
+    // 4. Prominently include medical clinics across the sectors (up to 30)
+    const clinics = stations.filter((s) => {
+      const ft = (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase();
+      return ft === 'clinic';
+    });
+    const cStep = Math.max(1, Math.floor(clinics.length / 30));
+    for (let i = 0; i < clinics.length; i += cStep) {
+      const c = clinics[i];
+      const id = c.properties?.id || c.id;
+      if (id && !seen.has(id)) {
+        seen.add(id);
+        prioritized.push(c);
+      }
+    }
+
+    // 5. Doctors and health dispensaries across the sectors (up to 12)
+    const doctors = stations.filter((s) => {
+      const ft = (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase();
+      return ft === 'doctors' || ft === 'dispensary';
+    });
+    const dStep = Math.max(1, Math.floor(doctors.length / 12));
+    for (let i = 0; i < doctors.length; i += dStep) {
+      const d = doctors[i];
+      const id = d.properties?.id || d.id;
+      if (id && !seen.has(id)) {
+        seen.add(id);
+        prioritized.push(d);
+      }
+    }
+
     return prioritized;
-  }, [layers.stations, stations, selectedFeature]);
+  }, [layers.stations, stations, selectedFeature, currentZoom]);
 
   // All active features for bounding box calculation
   // When roads exist, prioritize roads & buildings so map zooms to the street grid rather than region-wide clinics
@@ -777,7 +815,7 @@ export const MapView: React.FC<MapViewProps> = ({
         className="w-full h-full"
       >
         <ZoomControl position="bottomright" />
-        <MapEventsWatcher onViewportChange={onViewportChange} />
+        <MapEventsWatcher onViewportChange={onViewportChange} onZoomChange={setCurrentZoom} />
         <MapViewportManager
           features={allFeatures}
           selectedFeature={selectedFeature}
