@@ -1,7 +1,11 @@
 """FastAPI router defining core UNREACHABLE endpoints."""
+import asyncio
+import json
 import logging
-from typing import List, Optional
+from typing import Any, AsyncGenerator, Dict, List, Optional
 from fastapi import APIRouter, HTTPException, Query, status
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
 
 from app.core.config import API_VERSION, SAMPLE_DATA_PATH
 from app.models.routing import (
@@ -773,5 +777,114 @@ def search_pilot_features(
     )
 
 
+# ============================================================================
+# Emergency Incident Management & Real-time Stream Endpoints (Phase 5)
+# ============================================================================
+
+from app.services.incident_service import incident_service
 
 
+class IncidentActionRequest(BaseModel):
+    road_id: str = Field(..., description="Unique road segment identifier to block or clear")
+    action: str = Field(default="block", description="Incident action: 'block' or 'clear'")
+    reason: Optional[str] = Field(default="Manual emergency closure", description="Reason or description for road blockage")
+
+
+@router.post(
+    "/incidents",
+    summary="Create or clear emergency incident road block",
+    description="Blocks or clears a road segment in the SQLite incidents registry and applies in-memory obstruction overlay.",
+)
+def post_incident(
+    payload: Optional[IncidentActionRequest] = None,
+    road_id: Optional[str] = Query(default=None),
+    action: Optional[str] = Query(default=None),
+    reason: Optional[str] = Query(default=None),
+) -> Dict[str, Any]:
+    target_road_id = (payload.road_id if payload else None) or road_id
+    if not target_road_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="road_id is required")
+
+    target_action = (payload.action if payload else None) or action or "block"
+    target_action = str(target_action).lower().strip()
+    target_reason = (payload.reason if payload else None) or reason or "Manual emergency closure"
+
+    if target_action in ("block", "blocked", "close", "closure"):
+        event = incident_service.block_road(target_road_id, reason=target_reason)
+    elif target_action in ("clear", "cleared", "unblock", "open"):
+        event = incident_service.clear_road(target_road_id)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid action '{target_action}'; must be 'block' or 'clear'",
+        )
+
+    return {
+        "status": "success",
+        "action": target_action,
+        "road_id": target_road_id,
+        "blocked_roads": incident_service.get_blocked_roads(),
+        "event": event,
+    }
+
+
+@router.get(
+    "/incidents",
+    summary="List active road blockage incidents",
+    description="Returns all active SQLite-persisted road incidents and blocked road IDs.",
+)
+def get_incidents() -> Dict[str, Any]:
+    incidents = incident_service.get_incidents()
+    blocked = incident_service.get_blocked_roads()
+    return {
+        "incidents": incidents,
+        "blocked_roads": blocked,
+        "count": len(blocked),
+    }
+
+
+@router.get(
+    "/stream",
+    summary="Server-Sent Events real-time incident and unit simulation stream",
+    description="Streams real-time road incident events and animated unit position updates along the active route.",
+)
+async def stream_events():
+    async def event_generator() -> AsyncGenerator[str, None]:
+        queue = incident_service.subscribe()
+        try:
+            # 1. Send initial connection / current state event
+            init_payload = {
+                "type": "init",
+                "incidents": incident_service.get_incidents(),
+                "blocked_roads": incident_service.get_blocked_roads(),
+            }
+            yield f"event: init\ndata: {json.dumps(init_payload)}\n\n"
+
+            # 2. Main loop: emit simulated unit position ticks and any queued incident events
+            while True:
+                # Flush all queued incident events
+                while not queue.empty():
+                    inc_event = queue.get_nowait()
+                    yield f"event: incident\ndata: {json.dumps(inc_event)}\n\n"
+
+                # Compute current unit position along active route
+                unit_pos = incident_service.get_unit_position()
+                if unit_pos:
+                    yield f"event: unit_position\ndata: {json.dumps(unit_pos)}\n\n"
+
+                # Wait before next position tick
+                await asyncio.sleep(1.0)
+        except asyncio.CancelledError:
+            pass
+        finally:
+            incident_service.unsubscribe(queue)
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )

@@ -418,6 +418,32 @@ export const api = {
       candidates
     );
   },
+
+  getIncidents: async (): Promise<{ incidents: any[]; blocked_roads: string[]; count: number }> => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/incidents`);
+      return await handleResponse(res, '/incidents');
+    } catch {
+      return { incidents: [], blocked_roads: [], count: 0 };
+    }
+  },
+
+  setIncident: async (
+    roadId: string,
+    action: 'block' | 'clear' = 'block',
+    reason: string = 'Manual emergency closure'
+  ): Promise<{ status: string; action: string; road_id: string; blocked_roads: string[] }> => {
+    const res = await fetch(`${API_BASE_URL}/incidents`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ road_id: roadId, action, reason }),
+    });
+    return handleResponse(res, '/incidents');
+  },
+
+  getStreamUrl: (): string => {
+    return `${API_BASE_URL}/stream`;
+  },
 };
 
 export const apiService = api;

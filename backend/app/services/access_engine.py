@@ -221,6 +221,28 @@ class AccessEngine:
         if access_tag == "private" or vehicle_tag == "private":
             limiting_factors.append("Private access corridor: emergency right-of-way applicable")
 
+        # Incident Overlay Evaluation
+        try:
+            from app.services.incident_service import incident_service
+            if incident_service.is_road_blocked(road_id):
+                limiting_factors.append("Active emergency incident: road physically blocked")
+                return SegmentAssessment(
+                    road_id=road_id,
+                    name=name,
+                    road_class=road_class,
+                    width_m=width_m,
+                    required_width_m=vehicle.min_clearance_width_m,
+                    surface=surface,
+                    obstruction="Active emergency incident: road physically blocked",
+                    status=AccessClassification.INACCESSIBLE,
+                    is_passable=False,
+                    length_m=round(length_m, 1),
+                    limiting_factors=limiting_factors,
+                    notes="Road is closed by an active emergency incident block.",
+                )
+        except Exception:
+            pass
+
         # 1. Obstruction & Physical Barrier Evaluation
         barrier = props.get("barrier")
         if barrier and str(barrier).strip().lower() not in ("no", "none", "toll_booth", "border_control", "null"):
@@ -816,6 +838,16 @@ class AccessEngine:
                 "type": "LineString",
                 "coordinates": route_coords,
             }
+
+            try:
+                from app.services.incident_service import incident_service
+                incident_service.set_active_route(
+                    [(c[0], c[1]) for c in route_coords],
+                    vehicle_id=request.vehicle_id,
+                    unit_id=f"UNIT-{request.origin_station_id.split('-')[-1] if request.origin_station_id else '101'}",
+                )
+            except Exception:
+                pass
 
             return RouteResponse(
                 origin_id=request.origin_station_id,

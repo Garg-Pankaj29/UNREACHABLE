@@ -53,6 +53,8 @@ interface MapViewProps {
   fullHeight?: boolean;
   showLegend?: boolean;
   datasetMode?: 'pilot' | 'sample';
+  unitPosition?: [number, number] | null;
+  blockedRoadIds?: string[];
 }
 
 // Default center: Punjab & Chandigarh State-wide Emergency Network
@@ -234,6 +236,38 @@ const createViolationIcon = () =>
     iconAnchor: [12, 12],
     popupAnchor: [0, -14],
   });
+
+// Animated simulated emergency unit marker
+const createUnitIcon = (vehId: string = 'fire') => {
+  const isAmb = vehId === 'amb';
+  const bg = isAmb ? '#0284c7' : '#d7263d';
+  return L.divIcon({
+    className: 'custom-unit-marker',
+    html: `
+      <div style="
+        background: ${bg};
+        color: #ffffff;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2.5px solid #ffffff;
+        box-shadow: 0 0 14px ${bg}, 0 4px 10px rgba(0,0,0,0.5);
+        cursor: pointer;
+        animation: pulse 1.5s infinite;
+      " title="Simulated Emergency Unit">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 19 21 12 17 5 21 12 2"/>
+        </svg>
+      </div>
+    `,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor: [0, -18],
+  });
+};
 
 
 function MapViewportManager({
@@ -467,6 +501,8 @@ export const MapView: React.FC<MapViewProps> = ({
   fullHeight = false,
   showLegend = true,
   datasetMode,
+  unitPosition,
+  blockedRoadIds = [],
 }) => {
   const [tileError, setTileError] = useState(false);
   const [resetCount, setResetCount] = useState(0);
@@ -601,7 +637,14 @@ export const MapView: React.FC<MapViewProps> = ({
     let weight = isTraversed ? 5.5 : 3.5;
     let opacity = isTraversed ? 1.0 : 0.85;
 
-    if (hasRestriction || hasObstruction || status === 'infeasible' || status === 'inaccessible') {
+    const isIncidentBlocked = blockedRoadIds.includes(props.id) || props.is_blocked || props.incident_active;
+
+    if (isIncidentBlocked) {
+      color = '#d7263d'; // red — confirmed incident block
+      weight = 5.5;
+      dashArray = '6, 6';
+      opacity = 1.0;
+    } else if (hasRestriction || hasObstruction || status === 'infeasible' || status === 'inaccessible') {
       color = '#d7263d'; // red — confirmed inaccessible
       weight = 4.0;
     } else if (width !== null && width !== undefined && reqW !== undefined) {
@@ -1036,6 +1079,29 @@ export const MapView: React.FC<MapViewProps> = ({
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '2px' }}>
                   Coordinates: {destinationCoords[1].toFixed(4)}, {destinationCoords[0].toFixed(4)}
+                </div>
+              </div>
+            </Popup>
+          </Marker>
+        )}
+
+        {/* Real-time Simulated Emergency Unit Marker */}
+        {unitPosition && Array.isArray(unitPosition) && unitPosition.length >= 2 && (
+          <Marker
+            position={[unitPosition[0], unitPosition[1]]}
+            icon={createUnitIcon(selectedVehicle?.id)}
+            zIndexOffset={2000}
+          >
+            <Popup>
+              <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif' }}>
+                <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#d7263d', fontWeight: 800 }}>
+                  Live Dispatched Unit
+                </div>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--ink)' }}>
+                  {selectedVehicle?.name || 'Emergency Unit'}
+                </div>
+                <div style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '2px' }}>
+                  Simulated GPS: {unitPosition[0].toFixed(4)}, {unitPosition[1].toFixed(4)}
                 </div>
               </div>
             </Popup>

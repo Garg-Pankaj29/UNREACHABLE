@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Loader2, ShieldAlert, Sparkles, AlertTriangle } from 'lucide-react';
-import { GeoJSONFeature, IssueRecord, VehicleProfile, BuildingAccessResponse } from '../types';
+import { GeoJSONFeature, IssueRecord, VehicleProfile, BuildingAccessResponse, RouteResponse } from '../types';
 import { MapView } from '../components/MapView';
 import { VEHICLE_OPTIONS } from '../services/store';
 import { api, SearchResultItem } from '../services/api';
@@ -53,7 +53,70 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
 
   const [bldgAssessment, setBldgAssessment] = useState<BuildingAccessResponse | null>(null);
   const [bldgLoading, setBldgLoading] = useState<boolean>(false);
+  const [activeRoadRoute, setActiveRoadRoute] = useState<RouteResponse | null>(null);
+  const [blockedRoadIds, setBlockedRoadIds] = useState<string[]>([]);
+  const [unitPosition, setUnitPosition] = useState<[number, number] | null>(null);
+  const [routeRefreshNonce, setRouteRefreshNonce] = useState<number>(0);
+  const [isTogglingBlock, setIsTogglingBlock] = useState<boolean>(false);
 
+  // 1. Initial incidents load & SSE stream connection
+  useEffect(() => {
+    api.getIncidents().then((res) => {
+      if (res && res.blocked_roads) {
+        setBlockedRoadIds(res.blocked_roads);
+      }
+    });
+
+    let es: EventSource | null = null;
+    try {
+      es = new EventSource(api.getStreamUrl());
+
+      es.addEventListener('init', (e: MessageEvent) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.blocked_roads) setBlockedRoadIds(data.blocked_roads);
+        } catch (err) {
+          console.warn('SSE init parse error:', err);
+        }
+      });
+
+      es.addEventListener('incident', (e: MessageEvent) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.blocked_roads) {
+            setBlockedRoadIds(data.blocked_roads);
+            setRouteRefreshNonce((n) => n + 1);
+          }
+        } catch (err) {
+          console.warn('SSE incident parse error:', err);
+        }
+      });
+
+      es.addEventListener('unit_position', (e: MessageEvent) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.coordinates && Array.isArray(data.coordinates) && data.coordinates.length >= 2) {
+            // Backend yields [lon, lat]; Leaflet expects [lat, lon]
+            setUnitPosition([data.coordinates[1], data.coordinates[0]]);
+          }
+        } catch (err) {
+          console.warn('SSE unit_position parse error:', err);
+        }
+      });
+
+      es.onerror = (err) => {
+        console.debug('SSE connection state change / reconnecting:', err);
+      };
+    } catch (err) {
+      console.warn('EventSource initialization failed:', err);
+    }
+
+    return () => {
+      if (es) es.close();
+    };
+  }, []);
+
+  // 2. Building Access Evaluation with live recompute
   useEffect(() => {
     const isBldg = selectedFeature?.properties?.feature_type === 'building';
     const bId = selectedFeature?.properties?.id || (selectedFeature?.id as string);
@@ -81,7 +144,29 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
     } else {
       setBldgAssessment(null);
     }
-  }, [selectedFeature?.properties?.id, selectedFeature?.id, selectedFeature?.properties?.feature_type, selectedVehKey, datasetMode]);
+  }, [selectedFeature?.properties?.id, selectedFeature?.id, selectedFeature?.properties?.feature_type, selectedVehKey, datasetMode, routeRefreshNonce]);
+
+  // 3. Road Segment Route Evaluation with live recompute
+  useEffect(() => {
+    const isRoad = selectedFeature?.properties?.feature_type === 'road';
+    const rId = selectedFeature?.properties?.id || (selectedFeature?.id as string);
+    if (isRoad && rId) {
+      let isMounted = true;
+      api
+        .fetchRoute('station-01', undefined, selectedVehKey, rId, undefined, undefined, datasetMode)
+        .then((res) => {
+          if (isMounted) setActiveRoadRoute(res);
+        })
+        .catch(() => {
+          if (isMounted) setActiveRoadRoute(null);
+        });
+      return () => {
+        isMounted = false;
+      };
+    } else {
+      setActiveRoadRoute(null);
+    }
+  }, [selectedFeature?.properties?.id, selectedFeature?.id, selectedFeature?.properties?.feature_type, selectedVehKey, datasetMode, routeRefreshNonce]);
 
   const [layers, setLayers] = useState({
     roads: true,
@@ -358,6 +443,12 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
   const isStation = props?.feature_type === 'station' || props?.feature_type === 'facility';
   const isPlace = props?.feature_type === 'place' || (!isBuilding && !isRoad && !isStation);
 
+  const activeRouteGeometry = isBuilding
+    ? (bldgAssessment?.route?.geometry_geojson || null)
+    : isRoad
+    ? (activeRoadRoute?.geometry_geojson || null)
+    : null;
+
   return (
     <div className="stage">
       {/* Full Map Canvas */}
@@ -375,6 +466,9 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
         onViewportChange={onViewportChange}
         fullHeight={true}
         datasetMode={datasetMode}
+        routeGeometry={activeRouteGeometry}
+        unitPosition={unitPosition}
+        blockedRoadIds={blockedRoadIds}
       />
 
       {/* Floating Control Panel (Upper Left) */}
@@ -952,6 +1046,117 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
                 <p style={{ fontSize: '12px', color: 'var(--mute)', margin: '8px 0' }}>
                   Width is missing, so this segment is Unknown, not inaccessible.
                 </p>
+              )}
+
+              {/* Incident Road Blockage Button (Phase 5) */}
+              {(() => {
+                const isRoadBlocked = Boolean(
+                  props.id && (blockedRoadIds.includes(props.id) || props.is_blocked || props.incident_active)
+                );
+                return (
+                  <div style={{ margin: '14px 0 10px' }}>
+                    <button
+                      type="button"
+                      id="toggle-road-incident-block-btn"
+                      className={`btn sm ${isRoadBlocked ? 'sec' : 'pri'}`}
+                      style={{
+                        width: '100%',
+                        padding: '9px 12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        fontWeight: 800,
+                        fontSize: '12px',
+                        background: isRoadBlocked ? 'rgba(22, 138, 92, 0.15)' : 'rgba(215, 38, 61, 0.92)',
+                        borderColor: isRoadBlocked ? '#168a5c' : '#d7263d',
+                        color: isRoadBlocked ? '#168a5c' : '#ffffff',
+                        cursor: isTogglingBlock ? 'wait' : 'pointer',
+                        boxShadow: isRoadBlocked ? 'none' : '0 2px 8px rgba(215, 38, 61, 0.35)',
+                      }}
+                      disabled={isTogglingBlock}
+                      onClick={async () => {
+                        if (!props.id) return;
+                        setIsTogglingBlock(true);
+                        const nextAction = isRoadBlocked ? 'clear' : 'block';
+                        try {
+                          const res = await api.setIncident(props.id, nextAction);
+                          if (res && res.blocked_roads) {
+                            setBlockedRoadIds(res.blocked_roads);
+                          }
+                          setRouteRefreshNonce((n) => n + 1);
+                        } catch (err) {
+                          console.error('Failed to toggle road blockage:', err);
+                        } finally {
+                          setIsTogglingBlock(false);
+                        }
+                      }}
+                      title={isRoadBlocked ? "Reopen this road to emergency passage" : "Block this road with an emergency incident"}
+                    >
+                      {isTogglingBlock ? (
+                        <Loader2 size={13} className="spin" />
+                      ) : isRoadBlocked ? (
+                        <span>✓ Clear Blockage (Reopen Road)</span>
+                      ) : (
+                        <>
+                          <AlertTriangle size={13} />
+                          <span>Block this road (Incident Closure)</span>
+                        </>
+                      )}
+                    </button>
+                    {isRoadBlocked && (
+                      <div style={{ fontSize: '11px', color: '#d7263d', marginTop: '6px', fontWeight: 600 }}>
+                        ● Road actively blocked by incident overlay. Route re-computed live.
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Live Route to this road display */}
+              {activeRoadRoute && (
+                <div
+                  style={{
+                    margin: '8px 0 14px',
+                    padding: '10px 12px',
+                    background:
+                      activeRoadRoute.route_found && activeRoadRoute.classification !== 'inaccessible'
+                        ? 'rgba(22, 138, 92, 0.08)'
+                        : 'rgba(215, 38, 61, 0.12)',
+                    border: `1px solid ${
+                      activeRoadRoute.route_found && activeRoadRoute.classification !== 'inaccessible'
+                        ? 'rgba(22, 138, 92, 0.3)'
+                        : '#d7263d'
+                    }`,
+                    borderRadius: '8px',
+                    fontSize: '11px',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800 }}>
+                    <span>Live Route to Road:</span>
+                    <span
+                      style={{
+                        textTransform: 'uppercase',
+                        color:
+                          activeRoadRoute.route_found && activeRoadRoute.classification !== 'inaccessible'
+                            ? '#168a5c'
+                            : '#d7263d',
+                      }}
+                    >
+                      {activeRoadRoute.classification}
+                    </span>
+                  </div>
+                  {activeRoadRoute.route_found && activeRoadRoute.classification !== 'inaccessible' ? (
+                    <div style={{ marginTop: '4px', color: 'var(--mute)' }}>
+                      Distance: <b>{(activeRoadRoute.total_distance_m / 1000).toFixed(2)} km</b> • Segments:{' '}
+                      <b>{activeRoadRoute.segments_traversed.length}</b>
+                    </div>
+                  ) : (
+                    <div style={{ marginTop: '4px', color: '#d7263d', fontWeight: 600 }}>
+                      No feasible emergency route found. Road or approach is blocked.
+                    </div>
+                  )}
+                </div>
               )}
 
               <div className="cta">
