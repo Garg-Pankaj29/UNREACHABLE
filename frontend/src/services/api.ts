@@ -420,6 +420,8 @@ export const api = {
   },
 };
 
+export const apiService = api;
+
 export interface WorkOrderItem {
   road_id: string;
   name: string;

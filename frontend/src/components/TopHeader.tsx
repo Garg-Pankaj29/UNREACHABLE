@@ -20,7 +20,11 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
     <header className="top" role="banner">
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <a className="brand" href="#/" title="UNREACHABLE Emergency Access Intelligence">
-          <i aria-hidden="true" />
+          <img
+            src="/logo.jpeg"
+            alt="UNREACHABLE Logo"
+            className="brand-logo"
+          />
           <span>UNREACHABLE</span>
         </a>
         {datasetMode === 'pilot' ? (

@@ -1,30 +1,3061 @@
 [
   {
-    "road_id": "road-101",
-    "name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
-    "reason": "Unverified cadastral survey (unverified survey): field ground truth audit required.",
-    "buildings_affected": 4,
-    "data_source": "Synthetic Municipal Road Registry"
+    "road_id": "road-osm-733440064-2",
+    "name": "Service Corridor 733440064",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 51,
+    "data_source": "OpenStreetMap"
   },
   {
-    "road_id": "road-102",
-    "name": "Academic Blocks Central Spine (North Campus Lane)",
-    "reason": "Unverified cadastral survey (unverified survey): field ground truth audit required.",
-    "buildings_affected": 1,
-    "data_source": "Synthetic Municipal Road Registry"
+    "road_id": "road-osm-1102489365",
+    "name": "Track Corridor 1102489365",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 5,
+    "data_source": "OpenStreetMap"
   },
   {
-    "road_id": "road-105",
-    "name": "Gharuan East Rural By-lane (Unknown Width)",
+    "road_id": "road-osm-744528317-2",
+    "name": "Service Corridor 744528317",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 5,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102485689-4",
+    "name": "Service Corridor 1102485689",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 5,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483614",
+    "name": "Service Corridor 1102483614",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 5,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360099-6",
+    "name": "Service Corridor 734360099",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 3,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734321322-6",
+    "name": "Service Corridor 734321322",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 3,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095701-7",
+    "name": "Unclassified Corridor 643095701",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 2,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360102-2",
+    "name": "Service Corridor 734360102",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 2,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360095",
+    "name": "Service Corridor 734360095",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 2,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440065-7",
+    "name": "Service Corridor 733440065",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 2,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440061-5",
+    "name": "Service Corridor 733440061",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 2,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095701-6",
+    "name": "Unclassified Corridor 643095701",
     "reason": "Width unmeasured in cadastre; clearance unverified.",
     "buildings_affected": 1,
-    "data_source": "Synthetic Satellite Trace"
+    "data_source": "OpenStreetMap"
   },
   {
-    "road_id": "road-106",
-    "name": "Sports Arena & South Transit Spur",
-    "reason": "Unverified cadastral survey (unverified survey): field ground truth audit required.",
+    "road_id": "road-osm-734716699",
+    "name": "Service Corridor 734716699",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
     "buildings_affected": 1,
-    "data_source": "Synthetic Municipal Road Registry"
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360101-1",
+    "name": "Service Corridor 734360101",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360099-2",
+    "name": "Service Corridor 734360099",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360099-5",
+    "name": "Service Corridor 734360099",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360096",
+    "name": "Service Corridor 734360096",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734321322-5",
+    "name": "Service Corridor 734321322",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440064-3",
+    "name": "Service Corridor 733440064",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440064-4",
+    "name": "Service Corridor 733440064",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440064-5",
+    "name": "Service Corridor 733440064",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440063",
+    "name": "Service Corridor 733440063",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1216904613-1",
+    "name": "Service Corridor 1216904613",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1216904613-2",
+    "name": "Service Corridor 1216904613",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1216904612-1",
+    "name": "Service Corridor 1216904612",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107399",
+    "name": "Service Corridor 1171107399",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107385",
+    "name": "Service Corridor 1171107385",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102485688-1",
+    "name": "Service Corridor 1102485688",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102485688-2",
+    "name": "Service Corridor 1102485688",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102479411-2",
+    "name": "Service Corridor 1102479411",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489360",
+    "name": "Residential Corridor 1102489360",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 1,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-666600872",
+    "name": "Unclassified Corridor 666600872",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095707-1",
+    "name": "Unclassified Corridor 643095707",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095707-2",
+    "name": "Unclassified Corridor 643095707",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095707-3",
+    "name": "Unclassified Corridor 643095707",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095707-4",
+    "name": "Unclassified Corridor 643095707",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095705-1",
+    "name": "Unclassified Corridor 643095705",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095705-2",
+    "name": "Unclassified Corridor 643095705",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095705-3",
+    "name": "Unclassified Corridor 643095705",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095705-4",
+    "name": "Unclassified Corridor 643095705",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095704-1",
+    "name": "Unclassified Corridor 643095704",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095704-2",
+    "name": "Unclassified Corridor 643095704",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095704-3",
+    "name": "Unclassified Corridor 643095704",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095704-4",
+    "name": "Unclassified Corridor 643095704",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095703-1",
+    "name": "Unclassified Corridor 643095703",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095703-2",
+    "name": "Unclassified Corridor 643095703",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095703-3",
+    "name": "Unclassified Corridor 643095703",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095703-4",
+    "name": "Unclassified Corridor 643095703",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095703-5",
+    "name": "Unclassified Corridor 643095703",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095703-6",
+    "name": "Unclassified Corridor 643095703",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095702",
+    "name": "Unclassified Corridor 643095702",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095701-1",
+    "name": "Unclassified Corridor 643095701",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095701-2",
+    "name": "Unclassified Corridor 643095701",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095701-3",
+    "name": "Unclassified Corridor 643095701",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095701-4",
+    "name": "Unclassified Corridor 643095701",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095701-5",
+    "name": "Unclassified Corridor 643095701",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095701-8",
+    "name": "Unclassified Corridor 643095701",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095701-9",
+    "name": "Unclassified Corridor 643095701",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-639146424-1",
+    "name": "Unclassified Corridor 639146424",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-639146424-2",
+    "name": "Unclassified Corridor 639146424",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-639146424-3",
+    "name": "Unclassified Corridor 639146424",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-639146424-4",
+    "name": "Unclassified Corridor 639146424",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-639146424-5",
+    "name": "Unclassified Corridor 639146424",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-639146424-6",
+    "name": "Unclassified Corridor 639146424",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-639146337-1",
+    "name": "Unclassified Corridor 639146337",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-639146337-2",
+    "name": "Unclassified Corridor 639146337",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-639146337-3",
+    "name": "Unclassified Corridor 639146337",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1497394954",
+    "name": "Unclassified Corridor 1497394954",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1497394953",
+    "name": "Unclassified Corridor 1497394953",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1462513347-1",
+    "name": "Unclassified Corridor 1462513347",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1462513347-2",
+    "name": "Unclassified Corridor 1462513347",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1462513347-3",
+    "name": "Unclassified Corridor 1462513347",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1098502902-1",
+    "name": "Unclassified Corridor 1098502902",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1098502902-2",
+    "name": "Unclassified Corridor 1098502902",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1098502902-3",
+    "name": "Unclassified Corridor 1098502902",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1098502902-4",
+    "name": "Unclassified Corridor 1098502902",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1098502902-5",
+    "name": "Unclassified Corridor 1098502902",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1098502902-6",
+    "name": "Unclassified Corridor 1098502902",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1098502902-7",
+    "name": "Unclassified Corridor 1098502902",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1098502902-8",
+    "name": "Unclassified Corridor 1098502902",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1000892417-1",
+    "name": "Unclassified Corridor 1000892417",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1000892417-2",
+    "name": "Unclassified Corridor 1000892417",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1484816986-1",
+    "name": "Track Corridor 1484816986",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1484816986-2",
+    "name": "Track Corridor 1484816986",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1484816986-3",
+    "name": "Track Corridor 1484816986",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494079",
+    "name": "Track Corridor 1102494079",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101669766",
+    "name": "Track Corridor 1101669766",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101650530",
+    "name": "Track Corridor 1101650530",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101650528",
+    "name": "Track Corridor 1101650528",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101650527",
+    "name": "Track Corridor 1101650527",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101642094-1",
+    "name": "Track Corridor 1101642094",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101642094-2",
+    "name": "Track Corridor 1101642094",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101642092",
+    "name": "Track Corridor 1101642092",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101634429",
+    "name": "Track Corridor 1101634429",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101634423-1",
+    "name": "Track Corridor 1101634423",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101634423-2",
+    "name": "Track Corridor 1101634423",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101634423-3",
+    "name": "Track Corridor 1101634423",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101616434",
+    "name": "Track Corridor 1101616434",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101614209",
+    "name": "Track Corridor 1101614209",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101614208",
+    "name": "Track Corridor 1101614208",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101472123-1",
+    "name": "Track Corridor 1101472123",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101472123-2",
+    "name": "Track Corridor 1101472123",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101472123-3",
+    "name": "Track Corridor 1101472123",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101472119",
+    "name": "Track Corridor 1101472119",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101472118-1",
+    "name": "Track Corridor 1101472118",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101472118-2",
+    "name": "Track Corridor 1101472118",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101407035",
+    "name": "Track Corridor 1101407035",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101370557",
+    "name": "Track Corridor 1101370557",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1100821735-1",
+    "name": "Track Corridor 1100821735",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1100821735-2",
+    "name": "Track Corridor 1100821735",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757107652-1",
+    "name": "Service Corridor 757107652",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757107652-2",
+    "name": "Service Corridor 757107652",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757107652-3",
+    "name": "Service Corridor 757107652",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757107652-4",
+    "name": "Service Corridor 757107652",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757107652-5",
+    "name": "Service Corridor 757107652",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757107652-6",
+    "name": "Service Corridor 757107652",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757107651-1",
+    "name": "Service Corridor 757107651",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757107651-2",
+    "name": "Service Corridor 757107651",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757107650-1",
+    "name": "Service Corridor 757107650",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757107650-2",
+    "name": "Service Corridor 757107650",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757107649",
+    "name": "Service Corridor 757107649",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-744528317-1",
+    "name": "Service Corridor 744528317",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734697811-1",
+    "name": "Service Corridor 734697811",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734697811-2",
+    "name": "Service Corridor 734697811",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734697811-3",
+    "name": "Service Corridor 734697811",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734697810",
+    "name": "Service Corridor 734697810",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734697809-1",
+    "name": "Service Corridor 734697809",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734697809-2",
+    "name": "Service Corridor 734697809",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360102-1",
+    "name": "Service Corridor 734360102",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360101-2",
+    "name": "Service Corridor 734360101",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360101-3",
+    "name": "Service Corridor 734360101",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360100-1",
+    "name": "Service Corridor 734360100",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360100-2",
+    "name": "Service Corridor 734360100",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360100-3",
+    "name": "Service Corridor 734360100",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360099-1",
+    "name": "Service Corridor 734360099",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360099-3",
+    "name": "Service Corridor 734360099",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360099-4",
+    "name": "Service Corridor 734360099",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360098-1",
+    "name": "Service Corridor 734360098",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360098-2",
+    "name": "Service Corridor 734360098",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734360097",
+    "name": "Service Corridor 734360097",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734321322-1",
+    "name": "Service Corridor 734321322",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734321322-2",
+    "name": "Service Corridor 734321322",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734321322-3",
+    "name": "Service Corridor 734321322",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734321322-4",
+    "name": "Service Corridor 734321322",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734321321-1",
+    "name": "Service Corridor 734321321",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-734321321-2",
+    "name": "Service Corridor 734321321",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440065-1",
+    "name": "Service Corridor 733440065",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440065-2",
+    "name": "Service Corridor 733440065",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440065-3",
+    "name": "Service Corridor 733440065",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440065-4",
+    "name": "Service Corridor 733440065",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440065-5",
+    "name": "Service Corridor 733440065",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440065-6",
+    "name": "Service Corridor 733440065",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440064-1",
+    "name": "Service Corridor 733440064",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440064-6",
+    "name": "Service Corridor 733440064",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440062-1",
+    "name": "Service Corridor 733440062",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440062-2",
+    "name": "Service Corridor 733440062",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440061-1",
+    "name": "Service Corridor 733440061",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440061-2",
+    "name": "Service Corridor 733440061",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440061-3",
+    "name": "Service Corridor 733440061",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440061-4",
+    "name": "Service Corridor 733440061",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440061-6",
+    "name": "Service Corridor 733440061",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440061-7",
+    "name": "Service Corridor 733440061",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440061-8",
+    "name": "Service Corridor 733440061",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440061-9",
+    "name": "Service Corridor 733440061",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440061-10",
+    "name": "Service Corridor 733440061",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440060-1",
+    "name": "Service Corridor 733440060",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440060-2",
+    "name": "Service Corridor 733440060",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440060-3",
+    "name": "Service Corridor 733440060",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440059-1",
+    "name": "Service Corridor 733440059",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440059-2",
+    "name": "Service Corridor 733440059",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440059-3",
+    "name": "Service Corridor 733440059",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440059-4",
+    "name": "Service Corridor 733440059",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-733440058",
+    "name": "Service Corridor 733440058",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1462513346",
+    "name": "Service Corridor 1462513346",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1335002435",
+    "name": "Service Corridor 1335002435",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1273070045",
+    "name": "Service Corridor 1273070045",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1216904612-2",
+    "name": "Service Corridor 1216904612",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272469",
+    "name": "Service Corridor 1171272469",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272468",
+    "name": "Service Corridor 1171272468",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272467-1",
+    "name": "Service Corridor 1171272467",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272467-2",
+    "name": "Service Corridor 1171272467",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272466-1",
+    "name": "Service Corridor 1171272466",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272466-2",
+    "name": "Service Corridor 1171272466",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272466-3",
+    "name": "Service Corridor 1171272466",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272466-4",
+    "name": "Service Corridor 1171272466",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272466-5",
+    "name": "Service Corridor 1171272466",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272465-1",
+    "name": "Service Corridor 1171272465",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272465-2",
+    "name": "Service Corridor 1171272465",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272465-3",
+    "name": "Service Corridor 1171272465",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272465-4",
+    "name": "Service Corridor 1171272465",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272463",
+    "name": "Service Corridor 1171272463",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272460",
+    "name": "Service Corridor 1171272460",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272459-1",
+    "name": "Service Corridor 1171272459",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272459-2",
+    "name": "Service Corridor 1171272459",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272458-1",
+    "name": "Service Corridor 1171272458",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171272458-2",
+    "name": "Service Corridor 1171272458",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107382",
+    "name": "Service Corridor 1171107382",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107381",
+    "name": "Service Corridor 1171107381",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107380-1",
+    "name": "Service Corridor 1171107380",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107380-2",
+    "name": "Service Corridor 1171107380",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107380-3",
+    "name": "Service Corridor 1171107380",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107380-4",
+    "name": "Service Corridor 1171107380",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102495120-1",
+    "name": "Service Corridor 1102495120",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102495120-2",
+    "name": "Service Corridor 1102495120",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102495119-1",
+    "name": "Service Corridor 1102495119",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102495119-2",
+    "name": "Service Corridor 1102495119",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102495119-3",
+    "name": "Service Corridor 1102495119",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102495118",
+    "name": "Service Corridor 1102495118",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102495117",
+    "name": "Service Corridor 1102495117",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102495116",
+    "name": "Service Corridor 1102495116",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494077",
+    "name": "Service Corridor 1102494077",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494076",
+    "name": "Service Corridor 1102494076",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494075-1",
+    "name": "Service Corridor 1102494075",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494075-2",
+    "name": "Service Corridor 1102494075",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494075-3",
+    "name": "Service Corridor 1102494075",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494075-4",
+    "name": "Service Corridor 1102494075",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494074",
+    "name": "Service Corridor 1102494074",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489371",
+    "name": "Service Corridor 1102489371",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489370",
+    "name": "Service Corridor 1102489370",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489369",
+    "name": "Service Corridor 1102489369",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489367",
+    "name": "Service Corridor 1102489367",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489364",
+    "name": "Service Corridor 1102489364",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486135-1",
+    "name": "Service Corridor 1102486135",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486135-2",
+    "name": "Service Corridor 1102486135",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486135-3",
+    "name": "Service Corridor 1102486135",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486135-4",
+    "name": "Service Corridor 1102486135",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486135-5",
+    "name": "Service Corridor 1102486135",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486135-6",
+    "name": "Service Corridor 1102486135",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486134-1",
+    "name": "Service Corridor 1102486134",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486134-2",
+    "name": "Service Corridor 1102486134",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486134-3",
+    "name": "Service Corridor 1102486134",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486134-4",
+    "name": "Service Corridor 1102486134",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486134-5",
+    "name": "Service Corridor 1102486134",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486133-1",
+    "name": "Service Corridor 1102486133",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486133-2",
+    "name": "Service Corridor 1102486133",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486133-3",
+    "name": "Service Corridor 1102486133",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486133-4",
+    "name": "Service Corridor 1102486133",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486132-1",
+    "name": "Service Corridor 1102486132",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486132-2",
+    "name": "Service Corridor 1102486132",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486132-3",
+    "name": "Service Corridor 1102486132",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486132-4",
+    "name": "Service Corridor 1102486132",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486131",
+    "name": "Service Corridor 1102486131",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486130-1",
+    "name": "Service Corridor 1102486130",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486130-2",
+    "name": "Service Corridor 1102486130",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102486130-3",
+    "name": "Service Corridor 1102486130",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102485691-1",
+    "name": "Service Corridor 1102485691",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102485691-2",
+    "name": "Service Corridor 1102485691",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102485690",
+    "name": "Service Corridor 1102485690",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102485689-1",
+    "name": "Service Corridor 1102485689",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102485689-2",
+    "name": "Service Corridor 1102485689",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102485689-3",
+    "name": "Service Corridor 1102485689",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102485688-3",
+    "name": "Service Corridor 1102485688",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102485688-4",
+    "name": "Service Corridor 1102485688",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102479413",
+    "name": "Service Corridor 1102479413",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102479411-1",
+    "name": "Service Corridor 1102479411",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102479410",
+    "name": "Service Corridor 1102479410",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102478482",
+    "name": "Service Corridor 1102478482",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102478481",
+    "name": "Service Corridor 1102478481",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101650529-1",
+    "name": "Service Corridor 1101650529",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101650529-2",
+    "name": "Service Corridor 1101650529",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101642096-1",
+    "name": "Service Corridor 1101642096",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101642096-2",
+    "name": "Service Corridor 1101642096",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101642095",
+    "name": "Service Corridor 1101642095",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101642093",
+    "name": "Service Corridor 1101642093",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101642091",
+    "name": "Service Corridor 1101642091",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101634428",
+    "name": "Service Corridor 1101634428",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101634427",
+    "name": "Service Corridor 1101634427",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630269-1",
+    "name": "Service Corridor 1101630269",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630269-2",
+    "name": "Service Corridor 1101630269",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101626918-1",
+    "name": "Service Corridor 1101626918",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101626918-2",
+    "name": "Service Corridor 1101626918",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101616433",
+    "name": "Service Corridor 1101616433",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101614207",
+    "name": "Service Corridor 1101614207",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101611372",
+    "name": "Service Corridor 1101611372",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101611370",
+    "name": "Service Corridor 1101611370",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101472122-1",
+    "name": "Service Corridor 1101472122",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101472122-2",
+    "name": "Service Corridor 1101472122",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101472122-3",
+    "name": "Service Corridor 1101472122",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1051428730-1",
+    "name": "Service Corridor 1051428730",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1051428730-2",
+    "name": "Service Corridor 1051428730",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1051428730-3",
+    "name": "Service Corridor 1051428730",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1051428729",
+    "name": "Service Corridor 1051428729",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-758682193-1",
+    "name": "Residential Corridor 758682193",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-758682193-2",
+    "name": "Residential Corridor 758682193",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-758308728-1",
+    "name": "Residential Corridor 758308728",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-758308728-2",
+    "name": "Residential Corridor 758308728",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-758308728-3",
+    "name": "Residential Corridor 758308728",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-758308728-4",
+    "name": "Residential Corridor 758308728",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-758308728-5",
+    "name": "Residential Corridor 758308728",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-758308728-6",
+    "name": "Residential Corridor 758308728",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-758308728-7",
+    "name": "Residential Corridor 758308728",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-758308728-8",
+    "name": "Residential Corridor 758308728",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-758308728-9",
+    "name": "Residential Corridor 758308728",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-758308728-10",
+    "name": "Residential Corridor 758308728",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-758308727",
+    "name": "Residential Corridor 758308727",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757252635-1",
+    "name": "Residential Corridor 757252635",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757252635-2",
+    "name": "Residential Corridor 757252635",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-757252635-3",
+    "name": "Residential Corridor 757252635",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095706-1",
+    "name": "Residential Corridor 643095706",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095706-2",
+    "name": "Residential Corridor 643095706",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095706-3",
+    "name": "Residential Corridor 643095706",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095706-4",
+    "name": "Residential Corridor 643095706",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095706-5",
+    "name": "Residential Corridor 643095706",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095700",
+    "name": "Residential Corridor 643095700",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095699-1",
+    "name": "Residential Corridor 643095699",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-643095699-2",
+    "name": "Residential Corridor 643095699",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1370509586",
+    "name": "Residential Corridor 1370509586",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1370509585",
+    "name": "Residential Corridor 1370509585",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1273070044",
+    "name": "Residential Corridor 1273070044",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1273070043",
+    "name": "Residential Corridor 1273070043",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1273070042-1",
+    "name": "Residential Corridor 1273070042",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1273070042-2",
+    "name": "Residential Corridor 1273070042",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1273070042-3",
+    "name": "Residential Corridor 1273070042",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1273070042-4",
+    "name": "Residential Corridor 1273070042",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1273070042-5",
+    "name": "Residential Corridor 1273070042",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1273070041-1",
+    "name": "Residential Corridor 1273070041",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1273070041-2",
+    "name": "Residential Corridor 1273070041",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102495115",
+    "name": "Residential Corridor 1102495115",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494087-1",
+    "name": "Residential Corridor 1102494087",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494087-2",
+    "name": "Residential Corridor 1102494087",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494085-1",
+    "name": "Residential Corridor 1102494085",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494085-2",
+    "name": "Residential Corridor 1102494085",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494084",
+    "name": "Residential Corridor 1102494084",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494083",
+    "name": "Residential Corridor 1102494083",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102494082",
+    "name": "Residential Corridor 1102494082",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102490695",
+    "name": "Residential Corridor 1102490695",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102490693-1",
+    "name": "Residential Corridor 1102490693",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102490693-2",
+    "name": "Residential Corridor 1102490693",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102490692-1",
+    "name": "Residential Corridor 1102490692",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102490692-2",
+    "name": "Residential Corridor 1102490692",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102490691",
+    "name": "Residential Corridor 1102490691",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102490689-1",
+    "name": "Residential Corridor 1102490689",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102490689-2",
+    "name": "Residential Corridor 1102490689",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102490689-3",
+    "name": "Residential Corridor 1102490689",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102490688",
+    "name": "Residential Corridor 1102490688",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102490687",
+    "name": "Residential Corridor 1102490687",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489368-1",
+    "name": "Residential Corridor 1102489368",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489368-2",
+    "name": "Residential Corridor 1102489368",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489366",
+    "name": "Residential Corridor 1102489366",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489362",
+    "name": "Residential Corridor 1102489362",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489361-1",
+    "name": "Residential Corridor 1102489361",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489361-2",
+    "name": "Residential Corridor 1102489361",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489361-3",
+    "name": "Residential Corridor 1102489361",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489359-1",
+    "name": "Residential Corridor 1102489359",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489359-2",
+    "name": "Residential Corridor 1102489359",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489359-3",
+    "name": "Residential Corridor 1102489359",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102489359-4",
+    "name": "Residential Corridor 1102489359",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483627-1",
+    "name": "Residential Corridor 1102483627",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483627-2",
+    "name": "Residential Corridor 1102483627",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483626",
+    "name": "Residential Corridor 1102483626",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483625",
+    "name": "Residential Corridor 1102483625",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483624-1",
+    "name": "Residential Corridor 1102483624",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483624-2",
+    "name": "Residential Corridor 1102483624",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483624-3",
+    "name": "Residential Corridor 1102483624",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483624-4",
+    "name": "Residential Corridor 1102483624",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483623",
+    "name": "Residential Corridor 1102483623",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483622-1",
+    "name": "Residential Corridor 1102483622",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483622-2",
+    "name": "Residential Corridor 1102483622",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483621",
+    "name": "Residential Corridor 1102483621",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483620",
+    "name": "Residential Corridor 1102483620",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483619",
+    "name": "Residential Corridor 1102483619",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483617-1",
+    "name": "Residential Corridor 1102483617",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483617-2",
+    "name": "Residential Corridor 1102483617",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102483615",
+    "name": "Residential Corridor 1102483615",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102479409",
+    "name": "Residential Corridor 1102479409",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102479408-1",
+    "name": "Residential Corridor 1102479408",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102479408-2",
+    "name": "Residential Corridor 1102479408",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1102479407",
+    "name": "Residential Corridor 1102479407",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101663550",
+    "name": "Residential Corridor 1101663550",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101650532",
+    "name": "Residential Corridor 1101650532",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101650531",
+    "name": "Residential Corridor 1101650531",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101642099",
+    "name": "Residential Corridor 1101642099",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101642098",
+    "name": "Residential Corridor 1101642098",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101642097-1",
+    "name": "Residential Corridor 1101642097",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101642097-2",
+    "name": "Residential Corridor 1101642097",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101639019",
+    "name": "Residential Corridor 1101639019",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101639018",
+    "name": "Residential Corridor 1101639018",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630268-1",
+    "name": "Residential Corridor 1101630268",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630268-2",
+    "name": "Residential Corridor 1101630268",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630268-3",
+    "name": "Residential Corridor 1101630268",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630268-4",
+    "name": "Residential Corridor 1101630268",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630267",
+    "name": "Residential Corridor 1101630267",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630266-1",
+    "name": "Residential Corridor 1101630266",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630266-2",
+    "name": "Residential Corridor 1101630266",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630266-3",
+    "name": "Residential Corridor 1101630266",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630266-4",
+    "name": "Residential Corridor 1101630266",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630266-5",
+    "name": "Residential Corridor 1101630266",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630265-1",
+    "name": "Residential Corridor 1101630265",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630265-2",
+    "name": "Residential Corridor 1101630265",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630263",
+    "name": "Residential Corridor 1101630263",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630260-1",
+    "name": "Residential Corridor 1101630260",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630260-2",
+    "name": "Residential Corridor 1101630260",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630260-3",
+    "name": "Residential Corridor 1101630260",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630260-4",
+    "name": "Residential Corridor 1101630260",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630260-5",
+    "name": "Residential Corridor 1101630260",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630260-6",
+    "name": "Residential Corridor 1101630260",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630260-7",
+    "name": "Residential Corridor 1101630260",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1101630260-8",
+    "name": "Residential Corridor 1101630260",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1100804347-1",
+    "name": "Residential Corridor 1100804347",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1100804347-2",
+    "name": "Residential Corridor 1100804347",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1100779294-1",
+    "name": "Residential Corridor 1100779294",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1100779294-2",
+    "name": "Residential Corridor 1100779294",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1100779294-3",
+    "name": "Residential Corridor 1100779294",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107398",
+    "name": "Footway Corridor 1171107398",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107397-1",
+    "name": "Footway Corridor 1171107397",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107397-2",
+    "name": "Footway Corridor 1171107397",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107396",
+    "name": "Footway Corridor 1171107396",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107394",
+    "name": "Footway Corridor 1171107394",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107393",
+    "name": "Footway Corridor 1171107393",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107392",
+    "name": "Footway Corridor 1171107392",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107391-1",
+    "name": "Footway Corridor 1171107391",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107391-2",
+    "name": "Footway Corridor 1171107391",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107390-1",
+    "name": "Footway Corridor 1171107390",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107390-2",
+    "name": "Footway Corridor 1171107390",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107389-1",
+    "name": "Footway Corridor 1171107389",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107389-2",
+    "name": "Footway Corridor 1171107389",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107389-3",
+    "name": "Footway Corridor 1171107389",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107389-4",
+    "name": "Footway Corridor 1171107389",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107388-1",
+    "name": "Footway Corridor 1171107388",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107388-2",
+    "name": "Footway Corridor 1171107388",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107387-1",
+    "name": "Footway Corridor 1171107387",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107387-2",
+    "name": "Footway Corridor 1171107387",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107387-3",
+    "name": "Footway Corridor 1171107387",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107387-4",
+    "name": "Footway Corridor 1171107387",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107387-5",
+    "name": "Footway Corridor 1171107387",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107387-6",
+    "name": "Footway Corridor 1171107387",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1171107387-7",
+    "name": "Footway Corridor 1171107387",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1352732185",
+    "name": "Construction Corridor 1352732185",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1352732184",
+    "name": "Construction Corridor 1352732184",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1352732183-1",
+    "name": "Construction Corridor 1352732183",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1352732183-2",
+    "name": "Construction Corridor 1352732183",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1352732183-3",
+    "name": "Construction Corridor 1352732183",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1352732182",
+    "name": "Construction Corridor 1352732182",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1320471872-1",
+    "name": "Construction Corridor 1320471872",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1320471872-2",
+    "name": "Construction Corridor 1320471872",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
+  },
+  {
+    "road_id": "road-osm-1320471872-3",
+    "name": "Construction Corridor 1320471872",
+    "reason": "Width unmeasured in cadastre; clearance unverified.",
+    "buildings_affected": 0,
+    "data_source": "OpenStreetMap"
   }
 ]

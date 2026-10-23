@@ -1,43 +1,108 @@
 [
   {
-    "road_id": "road-101",
-    "name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
-    "buildings_affected": 4,
+    "road_id": "road-osm-733440064-2",
+    "name": "Service Corridor 733440064",
+    "buildings_affected": 51,
     "building_ids": [
-      "bldg-201",
-      "bldg-202",
-      "bldg-205",
-      "bldg-206"
+      "bldg-osm-4393899629",
+      "bldg-osm-4393913180",
+      "bldg-osm-4393950583",
+      "bldg-osm-4393950586",
+      "bldg-osm-4393950587",
+      "bldg-osm-4393950588",
+      "bldg-osm-4393952889",
+      "bldg-osm-4393952890",
+      "bldg-osm-4393952891",
+      "bldg-osm-4393952894",
+      "bldg-osm-4393952895",
+      "bldg-osm-4393952896",
+      "bldg-osm-441673347",
+      "bldg-osm-1203031403",
+      "bldg-osm-1203185692",
+      "bldg-osm-1203185693",
+      "bldg-osm-1203185694",
+      "bldg-osm-1203185695",
+      "bldg-osm-1216904611",
+      "bldg-osm-1216904614",
+      "bldg-osm-1216904615",
+      "bldg-osm-1216904616",
+      "bldg-osm-1216904618",
+      "bldg-osm-1216904620",
+      "bldg-osm-1216904621",
+      "bldg-osm-1216904622",
+      "bldg-osm-1216904627",
+      "bldg-osm-1216904628",
+      "bldg-osm-1216904629",
+      "bldg-osm-1216904630",
+      "bldg-osm-1216991245",
+      "bldg-osm-1216997335",
+      "bldg-osm-1216997336",
+      "bldg-osm-1216997337",
+      "bldg-osm-1216997338",
+      "bldg-osm-1216997339",
+      "bldg-osm-1216997340",
+      "bldg-osm-1216997341",
+      "bldg-osm-1216997342",
+      "bldg-osm-1216997343",
+      "bldg-osm-1216997344",
+      "bldg-osm-1216997345",
+      "bldg-osm-1216997346",
+      "bldg-osm-1216997348",
+      "bldg-osm-1216997349",
+      "bldg-osm-1216997350",
+      "bldg-osm-1216997351",
+      "bldg-osm-1216997352",
+      "bldg-osm-1216997353",
+      "bldg-osm-1216997354",
+      "bldg-osm-1560038599"
     ]
   },
   {
-    "road_id": "road-102",
-    "name": "Academic Blocks Central Spine (North Campus Lane)",
-    "buildings_affected": 1,
+    "road_id": "road-osm-1102489365",
+    "name": "Track Corridor 1102489365",
+    "buildings_affected": 5,
     "building_ids": [
-      "bldg-202"
+      "bldg-osm-4393952895",
+      "bldg-osm-1216997341",
+      "bldg-osm-1216997342",
+      "bldg-osm-1216997343",
+      "bldg-osm-1216997344"
     ]
   },
   {
-    "road_id": "road-105",
-    "name": "Gharuan East Rural By-lane (Unknown Width)",
-    "buildings_affected": 1,
+    "road_id": "road-osm-744528317-2",
+    "name": "Service Corridor 744528317",
+    "buildings_affected": 5,
     "building_ids": [
-      "bldg-205"
+      "bldg-osm-1216997335",
+      "bldg-osm-1216997336",
+      "bldg-osm-1216997337",
+      "bldg-osm-1216997338",
+      "bldg-osm-1216997339"
     ]
   },
   {
-    "road_id": "road-106",
-    "name": "Sports Arena & South Transit Spur",
-    "buildings_affected": 1,
+    "road_id": "road-osm-1102485689-4",
+    "name": "Service Corridor 1102485689",
+    "buildings_affected": 5,
     "building_ids": [
-      "bldg-206"
+      "bldg-osm-4393899629",
+      "bldg-osm-1216997348",
+      "bldg-osm-1216997349",
+      "bldg-osm-1216997350",
+      "bldg-osm-1216997351"
     ]
   },
   {
-    "road_id": "road-103",
-    "name": "Old Gharuan Village Bypass Gully (Narrow Corridor)",
-    "buildings_affected": 0,
-    "building_ids": []
+    "road_id": "road-osm-1102483614",
+    "name": "Service Corridor 1102483614",
+    "buildings_affected": 5,
+    "building_ids": [
+      "bldg-osm-4393899629",
+      "bldg-osm-1216997348",
+      "bldg-osm-1216997349",
+      "bldg-osm-1216997350",
+      "bldg-osm-1216997351"
+    ]
   }
 ]

@@ -1,0 +1,41 @@
+{
+  "road_id": "road-osm-482957891-1",
+  "road_name": "Tertiary Corridor 482957891",
+  "vehicle": {
+    "id": "fire",
+    "name": "Fire tender",
+    "category": "Heavy apparatus",
+    "min_clearance_width_m": 3.5,
+    "min_clearance_height_m": 3.5,
+    "turning_radius_m": 8.5,
+    "weight_tons": 16.0,
+    "description": "Heavy municipal water tender requiring \u2265 3.5m clearance corridor.",
+    "typical_equipment": "4,500L water tank, high-pressure pump, extension ladders, rescue gear",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "assessment": {
+    "road_id": "road-osm-482957891-1",
+    "name": "Tertiary Corridor 482957891",
+    "road_class": "Tertiary",
+    "width_m": 5.5,
+    "required_width_m": 3.5,
+    "surface": "asphalt",
+    "obstruction": null,
+    "status": "accessible",
+    "is_passable": true,
+    "length_m": 0.0,
+    "limiting_factors": [],
+    "notes": "Adequate clearance for Fire tender (5.5m usable width)."
+  },
+  "plain_language_explanation": "Adequate clearance for Fire tender (5.5m usable width)."
+}

@@ -1,35 +1,35 @@
 {
   "fire": {
     "counts": {
-      "feasible": 1,
-      "constrained": 1,
-      "infeasible": 3,
-      "unknown": 1,
-      "total": 6
+      "feasible": 0,
+      "constrained": 0,
+      "infeasible": 0,
+      "unknown": 52,
+      "total": 52
     },
-    "verified_reachable_pct": 20.0,
-    "evidence_coverage_pct": 83.3
+    "verified_reachable_pct": 0.0,
+    "evidence_coverage_pct": 0.0
   },
   "amb": {
     "counts": {
-      "feasible": 3,
+      "feasible": 0,
       "constrained": 0,
-      "infeasible": 2,
-      "unknown": 1,
-      "total": 6
+      "infeasible": 0,
+      "unknown": 52,
+      "total": 52
     },
-    "verified_reachable_pct": 60.0,
-    "evidence_coverage_pct": 83.3
+    "verified_reachable_pct": 0.0,
+    "evidence_coverage_pct": 0.0
   },
   "rapid": {
     "counts": {
-      "feasible": 3,
+      "feasible": 0,
       "constrained": 0,
-      "infeasible": 2,
-      "unknown": 1,
-      "total": 6
+      "infeasible": 0,
+      "unknown": 52,
+      "total": 52
     },
-    "verified_reachable_pct": 60.0,
-    "evidence_coverage_pct": 83.3
+    "verified_reachable_pct": 0.0,
+    "evidence_coverage_pct": 0.0
   }
 }

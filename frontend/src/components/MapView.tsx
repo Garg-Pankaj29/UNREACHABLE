@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   MapContainer,
-  TileLayer,
   GeoJSON as LeafletGeoJSON,
   Marker,
   Popup,
@@ -12,7 +11,7 @@ import {
 } from 'react-leaflet';
 import L, { LatLngExpression, PathOptions } from 'leaflet';
 import { AlternativeRoute, GeoJSONFeature, IssueRecord, RouteViolation, VehicleProfile } from '../types';
-import { RefreshCw, AlertTriangle } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 interface MapViewProps {
   buildings: GeoJSONFeature[];
@@ -435,7 +434,6 @@ export const MapView: React.FC<MapViewProps> = ({
   fullHeight = false,
   showLegend = true,
 }) => {
-  const [tileError, setTileError] = useState(false);
   const [resetCount, setResetCount] = useState(0);
 
   const isPilotMode = stations.length > 5 || roads.length > 50;
@@ -673,22 +671,6 @@ export const MapView: React.FC<MapViewProps> = ({
         </div>
       )}
 
-      {/* Offline Tile Graceful Fallback Notice */}
-      {tileError && (
-        <div
-          className="absolute bottom-20 left-4 z-[900] p-2 px-3 rounded-lg text-xs flex items-center space-x-2"
-          style={{
-            background: 'var(--glass)',
-            border: '1px solid var(--line)',
-            color: 'var(--ink)',
-            backdropFilter: 'blur(10px)',
-          }}
-        >
-          <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-          <span>Base map offline; vector GeoJSON layers rendered directly.</span>
-        </div>
-      )}
-
       {/* Leaflet Map Container with Zoom Control at bottomright */}
       <MapContainer
         center={mapCenter}
@@ -705,15 +687,6 @@ export const MapView: React.FC<MapViewProps> = ({
           resetCount={resetCount}
           routeGeometry={routeGeometry}
           alternativeRoutes={alternativeRoutes}
-        />
-
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          eventHandlers={{
-            tileerror: () => setTileError(true),
-            load: () => setTileError(false),
-          }}
         />
 
         {visibleRoads.length > 0 && (

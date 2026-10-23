@@ -1,0 +1,94 @@
+{
+  "origin_id": "station-osm-1216904632",
+  "destination_id": "bldg-osm-4393950583",
+  "destination_type": "building",
+  "vehicle": {
+    "id": "fire",
+    "name": "Fire tender",
+    "category": "Heavy apparatus",
+    "min_clearance_width_m": 3.5,
+    "min_clearance_height_m": 3.5,
+    "turning_radius_m": 8.5,
+    "weight_tons": 16.0,
+    "description": "Heavy municipal water tender requiring \u2265 3.5m clearance corridor.",
+    "typical_equipment": "4,500L water tank, high-pressure pump, extension ladders, rescue gear",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "classification": "unknown",
+  "route_found": true,
+  "total_distance_m": 15.5,
+  "segments_traversed": [
+    "road-osm-733440064-2"
+  ],
+  "geometry_geojson": {
+    "type": "LineString",
+    "coordinates": [
+      [
+        76.577081,
+        30.770454
+      ],
+      [
+        76.577243,
+        30.770454
+      ]
+    ]
+  },
+  "origin_name": "Hospital Facility 1216904632",
+  "destination_name": "Sukhna Hostel",
+  "steps": [
+    {
+      "step_index": 1,
+      "from_node": "node_76.577081_30.770454",
+      "to_node": "node_76.577243_30.770454",
+      "road_id": "road-osm-733440064-2",
+      "road_name": "Service Corridor 733440064",
+      "segment_length_m": 15.5,
+      "status": "unknown",
+      "reason": "Width unmeasured in cadastre; clearance unverified."
+    }
+  ],
+  "segment_assessments": [
+    {
+      "road_id": "road-osm-733440064-2",
+      "name": "Service Corridor 733440064",
+      "road_class": "Service",
+      "width_m": null,
+      "required_width_m": 3.5,
+      "surface": "paved",
+      "obstruction": null,
+      "status": "unknown",
+      "is_passable": true,
+      "length_m": 15.5,
+      "limiting_factors": [
+        "Unmeasured corridor width in cadastre: ground truth audit required"
+      ],
+      "notes": "Width unmeasured in cadastre; clearance unverified."
+    }
+  ],
+  "limiting_segments": [
+    "road-osm-733440064-2"
+  ],
+  "evaluated_constraints": [
+    "width",
+    "physical_obstruction"
+  ],
+  "unevaluated_constraints": [
+    "overhead_clearance",
+    "turning_radius",
+    "gross_weight_limit",
+    "gate_restriction",
+    "entrance_doorway_access"
+  ],
+  "explanation": "Route identified (15.5m across 1 segments), but contains unmeasured segment(s): road-osm-733440064-2. Access cannot be confirmed accessible without ground truth width survey.",
+  "disclaimer": "DETERMINISTIC EVALUATION FOR PROTOTYPE DEMONSTRATION. ROAD ARRIVAL DOES NOT GUARANTEE ENTRANCE ACCESS."
+}
