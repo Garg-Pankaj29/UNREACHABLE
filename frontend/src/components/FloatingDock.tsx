@@ -7,7 +7,7 @@ interface FloatingDockProps {
 export const NAV_ITEMS = [
   { path: '', icon: '◎', label: 'Overview' },
   { path: 'map', icon: '⌖', label: 'Access Atlas' },
-  { path: 'routes', icon: '↗', label: 'Routes' },
+  { path: 'routes', icon: '↗', label: 'Emergency Routes' },
   { path: 'inspector', icon: '◈', label: 'AI Inspector' },
   { path: 'interventions', icon: '▲', label: 'Interventions' },
   { path: 'simulation', icon: '◐', label: 'Simulation' },
@@ -20,6 +20,7 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({ currentPath }) => {
   if (activeKey === 'dashboard' || activeKey === '/') activeKey = '';
   if (activeKey === 'b' || activeKey === 'building' || activeKey === 'buildings') activeKey = 'map';
   if (activeKey === 'i' || activeKey === 'issue' || activeKey === 'issues') activeKey = 'interventions';
+  if (activeKey === 'route') activeKey = 'routes';
 
   return (
     <nav className="dk" aria-label="Main navigation">

@@ -37,6 +37,7 @@ export function App() {
 
   // Backend state
   const [stats, setStats] = useState<StatsResponse | null>(null);
+  const [datasetMode, setDatasetMode] = useState<'pilot' | 'sample'>('pilot');
   const [buildings, setBuildings] = useState<GeoJSONFeature[]>([]);
   const [roads, setRoads] = useState<GeoJSONFeature[]>([]);
   const [stations, setStations] = useState<GeoJSONFeature[]>([]);
@@ -81,8 +82,9 @@ export function App() {
 
   // Hash-based routing parser
   const parseHash = useCallback(() => {
-    const hash = window.location.hash.replace(/^#\/?/, '');
-    const parts = hash.split('/').filter(Boolean);
+    const rawHash = window.location.hash.replace(/^#\/?/, '');
+    const [pathPart] = rawHash.split('?');
+    const parts = (pathPart || '').split('/').filter(Boolean);
     let route = parts[0] || '';
     const param = parts[1] || '';
 
@@ -100,37 +102,102 @@ export function App() {
     return () => window.removeEventListener('hashchange', parseHash);
   }, [parseHash]);
 
-  // Load backend data from existing FastAPI endpoints
-  const fetchBackendData = useCallback(async () => {
+  // Load backend data from FastAPI endpoints
+  const fetchBackendData = useCallback(async (mode: 'pilot' | 'sample' = datasetMode) => {
     setBackendLoading(true);
     setBackendError(null);
     try {
       await api.fetchHealth();
 
-      const statsData = await api.fetchStats();
-      setStats(statsData);
+      if (mode === 'pilot') {
+        try {
+          // Fetch real pilot facilities (all 422 hospitals, fire stations, clinics)
+          const facRes = await api.fetchPilotFacilities();
+          const stns = facRes.features || [];
 
-      const neighbourhood = await api.fetchNeighbourhood();
-      const feats = neighbourhood.features || [];
+          // Fetch real pilot arterial roads
+          const pilotRes = await api.fetchPilotFeatures({ zoom: 12 });
+          const feats = pilotRes.features || [];
+          const rds = feats.filter((f) => f.properties?.feature_type === 'road');
+          const bldgs = feats.filter((f) => f.properties?.feature_type === 'building');
 
-      const bldgs = feats.filter((f) => f.properties?.feature_type === 'building');
-      const rds = feats.filter((f) => f.properties?.feature_type === 'road');
-      const stns = feats.filter((f) => f.properties?.feature_type === 'station');
+          setStations(stns);
+          setRoads(rds);
+          setBuildings(bldgs);
+          addLog(`Loaded real geographic pilot: ${stns.length} facilities, ${rds.length} road corridors`);
+        } catch (pilotErr: any) {
+          console.warn('Pilot API unavailable, falling back to sample:', pilotErr);
+          mode = 'sample';
+          setDatasetMode('sample');
+        }
+      }
 
-      setBuildings(bldgs);
-      setRoads(rds);
-      setStations(stns);
+      if (mode === 'sample') {
+        const statsData = await api.fetchStats();
+        setStats(statsData);
+
+        const neighbourhood = await api.fetchNeighbourhood();
+        const feats = neighbourhood.features || [];
+
+        const bldgs = feats.filter((f) => f.properties?.feature_type === 'building');
+        const rds = feats.filter((f) => f.properties?.feature_type === 'road');
+        const stns = feats.filter((f) => f.properties?.feature_type === 'station');
+
+        setBuildings(bldgs);
+        setRoads(rds);
+        setStations(stns);
+        addLog('Loaded synthetic demonstration area');
+      }
     } catch (err: any) {
       console.warn('FastAPI backend connection note:', err.message);
       setBackendError(err.message || 'Unable to connect to FastAPI backend');
     } finally {
       setBackendLoading(false);
     }
-  }, [selectedFeature]);
+  }, [datasetMode]);
 
   useEffect(() => {
     fetchBackendData();
-  }, []);
+  }, [fetchBackendData]);
+
+  // Handle dynamic Level-of-Detail viewport updates for pilot dataset
+  const handleViewportChange = useCallback(async (bbox: string, zoom: number) => {
+    if (datasetMode !== 'pilot') return;
+    if (zoom < 14) return; // At lower zooms, major roads & facilities are sufficient
+
+    try {
+      const res = await api.fetchPilotFeatures({ bbox, zoom, limit: 1500 });
+      const feats = res.features || [];
+      const newBldgs = feats.filter((f) => f.properties?.feature_type === 'building');
+      const newRds = feats.filter((f) => f.properties?.feature_type === 'road');
+
+      if (newBldgs.length > 0 || newRds.length > 0) {
+        setBuildings(newBldgs);
+        setRoads((prev) => {
+          const map = new Map<string, GeoJSONFeature>();
+          prev.forEach((r) => {
+            const id = r.properties?.id || r.id;
+            if (id) map.set(id, r);
+          });
+          newRds.forEach((r) => {
+            const id = r.properties?.id || r.id;
+            if (id) map.set(id, r);
+          });
+          return Array.from(map.values());
+        });
+      }
+    } catch (err) {
+      console.warn('LOD viewport load note:', err);
+    }
+  }, [datasetMode]);
+
+  const handleToggleDataset = (targetMode?: 'pilot' | 'sample') => {
+    const nextMode = targetMode || (datasetMode === 'pilot' ? 'sample' : 'pilot');
+    setDatasetMode(nextMode);
+    setSelectedFeature(null);
+    fetchBackendData(nextMode);
+    showToast(nextMode === 'pilot' ? 'Switched to Real Geographic Pilot (Chandigarh)' : 'Switched to Synthetic Demo (Gharuan)');
+  };
 
   // Issue status transitions
   const handleUpdateIssueStatus = (
@@ -175,6 +242,9 @@ export function App() {
             issues={issues}
             selectedFeature={selectedFeature}
             onSelectFeature={setSelectedFeature}
+            datasetMode={datasetMode}
+            onToggleDataset={handleToggleDataset}
+            onViewportChange={handleViewportChange}
           />
         );
 
@@ -184,6 +254,9 @@ export function App() {
             buildings={buildings}
             stations={stations}
             roads={roads}
+            datasetMode={datasetMode}
+            initialTarget={selectedFeature}
+            targetId={routeParam}
           />
         );
 
@@ -234,6 +307,7 @@ export function App() {
             buildingId={routeParam}
             buildings={buildings}
             roads={roads}
+            datasetMode={datasetMode}
             loading={backendLoading}
             error={backendError}
           />
@@ -283,11 +357,13 @@ export function App() {
       {/* Living background simulation canvas */}
       <LivingBackground theme={theme} />
 
-      {/* Top Header with integrated Synthetic Badge, Replay Badge, and Friendly Theme Toggle */}
+      {/* Top Header with integrated Dataset Switcher, Replay Badge, and Friendly Theme Toggle */}
       <TopHeader
         theme={theme}
         onToggleTheme={toggleTheme}
         isReplay={isReplay}
+        datasetMode={datasetMode}
+        onToggleDataset={() => handleToggleDataset()}
       />
 
       {/* Quick Launch Demo Mode Chip (hidden when already on #/demo) */}
@@ -345,7 +421,7 @@ export function App() {
         >
           <span>FastAPI backend unreachable at {api.getBaseUrl()}</span>
           <button
-            onClick={fetchBackendData}
+            onClick={() => fetchBackendData()}
             style={{
               background: 'var(--ink)',
               color: 'var(--bg)',

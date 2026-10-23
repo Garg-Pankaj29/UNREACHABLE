@@ -1,16 +1,20 @@
 import React from 'react';
-import { Zap, Sun, Moon } from 'lucide-react';
+import { Zap, Sun, Moon, Navigation } from 'lucide-react';
 
 interface TopHeaderProps {
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
   isReplay?: boolean;
+  datasetMode?: 'pilot' | 'sample';
+  onToggleDataset?: () => void;
 }
 
 export const TopHeader: React.FC<TopHeaderProps> = ({
   theme,
   onToggleTheme,
   isReplay = false,
+  datasetMode = 'pilot',
+  onToggleDataset,
 }) => {
   return (
     <header className="top" role="banner">
@@ -19,15 +23,74 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           <i aria-hidden="true" />
           <span>UNREACHABLE</span>
         </a>
-        <span
-          id="synthetic-demo-data-ribbon"
-          className="header-synthetic-badge"
-          role="note"
-          aria-label="Synthetic demo data notice"
+        {datasetMode === 'pilot' ? (
+          <button
+            type="button"
+            id="pilot-dataset-ribbon"
+            onClick={onToggleDataset}
+            className="header-synthetic-badge"
+            role="note"
+            aria-label="Real pilot geographic dataset active. Click to switch to demo dataset."
+            style={{
+              background: 'rgba(22, 138, 92, 0.15)',
+              borderColor: 'rgba(22, 138, 92, 0.45)',
+              color: '#168a5c',
+              cursor: onToggleDataset ? 'pointer' : 'default',
+            }}
+            title="Real Pilot: Chandigarh-Mohali-Gharuan (Click to toggle Demo dataset)"
+          >
+            <span
+              style={{
+                width: '7px',
+                height: '7px',
+                borderRadius: '50%',
+                background: '#168a5c',
+                display: 'inline-block',
+                boxShadow: '0 0 6px #168a5c',
+              }}
+            />
+            <span>Real Pilot: Chandigarh (82k+ features)</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            id="synthetic-demo-data-ribbon"
+            onClick={onToggleDataset}
+            className="header-synthetic-badge"
+            role="note"
+            aria-label="Synthetic demo data notice. Click to switch to real pilot dataset."
+            style={{ cursor: onToggleDataset ? 'pointer' : 'default' }}
+            title="Synthetic Prototype Model (Click to toggle Real Pilot dataset)"
+          >
+            <Zap size={11} className="fill-current text-current" aria-hidden="true" />
+            <span>Synthetic demo data</span>
+          </button>
+        )}
+
+        <a
+          href="#/routes"
+          className="header-routes-btn"
+          id="header-routes-nav"
+          title="Emergency Centre Selection & Multiple Routes"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'var(--tape, #ffd60a)',
+            color: '#1c1f1b',
+            padding: '5px 14px',
+            borderRadius: '99px',
+            fontSize: '12px',
+            fontWeight: 800,
+            textDecoration: 'none',
+            letterSpacing: '0.02em',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+            transition: 'transform 0.15s ease',
+          }}
         >
-          <Zap size={11} className="fill-current text-current" aria-hidden="true" />
-          <span>Synthetic demo data</span>
-        </span>
+          <Navigation size={13} style={{ transform: 'rotate(45deg)' }} />
+          <span>Emergency Routes</span>
+        </a>
       </div>
 
       <div className="tr" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

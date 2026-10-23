@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { GeoJSONFeature, IssueRecord, VehicleProfile } from '../types';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, X, Loader2, ShieldAlert } from 'lucide-react';
+import { GeoJSONFeature, IssueRecord, VehicleProfile, BuildingAccessResponse } from '../types';
 import { MapView } from '../components/MapView';
 import { VEHICLE_OPTIONS } from '../services/store';
+import { api, SearchResultItem } from '../services/api';
 
 interface AccessAtlasPageProps {
   buildings: GeoJSONFeature[];
@@ -11,6 +13,9 @@ interface AccessAtlasPageProps {
   selectedFeature: GeoJSONFeature | null;
   onSelectFeature: (feature: GeoJSONFeature | null) => void;
   onSelectVehicle?: (vehicle: VehicleProfile) => void;
+  datasetMode?: 'pilot' | 'sample';
+  onToggleDataset?: (mode: 'pilot' | 'sample') => void;
+  onViewportChange?: (bbox: string, zoom: number) => void;
 }
 
 export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
@@ -20,9 +25,19 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
   issues,
   selectedFeature,
   onSelectFeature,
+  datasetMode = 'pilot',
+  onToggleDataset,
+  onViewportChange,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [selectedVehKey, setSelectedVehKey] = useState<string>('fire');
+  const [onlineAvailable, setOnlineAvailable] = useState<boolean>(true);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [statusFilters, setStatusFilters] = useState<{
     ok: boolean;
@@ -36,6 +51,38 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
     unknown: true,
   });
 
+  const [bldgAssessment, setBldgAssessment] = useState<BuildingAccessResponse | null>(null);
+  const [bldgLoading, setBldgLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const isBldg = selectedFeature?.properties?.feature_type === 'building';
+    const bId = selectedFeature?.properties?.id || (selectedFeature?.id as string);
+    if (isBldg && bId) {
+      let isMounted = true;
+      setBldgLoading(true);
+      api
+        .fetchBuildingAccess(bId, selectedVehKey, undefined, datasetMode)
+        .then((res) => {
+          if (isMounted) {
+            setBldgAssessment(res);
+            setBldgLoading(false);
+          }
+        })
+        .catch((err) => {
+          if (isMounted) {
+            console.warn('Building assessment fetch error:', err);
+            setBldgAssessment(null);
+            setBldgLoading(false);
+          }
+        });
+      return () => {
+        isMounted = false;
+      };
+    } else {
+      setBldgAssessment(null);
+    }
+  }, [selectedFeature?.properties?.id, selectedFeature?.id, selectedFeature?.properties?.feature_type, selectedVehKey, datasetMode]);
+
   const [layers, setLayers] = useState({
     roads: true,
     buildings: true,
@@ -43,16 +90,231 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
     issues: true,
   });
 
-  // Keyboard navigation: Escape key deselects currently active feature
+  // Debounced search effect
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (q.length < 2) {
+      setSearchResults([]);
+      setIsDropdownOpen(false);
+      setIsSearching(false);
+      return;
+    }
+
+    let isMounted = true;
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        if (datasetMode === 'pilot') {
+          const resp = await api.searchPilot(q, 15);
+          if (isMounted) {
+            setSearchResults(resp.results || []);
+            if (resp.online_available !== undefined) {
+              setOnlineAvailable(resp.online_available);
+            }
+            setIsDropdownOpen(true);
+            setActiveIndex(0);
+          }
+        } else {
+          // Demo/sample mode search across loaded sample features
+          const qLower = q.toLowerCase();
+          const matches: SearchResultItem[] = [];
+
+          stations.forEach((s) => {
+            const p = s.properties || {};
+            if (p.name?.toLowerCase().includes(qLower) || p.id?.toLowerCase().includes(qLower)) {
+              matches.push({
+                id: p.id || (s.id as string),
+                name: p.name || 'Emergency Station',
+                feature_type: 'facility',
+                sub_type: 'station',
+                details: `Emergency Station • ${p.data_source || 'Demo Station'}`,
+                coordinates: s.geometry?.coordinates,
+                geometry: s.geometry,
+                properties: p,
+                verification_status: p.verification_status || 'verified_sample',
+              });
+            }
+          });
+
+          buildings.forEach((b) => {
+            const p = b.properties || {};
+            if (p.name?.toLowerCase().includes(qLower) || p.id?.toLowerCase().includes(qLower)) {
+              matches.push({
+                id: p.id || (b.id as string),
+                name: p.name || `Building ${p.id}`,
+                feature_type: 'building',
+                sub_type: p.use_type || 'building',
+                details: `Building • Status: ${p.access_status || 'unknown'}`,
+                coordinates: b.geometry?.type === 'Polygon' ? b.geometry.coordinates[0]?.[0] : undefined,
+                geometry: b.geometry,
+                properties: p,
+                verification_status: p.verification_status,
+              });
+            }
+          });
+
+          roads.forEach((r) => {
+            const p = r.properties || {};
+            if (p.name?.toLowerCase().includes(qLower) || p.id?.toLowerCase().includes(qLower)) {
+              matches.push({
+                id: p.id || (r.id as string),
+                name: p.name || `Road ${p.id}`,
+                feature_type: 'road',
+                sub_type: p.road_class || 'road',
+                details: `Road • Width: ${p.width_m ? `${p.width_m}m` : 'unknown'}`,
+                coordinates: r.geometry?.type === 'LineString' ? r.geometry.coordinates[Math.floor(r.geometry.coordinates.length / 2)] : undefined,
+                geometry: r.geometry,
+                properties: p,
+                verification_status: p.verification_status,
+              });
+            }
+          });
+
+          if (isMounted) {
+            setSearchResults(matches.slice(0, 15));
+            setIsDropdownOpen(true);
+            setActiveIndex(0);
+          }
+        }
+      } catch (err) {
+        console.error('Search error:', err);
+        if (isMounted) {
+          setSearchResults([]);
+          setIsDropdownOpen(true);
+        }
+      } finally {
+        if (isMounted) {
+          setIsSearching(false);
+        }
+      }
+    }, 200);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [searchQuery, datasetMode, stations, buildings, roads]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Keyboard navigation: Escape key deselects currently active feature if dropdown is closed
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onSelectFeature(null);
+        if (isDropdownOpen) {
+          setIsDropdownOpen(false);
+        } else {
+          onSelectFeature(null);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onSelectFeature]);
+  }, [isDropdownOpen, onSelectFeature]);
+
+  const handleSelectResult = (item: SearchResultItem) => {
+    const feature: GeoJSONFeature = {
+      type: 'Feature',
+      id: item.id,
+      geometry: item.geometry || {
+        type: 'Point',
+        coordinates: item.coordinates || [76.7794, 30.7333],
+      },
+      properties: {
+        id: item.id,
+        name: item.name,
+        feature_type: item.feature_type,
+        sub_type: item.sub_type,
+        details: item.details,
+        source: item.source || (datasetMode === 'pilot' ? 'local_pilot' : 'sample'),
+        inside_pilot_area: item.inside_pilot_area !== false,
+        coverage_notice: item.coverage_notice,
+        verification_status: item.verification_status,
+        ...item.properties,
+      },
+    };
+    onSelectFeature(feature);
+    setIsDropdownOpen(false);
+    setSearchQuery(item.name);
+  };
+
+  const handleSearchInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (searchResults.length > 0) {
+        setIsDropdownOpen(true);
+        setActiveIndex((prev) => (prev < searchResults.length - 1 ? prev + 1 : 0));
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (searchResults.length > 0) {
+        setIsDropdownOpen(true);
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : searchResults.length - 1));
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (isDropdownOpen && searchResults.length > 0) {
+        handleSelectResult(searchResults[activeIndex] || searchResults[0]);
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDropdownOpen(false);
+    }
+  };
+
+  const renderBadge = (item: SearchResultItem) => {
+    const isOutsidePilot = item.inside_pilot_area === false;
+    let typeBadge: React.ReactNode = null;
+
+    if (item.feature_type === 'facility') {
+      const ft = (item.sub_type || '').toLowerCase();
+      if (ft === 'hospital') {
+        typeBadge = <span style={{ background: '#2563eb', color: '#fff', fontSize: '9px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px' }}>HOSPITAL</span>;
+      } else if (ft === 'fire_station' || ft === 'fire') {
+        typeBadge = <span style={{ background: '#dc2626', color: '#fff', fontSize: '9px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px' }}>FIRE STATION</span>;
+      } else if (ft === 'clinic') {
+        typeBadge = <span style={{ background: '#0d9488', color: '#fff', fontSize: '9px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px' }}>CLINIC</span>;
+      } else if (ft === 'doctors') {
+        typeBadge = <span style={{ background: '#0284c7', color: '#fff', fontSize: '9px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px' }}>DOCTOR</span>;
+      } else {
+        typeBadge = <span style={{ background: '#10b981', color: '#fff', fontSize: '9px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px' }}>FACILITY</span>;
+      }
+    } else if (item.feature_type === 'road') {
+      typeBadge = <span style={{ background: '#64748b', color: '#fff', fontSize: '9px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px' }}>ROAD</span>;
+    } else if (item.feature_type === 'place') {
+      typeBadge = <span style={{ background: '#d97706', color: '#fff', fontSize: '9px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px' }}>LOCATION</span>;
+    } else {
+      typeBadge = <span style={{ background: '#475569', color: '#fff', fontSize: '9px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px' }}>BUILDING</span>;
+    }
+
+    const sourceBadge = item.source === 'online_osm' ? (
+      <span style={{ background: 'rgba(37, 99, 235, 0.12)', color: '#2563eb', border: '1px solid #93c5fd', fontSize: '9px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px' }}>ONLINE</span>
+    ) : item.source === 'local_pilot' ? (
+      <span style={{ background: 'rgba(13, 148, 136, 0.12)', color: '#0d9488', border: '1px solid #99f6e4', fontSize: '9px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px' }}>PILOT DB</span>
+    ) : null;
+
+    const outsideBadge = isOutsidePilot ? (
+      <span style={{ background: 'rgba(217, 119, 6, 0.15)', color: '#d97706', border: '1px solid #fde68a', fontSize: '9px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px' }} title="Outside pilot dataset corridor">OUTSIDE PILOT</span>
+    ) : null;
+
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+        {sourceBadge}
+        {outsideBadge}
+        {typeBadge}
+      </div>
+    );
+  };
 
   const toggleStatus = (key: 'ok' | 'constrained' | 'infeasible' | 'unknown') => {
     setStatusFilters((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -72,7 +334,10 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
     typicalEquipment: 'Standard emergency equipment',
   };
 
-  const getPill = (status?: string) => {
+  const getPill = (status?: string, isOutside?: boolean) => {
+    if (isOutside) {
+      return <b className="pl" style={{ background: 'rgba(217, 119, 6, 0.15)', color: '#d97706', border: '1px solid #fde68a' }}>⚠ Outside pilot coverage</b>;
+    }
     switch (status) {
       case 'feasible':
       case 'ok':
@@ -87,9 +352,11 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
   };
 
   const props = selectedFeature?.properties;
+  const isOutsidePilot = props?.inside_pilot_area === false;
   const isBuilding = props?.feature_type === 'building';
   const isRoad = props?.feature_type === 'road';
-  const isStation = props?.feature_type === 'station';
+  const isStation = props?.feature_type === 'station' || props?.feature_type === 'facility';
+  const isPlace = props?.feature_type === 'place' || (!isBuilding && !isRoad && !isStation);
 
   return (
     <div className="stage">
@@ -105,23 +372,223 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
         statusFilters={statusFilters}
         searchQuery={searchQuery}
         onSelectFeature={onSelectFeature}
+        onViewportChange={onViewportChange}
         fullHeight={true}
       />
 
       {/* Floating Control Panel (Upper Left) */}
       <div className="ctl" aria-label="Access Atlas controls">
-        <h3>Access Atlas</h3>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <h3 style={{ margin: 0 }}>Access Atlas</h3>
+          {onToggleDataset && (
+            <div className="chips" style={{ margin: 0 }}>
+              <button
+                type="button"
+                className={`chip ${datasetMode === 'pilot' ? 'on' : ''}`}
+                onClick={() => onToggleDataset('pilot')}
+                style={{ fontSize: '11px', padding: '2px 8px' }}
+                title="Real Pilot corridor (Chandigarh-Mohali-Gharuan)"
+              >
+                ● Real Pilot
+              </button>
+              <button
+                type="button"
+                className={`chip ${datasetMode === 'sample' ? 'on' : ''}`}
+                onClick={() => onToggleDataset('sample')}
+                style={{ fontSize: '11px', padding: '2px 8px' }}
+                title="Synthetic demonstration dataset (Gharuan)"
+              >
+                ⚡ Demo
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Quick Shortcut to Emergency Routes */}
+        <a
+          href="#/routes"
+          className="btn sm"
+          id="atlas-open-routes-btn"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            width: '100%',
+            marginBottom: '12px',
+            background: 'var(--tape, #ffd60a)',
+            color: '#1c1f1b',
+            fontWeight: 800,
+            fontSize: '12px',
+            textDecoration: 'none',
+            border: '1.5px solid #1c1f1b',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          }}
+          title="Switch to Emergency Station Selection & Multi-Alternative Route Console"
+        >
+          <span>↗ Open Emergency Route Console</span>
+        </a>
 
         {/* Search */}
-        <div className="fld">
-          <label htmlFor="atlas-search">Search building or road</label>
-          <input
-            id="atlas-search"
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="e.g. bldg-201 or Station Link"
-          />
+        <div className="fld atlas-search-container" ref={searchContainerRef} style={{ width: '100%', marginBottom: '14px' }}>
+          <label htmlFor="atlas-search" style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--ink)', marginBottom: '6px' }}>
+            Search building or road
+          </label>
+          <div className="atlas-search-input-wrap" style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%' }}>
+            <span className="atlas-search-icon-left" style={{ position: 'absolute', left: '12px', pointerEvents: 'none', color: 'var(--ink)', display: 'flex', alignItems: 'center', zIndex: 4 }}>
+              {isSearching ? (
+                <Loader2 className="atlas-search-spinner" style={{ width: 18, height: 18, color: 'var(--tape, #ffd60a)' }} />
+              ) : (
+                <Search style={{ width: 18, height: 18, color: 'var(--ink)' }} />
+              )}
+            </span>
+            <input
+              id="atlas-search"
+              ref={inputRef}
+              type="text"
+              role="combobox"
+              aria-expanded={isDropdownOpen}
+              aria-autocomplete="list"
+              aria-controls="atlas-search-results"
+              aria-activedescendant={
+                searchResults[activeIndex] ? `result-${searchResults[activeIndex].id}` : undefined
+              }
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => {
+                if (searchResults.length > 0) setIsDropdownOpen(true);
+              }}
+              onKeyDown={handleSearchInputKeyDown}
+              placeholder="Search hospitals, fire stations, roads, buildings…"
+              autoComplete="off"
+              style={{
+                display: 'block',
+                width: '100%',
+                minHeight: '40px',
+                height: '42px',
+                padding: '8px 36px 8px 38px',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: 'var(--ink)',
+                background: 'var(--bg)',
+                border: '2px solid var(--ink)',
+                borderRadius: '8px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="atlas-search-btn-clear"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSearchResults([]);
+                  setIsDropdownOpen(false);
+                  inputRef.current?.focus();
+                }}
+                title="Clear search"
+                aria-label="Clear search"
+                style={{
+                  position: 'absolute',
+                  right: '8px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--mute)',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  zIndex: 4,
+                }}
+              >
+                <X style={{ width: 16, height: 16 }} />
+              </button>
+            )}
+          </div>
+
+          {/* Results Dropdown */}
+          {isDropdownOpen && (
+            <div
+              id="atlas-search-results"
+              role="listbox"
+              className="atlas-search-dropdown"
+              aria-label="Search results"
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 4px)',
+                left: 0,
+                right: 0,
+                width: '100%',
+                maxHeight: '260px',
+                overflowY: 'auto',
+                background: 'var(--bg)',
+                border: '1.5px solid var(--ink)',
+                borderRadius: '8px',
+                boxShadow: '0 12px 32px rgba(0,0,0,0.45)',
+                zIndex: 9999,
+                padding: '4px 0',
+                boxSizing: 'border-box',
+              }}
+            >
+              {!onlineAvailable && (
+                <div style={{ padding: '6px 10px', background: 'rgba(100, 116, 139, 0.12)', fontSize: '11px', color: 'var(--mute)', display: 'flex', alignItems: 'center', gap: '6px', borderBottom: '1px solid var(--line)' }}>
+                  <span>⚡ Online search offline • Local pilot database active</span>
+                </div>
+              )}
+              {searchResults.length > 0 ? (
+                searchResults.map((item, idx) => (
+                  <button
+                    key={`${item.id}-${idx}`}
+                    id={`result-${item.id}`}
+                    role="option"
+                    aria-selected={activeIndex === idx}
+                    type="button"
+                    className={`atlas-search-item ${activeIndex === idx ? 'active' : ''}`}
+                    onClick={() => handleSelectResult(item)}
+                    onMouseEnter={() => setActiveIndex(idx)}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      width: '100%',
+                      padding: '8px 12px',
+                      cursor: 'pointer',
+                      borderBottom: '1px solid var(--line)',
+                      background: activeIndex === idx ? 'rgba(255, 214, 10, 0.15)' : 'transparent',
+                      borderLeft: activeIndex === idx ? '3px solid #ffd60a' : '3px solid transparent',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <div className="atlas-search-item-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', width: '100%' }}>
+                      <span className="atlas-search-item-name" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink)' }}>{item.name}</span>
+                      {renderBadge(item)}
+                    </div>
+                    {item.details && (
+                      <span className="atlas-search-item-sub" style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '2px', lineHeight: '1.3' }}>{item.details}</span>
+                    )}
+                    {item.inside_pilot_area === false && (
+                      <span style={{ fontSize: '10px', color: '#d97706', marginTop: '2px', fontWeight: 600 }}>
+                        ⚠️ Detailed access analysis unavailable outside Chandigarh pilot
+                      </span>
+                    )}
+                  </button>
+                ))
+              ) : isSearching ? (
+                <div className="atlas-search-empty" style={{ padding: '14px 12px', fontSize: '12px', color: 'var(--mute)', textAlign: 'center' }}>
+                  <Loader2
+                    className="atlas-search-spinner"
+                    style={{ display: 'inline', width: 14, height: 14, marginRight: 6, verticalAlign: 'middle' }}
+                  />
+                  Searching {datasetMode === 'pilot' ? 'pilot corridor & universal places' : 'demo data'}...
+                </div>
+              ) : (
+                <div className="atlas-search-empty" style={{ padding: '14px 12px', fontSize: '12px', color: 'var(--mute)', textAlign: 'center' }}>
+                  No matching locations, roads, or facilities found for "{searchQuery}"
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Vehicle Profile */}
@@ -242,11 +709,165 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
             </button>
           </div>
 
-          <div className="pan-status">{getPill(props.access_status)}</div>
+          <div className="pan-status">{getPill(props.access_status, isOutsidePilot)}</div>
+
+          {/* Outside pilot dataset notice banner */}
+          {isOutsidePilot && (
+            <div
+              style={{
+                margin: '10px 0',
+                padding: '10px 12px',
+                background: 'rgba(217, 119, 6, 0.1)',
+                border: '1.5px solid #d97706',
+                borderRadius: '8px',
+                fontSize: '12px',
+                color: 'var(--ink)',
+                lineHeight: '1.4',
+              }}
+            >
+              <div
+                style={{
+                  fontWeight: 800,
+                  color: '#d97706',
+                  marginBottom: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <span>⚠️ Pilot Boundary Notice</span>
+              </div>
+              <div>
+                {props.coverage_notice ||
+                  'This location is outside the Chandigarh pilot corridor. Detailed road width measurements, emergency vehicle clearances, and access feasibility analysis are not available.'}
+              </div>
+            </div>
+          )}
 
           {/* Building Details */}
           {isBuilding && (
             <>
+              {/* Building Emergency Access Assessment Card */}
+              <div
+                style={{
+                  margin: '12px 0',
+                  padding: '14px',
+                  background: 'rgba(255, 214, 10, 0.05)',
+                  border: '1.5px solid #ffd60a',
+                  borderRadius: '10px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--mute)', letterSpacing: '0.5px' }}>
+                    Emergency Access Assessment
+                  </span>
+                  {bldgLoading ? (
+                    <span style={{ fontSize: '11px', color: 'var(--mute)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Loader2 className="animate-spin" size={12} /> Evaluating...
+                    </span>
+                  ) : (
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        background:
+                          bldgAssessment?.classification === 'accessible'
+                            ? 'rgba(16, 185, 129, 0.15)'
+                            : bldgAssessment?.classification === 'constrained'
+                            ? 'rgba(245, 158, 11, 0.15)'
+                            : bldgAssessment?.classification === 'inaccessible'
+                            ? 'rgba(239, 68, 68, 0.15)'
+                            : 'rgba(100, 116, 139, 0.15)',
+                        color:
+                          bldgAssessment?.classification === 'accessible'
+                            ? '#059669'
+                            : bldgAssessment?.classification === 'constrained'
+                            ? '#d97706'
+                            : bldgAssessment?.classification === 'inaccessible'
+                            ? '#dc2626'
+                            : '#475569',
+                      }}
+                    >
+                      {bldgAssessment?.classification === 'accessible'
+                        ? '● CORRIDOR REACHABLE'
+                        : bldgAssessment?.classification === 'constrained'
+                        ? '▲ CONSTRAINED'
+                        : bldgAssessment?.classification === 'inaccessible'
+                        ? '✕ BLOCKED'
+                        : '? UNVERIFIED'}
+                    </span>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--mute)' }}>Approach Road:</span>
+                    <span style={{ fontWeight: 700, textAlign: 'right', maxWidth: '170px' }}>
+                      {bldgAssessment?.approach_road_name || props.connected_road_id || 'Nearest connected corridor'}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--mute)' }}>Road Frontage Setback:</span>
+                    <span style={{ fontWeight: 800 }}>
+                      {bldgAssessment?.estimated_setback_m !== null && bldgAssessment?.estimated_setback_m !== undefined
+                        ? `${bldgAssessment.estimated_setback_m} m`
+                        : props.estimated_setback_m
+                        ? `${props.estimated_setback_m} m`
+                        : 'Unsurveyed'}
+                    </span>
+                  </div>
+
+                  {bldgAssessment?.origin_station_name && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--mute)' }}>Dispatch Origin:</span>
+                      <span style={{ fontWeight: 700, textAlign: 'right', maxWidth: '170px' }}>
+                        {bldgAssessment.origin_station_name}
+                      </span>
+                    </div>
+                  )}
+
+                  {bldgAssessment?.route?.total_distance_m !== undefined && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--mute)' }}>Route Distance:</span>
+                      <span style={{ fontWeight: 800, color: 'var(--sig)' }}>
+                        {(bldgAssessment.route.total_distance_m / 1000).toFixed(1)} km
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Road vs Entrance Distinction */}
+                <div
+                  style={{
+                    marginTop: '10px',
+                    padding: '8px 10px',
+                    background: 'rgba(217, 119, 6, 0.08)',
+                    border: '1px solid rgba(217, 119, 6, 0.25)',
+                    borderRadius: '6px',
+                    fontSize: '11px',
+                    lineHeight: 1.4,
+                    color: 'var(--ink)',
+                  }}
+                >
+                  <b style={{ color: '#d97706', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '2px' }}>
+                    <ShieldAlert size={13} />
+                    Road Reachability Only
+                  </b>
+                  <span>
+                    Building entrance gates and courtyard driveways are unsurveyed. Apparatus holds on the street; crew advances on foot or hose relay.
+                  </span>
+                </div>
+
+                {bldgAssessment?.missing_evidence && bldgAssessment.missing_evidence.length > 0 && (
+                  <div style={{ marginTop: '8px', fontSize: '10px', color: 'var(--mute)' }}>
+                    <b>Missing Evidence:</b> {bldgAssessment.missing_evidence.slice(0, 2).join(' • ')}
+                  </div>
+                )}
+              </div>
+
               <div className="pan-props">
                 <div className="pan-prop-row">
                   <span className="pan-prop-label">Use type</span>
@@ -268,7 +889,7 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
                 </div>
                 <div className="pan-prop-row">
                   <span className="pan-prop-label">Source</span>
-                  <span className="pan-prop-val">{props.data_source || 'Synthetic Cadastre'}</span>
+                  <span className="pan-prop-val">{props.data_source || (datasetMode === 'pilot' ? 'OpenStreetMap Pilot' : 'Synthetic Cadastre')}</span>
                 </div>
               </div>
 
@@ -278,12 +899,12 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
                 </p>
               )}
 
-              <div className="cta">
+              <div className="cta" style={{ marginTop: '12px' }}>
                 <a className="btn pri sm" href={`#/b/${props.id}`}>
-                  View Details
+                  Full Assessment Report
                 </a>
-                <a className="btn sm" href="#/routes">
-                  Analyse Route
+                <a className="btn sm" href={`#/routes/${props.id}`}>
+                  Analyse Full Route
                 </a>
               </div>
             </>
@@ -361,10 +982,67 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
               </p>
 
               <div className="cta">
-                <a className="btn pri sm" href="#/routes">
-                  Analyse from here
+                <a
+                  className="btn pri sm"
+                  href={`#/routes?origin=${encodeURIComponent(props.id)}`}
+                  title="Compute emergency routes departing from this facility"
+                >
+                  Plan Routes from Here →
                 </a>
               </div>
+            </>
+          )}
+
+          {/* Landmark / Location / Search Result Details */}
+          {isPlace && (
+            <>
+              <div className="pan-props">
+                <div className="pan-prop-row">
+                  <span className="pan-prop-label">Location Type</span>
+                  <span className="pan-prop-val" style={{ textTransform: 'capitalize' }}>
+                    {props.sub_type || 'Landmark / Locality'}
+                  </span>
+                </div>
+                <div className="pan-prop-row">
+                  <span className="pan-prop-label">Source</span>
+                  <span className="pan-prop-val">
+                    {props.source === 'online_osm' ? 'OpenStreetMap Nominatim' : 'Local Pilot Dataset'}
+                  </span>
+                </div>
+                {props.details && (
+                  <div className="pan-prop-row">
+                    <span className="pan-prop-label">Locality</span>
+                    <span
+                      className="pan-prop-val"
+                      style={{ maxWidth: '170px', textAlign: 'right', wordBreak: 'break-word' }}
+                    >
+                      {props.details}
+                    </span>
+                  </div>
+                )}
+                <div className="pan-prop-row">
+                  <span className="pan-prop-label">Pilot Coverage</span>
+                  <span className="pan-prop-val">
+                    {props.inside_pilot_area !== false ? 'Within Pilot Area' : 'Outside Pilot Area'}
+                  </span>
+                </div>
+              </div>
+
+              {props.inside_pilot_area !== false && (
+                <div className="cta" style={{ marginTop: '12px' }}>
+                  <a
+                    className="btn pri sm"
+                    href={`#/routes?dest=${encodeURIComponent(props.name || props.id)}&coords=${
+                      selectedFeature?.geometry?.type === 'Point' && Array.isArray(selectedFeature.geometry.coordinates)
+                        ? `${selectedFeature.geometry.coordinates[0]},${selectedFeature.geometry.coordinates[1]}`
+                        : ''
+                    }`}
+                    title="Calculate emergency vehicle routes to this destination"
+                  >
+                    Analyse Emergency Route →
+                  </a>
+                </div>
+              )}
             </>
           )}
         </aside>
