@@ -26,6 +26,9 @@ class TestRealData(unittest.TestCase):
         cls.data_service = DataService(data_path=REAL_DATA_PATH)
         cls.engine = AccessEngine(ds=cls.data_service)
 
+    def tearDown(self):
+        os.environ["DATA_MODE"] = "demo"
+
     def test_unique_ids(self):
         """Every feature in real dataset must have a unique identifier."""
         ids = [f.get("id") or f.get("properties", {}).get("id") for f in self.features]

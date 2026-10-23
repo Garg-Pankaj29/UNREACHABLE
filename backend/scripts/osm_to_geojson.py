@@ -107,10 +107,15 @@ def get_element_points_xy(el: dict) -> List[Tuple[float, float]]:
 
 
 def get_element_centroid(el: dict) -> Tuple[float, float]:
-    """Compute (lon, lat) centroid for node or way."""
+    """Compute (lon, lat) centroid for node, way, or relation."""
     if el.get("type") == "node" and "lon" in el and "lat" in el:
         return el["lon"], el["lat"]
+    if "bounds" in el:
+        b = el["bounds"]
+        return (b["minlon"] + b["maxlon"]) / 2, (b["minlat"] + b["maxlat"]) / 2
     geom = el.get("geometry", [])
+    if not geom and "members" in el:
+        geom = [pt for m in el.get("members", []) for pt in m.get("geometry", [])]
     if not geom:
         return 0.0, 0.0
     avg_lon = sum(pt["lon"] for pt in geom) / len(geom)
@@ -327,6 +332,8 @@ def convert_osm_to_geojson(overpass_data: dict) -> dict:
         osm_id = st["id"]
         tags = st.get("tags", {})
         c_lon, c_lat = get_element_centroid(st)
+        if abs(c_lat) < 1.0 or abs(c_lon) < 1.0:
+            continue
         closest_road_id, setback_m = find_nearest_road(c_lon, c_lat)
 
         station_id = f"station-osm-{osm_id}"
@@ -364,6 +371,8 @@ def convert_osm_to_geojson(overpass_data: dict) -> dict:
         osm_id = bldg["id"]
         tags = bldg.get("tags", {})
         c_lon, c_lat = get_element_centroid(bldg)
+        if abs(c_lat) < 1.0 or abs(c_lon) < 1.0:
+            continue
         closest_road_id, setback_m = find_nearest_road(c_lon, c_lat)
 
         bldg_id = f"bldg-osm-{osm_id}"
@@ -415,6 +424,14 @@ def convert_osm_to_geojson(overpass_data: dict) -> dict:
                 pts.append(pts[0])
             geom_type = "Polygon"
             geom_coords = [pts]
+        elif bldg.get("type") == "relation" and "members" in bldg:
+            outer_members = [m for m in bldg.get("members", []) if m.get("role") == "outer" and len(m.get("geometry", [])) >= 3]
+            if outer_members:
+                pts = [[pt["lon"], pt["lat"]] for pt in outer_members[0]["geometry"]]
+                if pts[0] != pts[-1]:
+                    pts.append(pts[0])
+                geom_type = "Polygon"
+                geom_coords = [pts]
 
         feat = {
             "type": "Feature",

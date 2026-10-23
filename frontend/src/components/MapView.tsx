@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   MapContainer,
+  TileLayer,
   GeoJSON as LeafletGeoJSON,
   Marker,
   Popup,
@@ -53,8 +54,8 @@ interface MapViewProps {
   showLegend?: boolean;
 }
 
-// Default center: Chandigarh city center
-const DEFAULT_PILOT_CENTER: LatLngExpression = [30.7333, 76.7794];
+// Default center: Chandigarh University / Gharuan / Kharar pilot corridor
+const DEFAULT_PILOT_CENTER: LatLngExpression = [30.7686, 76.5750];
 const DEFAULT_CENTER: LatLngExpression = [30.7686, 76.5750];
 const DEFAULT_ZOOM = 13;
 
@@ -275,16 +276,23 @@ function MapViewportManager({
         const geom = f.geometry;
         if (!geom) return;
         if (geom.type === 'Point' && Array.isArray(geom.coordinates)) {
-          bounds.extend([geom.coordinates[1], geom.coordinates[0]]);
+          const [lon, lat] = geom.coordinates;
+          if (lon && lat && Math.abs(lat) > 1 && Math.abs(lon) > 1) {
+            bounds.extend([lat, lon]);
+          }
         } else if (geom.type === 'LineString' && Array.isArray(geom.coordinates)) {
           geom.coordinates.forEach((c: any) => {
-            if (Array.isArray(c) && c.length >= 2) bounds.extend([c[1], c[0]]);
+            if (Array.isArray(c) && c.length >= 2 && c[0] && c[1] && Math.abs(c[1]) > 1 && Math.abs(c[0]) > 1) {
+              bounds.extend([c[1], c[0]]);
+            }
           });
         } else if (geom.type === 'Polygon' && Array.isArray(geom.coordinates)) {
           geom.coordinates.forEach((ring: any) => {
             if (Array.isArray(ring)) {
               ring.forEach((c: any) => {
-                if (Array.isArray(c) && c.length >= 2) bounds.extend([c[1], c[0]]);
+                if (Array.isArray(c) && c.length >= 2 && c[0] && c[1] && Math.abs(c[1]) > 1 && Math.abs(c[0]) > 1) {
+                  bounds.extend([c[1], c[0]]);
+                }
               });
             }
           });
@@ -293,7 +301,7 @@ function MapViewportManager({
 
       if (bounds.isValid()) {
         map.fitBounds(bounds, {
-          padding: [24, 24],
+          padding: [28, 28],
           maxZoom: 16,
         });
       }
@@ -302,10 +310,12 @@ function MapViewportManager({
     }
   }, [features, map]);
 
-  // Initial fit when data loads
+  // Initial fit when data loads, and refit on mode change
+  const lastCount = useRef(0);
   useEffect(() => {
-    if (!initialFitDone.current && features.length > 0) {
+    if (features.length > 0 && Math.abs(features.length - lastCount.current) > 3) {
       fitToFeatures();
+      lastCount.current = features.length;
       initialFitDone.current = true;
     }
   }, [features, fitToFeatures]);
@@ -441,6 +451,7 @@ export const MapView: React.FC<MapViewProps> = ({
   fullHeight = false,
   showLegend = true,
 }) => {
+  const [tileError, setTileError] = useState(false);
   const [resetCount, setResetCount] = useState(0);
 
   const isPilotMode = stations.length > 5 || roads.length > 50;
@@ -730,6 +741,20 @@ export const MapView: React.FC<MapViewProps> = ({
         </div>
       )}
 
+      {/* Offline Tile Graceful Fallback Notice */}
+      {tileError && (
+        <div
+          className="absolute bottom-20 left-4 z-[900] p-2 px-3 rounded-lg text-xs flex items-center space-x-2"
+          style={{
+            background: 'var(--glass)',
+            border: '1px solid var(--line)',
+            color: 'var(--mute)',
+          }}
+        >
+          <span>Basemap tiles unavailable (operating in offline fallback mode)</span>
+        </div>
+      )}
+
       {/* Leaflet Map Container with Zoom Control at bottomright */}
       <MapContainer
         center={mapCenter}
@@ -746,6 +771,16 @@ export const MapView: React.FC<MapViewProps> = ({
           resetCount={resetCount}
           routeGeometry={routeGeometry}
           alternativeRoutes={alternativeRoutes}
+        />
+
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={19}
+          eventHandlers={{
+            tileerror: () => setTileError(true),
+            load: () => setTileError(false),
+          }}
         />
 
         {visibleRoads.length > 0 && (
