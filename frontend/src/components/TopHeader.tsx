@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, Sun, Moon, Navigation } from 'lucide-react';
+import { Zap, Sun, Moon } from 'lucide-react';
 
 interface TopHeaderProps {
   theme: 'light' | 'dark';
@@ -66,31 +66,6 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             <span>Synthetic demo data</span>
           </button>
         )}
-
-        <a
-          href="#/routes"
-          className="header-routes-btn"
-          id="header-routes-nav"
-          title="Emergency Centre Selection & Multiple Routes"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'var(--tape, #ffd60a)',
-            color: '#1c1f1b',
-            padding: '5px 14px',
-            borderRadius: '99px',
-            fontSize: '12px',
-            fontWeight: 800,
-            textDecoration: 'none',
-            letterSpacing: '0.02em',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-            transition: 'transform 0.15s ease',
-          }}
-        >
-          <Navigation size={13} style={{ transform: 'rotate(45deg)' }} />
-          <span>Emergency Routes</span>
-        </a>
       </div>
 
       <div className="tr" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

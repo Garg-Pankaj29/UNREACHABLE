@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CheckCircle } from 'lucide-react';
 import {
   BuildingAccessResponse,
   ExplainResponse,
@@ -497,19 +498,22 @@ export const AIInspectorPage: React.FC<AIInspectorPageProps> = ({
                   Plain-language explanation
                 </h4>
                 {explainResult && (
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <span
                       className={`pl ${explainResult.source === 'local_llm' ? 'c-ok' : 'c-unknown'}`}
-                      style={{ fontSize: '11px', textTransform: 'none' }}
+                      style={{ fontSize: '13px', fontWeight: 700, textTransform: 'none', padding: '4px 12px' }}
                     >
-                      {explainResult.source === 'local_llm' ? 'Local LLM' : 'Template'}
+                      {explainResult.source === 'local_llm'
+                        ? 'Local LLM (LM Studio Gemma)'
+                        : 'Template Fallback'}
                     </span>
                     {explainResult.validated && (
                       <span
                         className="pl c-ok"
-                        style={{ fontSize: '11px', textTransform: 'none' }}
+                        style={{ fontSize: '13px', fontWeight: 700, textTransform: 'none', padding: '4px 12px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
                       >
-                        Validated ✓
+                        <CheckCircle size={13} />
+                        Validated
                       </span>
                     )}
                   </div>
@@ -517,31 +521,31 @@ export const AIInspectorPage: React.FC<AIInspectorPageProps> = ({
               </div>
 
               {explainLoading ? (
-                <div style={{ padding: '24px 0', textAlign: 'center', color: 'var(--mute)', fontSize: '13px' }}>
+                <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--mute)', fontSize: '14px' }}>
                   <div
                     style={{
                       display: 'inline-block',
-                      width: '22px',
-                      height: '22px',
-                      border: '2.5px solid var(--line)',
+                      width: '28px',
+                      height: '28px',
+                      border: '3px solid var(--line)',
                       borderTopColor: '#4361ee',
                       borderRadius: '50%',
                       animation: 'spin 0.8s linear infinite',
-                      marginBottom: '8px',
+                      marginBottom: '10px',
                     }}
                   />
-                  <div>Querying local LLM with numeric guardrails...</div>
-                  <div style={{ fontSize: '11px', marginTop: '4px', color: 'var(--mute)' }}>
-                    Automatically falls back to template if LM Studio is inactive
+                  <div style={{ fontWeight: 600, color: 'var(--ink)' }}>Querying Local LLM (LM Studio Gemma) via secure tunnel...</div>
+                  <div style={{ fontSize: '12px', marginTop: '6px', color: 'var(--mute)' }}>
+                    Evaluating route against deterministic cadastre facts with zero invented numbers. Please allow up to 2–3 minutes for local model generation.
                   </div>
                 </div>
               ) : explainResult ? (
                 <div>
-                  <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.6, color: 'var(--ink)' }}>
+                  <p style={{ margin: 0, fontSize: '14px', lineHeight: 1.65, color: 'var(--ink)', fontWeight: 500 }}>
                     {explainResult.text}
                   </p>
-                  <small style={{ display: 'block', marginTop: '10px', fontSize: '11px', color: 'var(--mute)' }}>
-                    Verified with local cadastre facts. Local model only; no cloud calls.
+                  <small style={{ display: 'block', marginTop: '12px', fontSize: '12px', color: 'var(--mute)' }}>
+                    Verified with local cadastre facts. Local model only; zero invented metrics.
                   </small>
                 </div>
               ) : null}

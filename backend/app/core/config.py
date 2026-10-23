@@ -1,12 +1,18 @@
 """Core configuration module for UNREACHABLE backend."""
 from pathlib import Path
 from typing import List
+from dotenv import load_dotenv
 
 # Base directory for the backend application
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Repository root directory
 REPO_ROOT = BASE_DIR.parent
+
+# Load environment variables from root or backend .env
+load_dotenv(REPO_ROOT / ".env")
+load_dotenv(BASE_DIR / ".env")
+
 
 # Relative path to sample GeoJSON demonstration dataset
 SAMPLE_DATA_PATH = REPO_ROOT / "data" / "sample" / "neighbourhood.geojson"

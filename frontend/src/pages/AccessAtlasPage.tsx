@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, X, Loader2, ShieldAlert } from 'lucide-react';
+import { Search, X, Loader2, ShieldAlert, Sparkles, AlertTriangle } from 'lucide-react';
 import { GeoJSONFeature, IssueRecord, VehicleProfile, BuildingAccessResponse } from '../types';
 import { MapView } from '../components/MapView';
 import { VEHICLE_OPTIONS } from '../services/store';
@@ -336,18 +336,18 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
 
   const getPill = (status?: string, isOutside?: boolean) => {
     if (isOutside) {
-      return <b className="pl" style={{ background: 'rgba(217, 119, 6, 0.15)', color: '#d97706', border: '1px solid #fde68a' }}>⚠ Outside pilot coverage</b>;
+      return <b className="pl" style={{ background: 'rgba(217, 119, 6, 0.15)', color: '#d97706', border: '1px solid #fde68a' }}>Outside pilot coverage</b>;
     }
     switch (status) {
       case 'feasible':
       case 'ok':
-        return <b className="pl c-ok">● Verified accessible</b>;
+        return <b className="pl c-ok">Verified accessible</b>;
       case 'constrained':
-        return <b className="pl c-constrained">▲ Constrained</b>;
+        return <b className="pl c-constrained">Constrained</b>;
       case 'infeasible':
-        return <b className="pl c-infeasible">✕ Potentially inaccessible</b>;
+        return <b className="pl c-infeasible">Potentially inaccessible</b>;
       default:
-        return <b className="pl c-unknown">? Unknown</b>;
+        return <b className="pl c-unknown">Unknown</b>;
     }
   };
 
@@ -395,10 +395,11 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
                 type="button"
                 className={`chip ${datasetMode === 'sample' ? 'on' : ''}`}
                 onClick={() => onToggleDataset('sample')}
-                style={{ fontSize: '11px', padding: '2px 8px' }}
+                style={{ fontSize: '11px', padding: '2px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                 title="Synthetic demonstration dataset (Gharuan)"
               >
-                ⚡ Demo
+                <Sparkles size={12} />
+                <span>Demo</span>
               </button>
             </div>
           )}
@@ -534,7 +535,8 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
             >
               {!onlineAvailable && (
                 <div style={{ padding: '6px 10px', background: 'rgba(100, 116, 139, 0.12)', fontSize: '11px', color: 'var(--mute)', display: 'flex', alignItems: 'center', gap: '6px', borderBottom: '1px solid var(--line)' }}>
-                  <span>⚡ Online search offline • Local pilot database active</span>
+                  <AlertTriangle size={12} style={{ color: '#d97706' }} />
+                  <span>Online search offline • Local pilot database active</span>
                 </div>
               )}
               {searchResults.length > 0 ? (
@@ -568,8 +570,9 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
                       <span className="atlas-search-item-sub" style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '2px', lineHeight: '1.3' }}>{item.details}</span>
                     )}
                     {item.inside_pilot_area === false && (
-                      <span style={{ fontSize: '10px', color: '#d97706', marginTop: '2px', fontWeight: 600 }}>
-                        ⚠️ Detailed access analysis unavailable outside Chandigarh pilot
+                      <span style={{ fontSize: '11px', color: '#d97706', marginTop: '2px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <AlertTriangle size={12} />
+                        <span>Detailed access analysis unavailable outside Chandigarh pilot</span>
                       </span>
                     )}
                   </button>
@@ -733,9 +736,11 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
+                  fontSize: '14px',
                 }}
               >
-                <span>⚠️ Pilot Boundary Notice</span>
+                <ShieldAlert size={16} />
+                <span>Pilot Boundary Notice</span>
               </div>
               <div>
                 {props.coverage_notice ||

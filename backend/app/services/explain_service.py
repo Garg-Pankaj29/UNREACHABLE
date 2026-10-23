@@ -164,36 +164,110 @@ class ExplainService:
             "evidence_status": assessment.entrance_status,
         }
 
+    def query_gemini_api(
+        self,
+        facts: Dict[str, Any],
+        timeout_sec: float = 7.0,
+    ) -> Optional[str]:
+        """Attempt to call Google Gemini API for fast, real-time explanation."""
+        api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            return None
+
+        model_name = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+
+        system_instruction = (
+            "You are an emergency routing expert. Explain in exactly 2 or 3 short factual sentences using ONLY the facts provided. "
+            "Do NOT invent numbers, measurements, or speculative claims. Never say a route is completely safe. "
+            "Refer strictly to the provided corridor clearances and access criteria."
+        )
+        user_prompt = f"Facts:\n{json.dumps(facts, indent=2)}\n\nExplain the route assessment:"
+
+        payload = {
+            "system_instruction": {
+                "parts": [{"text": system_instruction}]
+            },
+            "contents": [
+                {
+                    "role": "user",
+                    "parts": [{"text": user_prompt}]
+                }
+            ],
+            "generationConfig": {
+                "temperature": 0.0,
+                "maxOutputTokens": 200,
+            }
+        }
+
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+
+        try:
+            with urllib.request.urlopen(req, timeout=timeout_sec) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                candidates = data.get("candidates", [])
+                if candidates and "content" in candidates[0]:
+                    parts = candidates[0]["content"].get("parts", [])
+                    if parts and "text" in parts[0]:
+                        return parts[0]["text"].strip()
+        except Exception as exc:
+            logger.info("Gemini API call failed (%s); trying fallback", exc)
+            return None
+
+        return None
+
     def query_local_llm(
         self,
         facts: Dict[str, Any],
-        timeout_sec: float = 6.0,
+        timeout_sec: float = 180.0,
     ) -> Optional[str]:
         """Attempt to call local OpenAI-compatible endpoint (LM Studio).
         
-        Uses stdlib urllib. Never makes cloud calls. Timeout default 6s.
+        Uses stdlib urllib. Never makes cloud calls. Timeout default 180s (3 min).
         """
         base_url = os.getenv("LM_STUDIO_URL", "http://127.0.0.1:1234/v1").rstrip("/")
-        model = os.getenv("LM_MODEL", "")
+        env_model = os.getenv("LM_MODEL", "").strip()
 
-        # If model is not explicitly defined in env, query /models or use loaded default
-        if not model:
-            try:
-                models_req = urllib.request.Request(
-                    f"{base_url}/models",
-                    headers={"Accept": "application/json"},
-                    method="GET",
-                )
-                with urllib.request.urlopen(models_req, timeout=1.5) as resp:
-                    models_data = json.loads(resp.read().decode("utf-8"))
-                    data_items = models_data.get("data", [])
-                    if data_items and isinstance(data_items, list):
-                        model = data_items[0].get("id", "")
-            except Exception:
-                model = "default"
+        # Query /models to find the best available model on the endpoint
+        resolved_model = env_model
+        try:
+            models_req = urllib.request.Request(
+                f"{base_url}/models",
+                headers={
+                    "Accept": "application/json",
+                    "User-Agent": "UNREACHABLE-Engine/1.0",
+                    "ngrok-skip-browser-warning": "true",
+                },
+                method="GET",
+            )
+            with urllib.request.urlopen(models_req, timeout=4.0) as resp:
+                models_data = json.loads(resp.read().decode("utf-8"))
+                data_items = models_data.get("data", [])
+                if data_items and isinstance(data_items, list):
+                    all_ids = [m.get("id", "") for m in data_items if m.get("id")]
+                    # Match env_model substring (e.g. 'gemma-4' matching 'google/gemma-4-e4b')
+                    matched = None
+                    if env_model:
+                        for mid in all_ids:
+                            if env_model.lower() in mid.lower():
+                                matched = mid
+                                break
+                    if matched:
+                        resolved_model = matched
+                    elif all_ids:
+                        # Default to the first generative text model available
+                        text_models = [m for m in all_ids if "embedding" not in m.lower()]
+                        resolved_model = text_models[0] if text_models else all_ids[0]
+        except Exception as exc:
+            logger.info("Could not fetch /models from %s: %s; using %s", base_url, exc, resolved_model or "default")
 
-        if not model:
-            model = "default"
+        if not resolved_model:
+            resolved_model = "default"
 
         system_prompt = (
             "Explain in 3 short sentences using ONLY the facts provided. "
@@ -202,19 +276,23 @@ class ExplainService:
         user_prompt = f"Facts:\n{json.dumps(facts, indent=2)}\n\nExplain the route assessment:"
 
         payload = {
-            "model": model,
+            "model": resolved_model,
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            "temperature": 0,
-            "max_tokens": 200,
+            "temperature": 0.0,
+            "max_tokens": 180,
         }
 
         req = urllib.request.Request(
             f"{base_url}/chat/completions",
             data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "UNREACHABLE-Engine/1.0",
+                "ngrok-skip-browser-warning": "true",
+            },
             method="POST",
         )
 
@@ -233,7 +311,7 @@ class ExplainService:
         building_id: str,
         vehicle_id: str = "fire",
     ) -> ExplainResponse:
-        """Generates a strictly validated explanation from deterministic facts."""
+        """Generates a strictly validated explanation from deterministic facts using Local LLM (LM Studio Gemma)."""
         facts = self.build_facts(
             station_id=station_id,
             building_id=building_id,
@@ -241,9 +319,11 @@ class ExplainService:
         )
         allowed_numbers = extract_all_numbers(facts)
 
-        # 1. Attempt local LLM execution
+        # 1. Primary: Local LLM (LM Studio with Gemma or any loaded local model)
         try:
-            llm_text = self.query_local_llm(facts, timeout_sec=6.0)
+            logger.info("Attempting local LLM query via LM Studio for %s (timeout: 180s)...", building_id)
+            llm_text = self.query_local_llm(facts, timeout_sec=180.0)
+            logger.info("Local LLM response received: %s", llm_text)
             if llm_text:
                 if validate_explanation(llm_text, allowed_numbers):
                     return ExplainResponse(
@@ -252,9 +332,9 @@ class ExplainService:
                         validated=True,
                     )
                 else:
-                    logger.warning("Local LLM output failed guardrail validation; falling back to template")
+                    logger.warning("Local LLM output failed guardrail validation (text: %r); allowed numbers: %s; falling back to template", llm_text, allowed_numbers)
         except Exception as exc:
-            logger.info("Local LLM call unavailable or timed out (%s); falling back to template", exc)
+            logger.warning("Local LLM call error (%s); falling back to template", exc, exc_info=True)
 
         # 2. Deterministic template fallback
         template_text = generate_template_explanation(facts)
@@ -266,3 +346,5 @@ class ExplainService:
 
 
 explain_service = ExplainService()
+
+

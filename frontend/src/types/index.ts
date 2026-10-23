@@ -276,7 +276,7 @@ export interface ExplainRequest {
 
 export interface ExplainResponse {
   text: string;
-  source: 'local_llm' | 'template';
+  source: 'gemini_api' | 'local_llm' | 'template';
   validated: boolean;
 }
 

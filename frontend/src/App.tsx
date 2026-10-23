@@ -6,7 +6,6 @@ import {
   StatsResponse,
 } from './types';
 import { INITIAL_ISSUES } from './services/store';
-import { Zap } from 'lucide-react';
 import { LivingBackground } from './components/LivingBackground';
 import { TopHeader } from './components/TopHeader';
 import { FloatingDock } from './components/FloatingDock';
@@ -365,35 +364,6 @@ export function App() {
         datasetMode={datasetMode}
         onToggleDataset={() => handleToggleDataset()}
       />
-
-      {/* Quick Launch Demo Mode Chip (hidden when already on #/demo) */}
-      {currentRoute !== 'demo' && (
-        <a
-          href="#/demo"
-          id="demo-mode-launcher"
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            left: '24px',
-            zIndex: 40,
-            background: 'var(--tape, #ffd60a)',
-            color: '#1c1f1b',
-            border: '1px solid rgba(0,0,0,0.1)',
-            borderRadius: '99px',
-            padding: '6px 14px',
-            fontSize: '12px',
-            fontWeight: 800,
-            textDecoration: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.12)',
-          }}
-        >
-          <Zap size={14} className="fill-current text-current" aria-hidden="true" />
-          <span>Presenter Demo</span>
-        </a>
-      )}
 
       {/* Connection notification if backend is unreachable and not in replay */}
       {backendError && !isReplay && (

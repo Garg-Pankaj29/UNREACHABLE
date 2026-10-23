@@ -3,6 +3,7 @@ import { StatsResponse, IssueRecord, CriticalRoad, VehicleGapResponse } from '..
 import { SvgMap } from '../components/SvgMap';
 import { calculateIssueScore, SEVERITY_NAMES } from '../services/store';
 import { api } from '../services/api';
+import { Zap } from 'lucide-react';
 
 interface OverviewPageProps {
   stats: StatsResponse | null;
@@ -119,11 +120,26 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
             and halts with a warning pulse when corridors are obstructed or impassable.
           </p>
           <div className="cta">
-            <a className="btn pri" href="#/map">
-              Explore Access Atlas
-            </a>
-            <a className="btn" href="#/about">
-              See how it works
+            <a
+              className="btn pri"
+              href="#/demo"
+              id="hero-presenter-demo-btn"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'var(--tape, #ffd60a)',
+                color: '#1c1f1b',
+                fontWeight: 800,
+                fontSize: '16px',
+                height: '48px',
+                padding: '0 24px',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
+                border: '1.5px solid rgba(0,0,0,0.15)',
+              }}
+            >
+              <Zap size={18} className="fill-current text-current" aria-hidden="true" />
+              <span>Presenter Demo</span>
             </a>
           </div>
         </div>
@@ -348,35 +364,35 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
 
 
       {/* Top 5 Single Points of Failure Card */}
-      <div style={{ margin: '24px 0', background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '16px', padding: '18px 20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+      <div style={{ margin: '24px 0', background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '16px', padding: '20px 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '20px' }}>Top 5 Single Points of Failure</h2>
-            <p className="lede" style={{ fontSize: '14px', margin: '4px 0 0 0' }}>
+            <h2 style={{ margin: 0, fontSize: '22px' }}>Top 5 Single Points of Failure</h2>
+            <p className="lede" style={{ fontSize: '15px', margin: '4px 0 0 0' }}>
               Critical corridors ranked by number of buildings whose access deteriorates if blocked (evaluated for {selectedVehicle === 'fire' ? 'Fire Engine ≥3.5m' : selectedVehicle === 'amb' ? 'Ambulance ≥3.0m' : 'Rapid Response ≥2.4m'}).
             </p>
           </div>
-          <span style={{ fontSize: '11px', textTransform: 'uppercase', fontWeight: 800, color: 'var(--sig)', background: 'rgba(215,38,61,0.08)', padding: '3px 8px', borderRadius: '6px' }}>
+          <span style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 800, color: 'var(--sig)', background: 'rgba(215,38,61,0.08)', padding: '4px 10px', borderRadius: '6px' }}>
             Vulnerability Engine
           </span>
         </div>
 
         {criticalLoading ? (
-          <p style={{ color: 'var(--mute)', fontSize: '14px', margin: '12px 0' }}>Analyzing topological single points of failure...</p>
+          <p style={{ color: 'var(--mute)', fontSize: '15px', margin: '14px 0' }}>Analyzing topological single points of failure...</p>
         ) : criticalRoads.length === 0 ? (
-          <p style={{ color: 'var(--mute)', fontSize: '13px', margin: '14px 0' }}>
+          <p style={{ color: 'var(--mute)', fontSize: '15px', margin: '14px 0' }}>
             No critical single points of failure detected for this vehicle profile.
           </p>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginTop: '14px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '12px', marginTop: '16px' }}>
             {criticalRoads.map((cr, idx) => (
               <div
                 key={cr.road_id}
                 style={{
                   background: 'var(--bg)',
-                  border: '1px solid var(--line)',
-                  borderRadius: '10px',
-                  padding: '12px',
+                  border: '1.5px solid var(--line)',
+                  borderRadius: '12px',
+                  padding: '14px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
@@ -384,19 +400,19 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
               >
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--mute)' }}>#{idx + 1}</span>
+                    <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--mute)' }}>#{idx + 1}</span>
                     <span className="sc" style={{ background: cr.buildings_affected > 0 ? '#d7263d' : '#2a9d8f' }}>
                       {cr.buildings_affected}
                     </span>
                   </div>
-                  <div style={{ fontWeight: 800, fontSize: '14px', marginTop: '4px', color: 'var(--ink)' }}>
+                  <div style={{ fontWeight: 800, fontSize: '15px', marginTop: '6px', color: 'var(--ink)' }}>
                     {cr.name}
                   </div>
-                  <div style={{ fontSize: '11px', color: 'var(--mute)', fontFamily: 'monospace' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--mute)', fontFamily: 'monospace', marginTop: '2px' }}>
                     {cr.road_id}
                   </div>
                 </div>
-                <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--sig)', fontWeight: 600 }}>
+                <div style={{ marginTop: '10px', fontSize: '13px', color: 'var(--sig)', fontWeight: 700 }}>
                   {cr.buildings_affected} building{cr.buildings_affected !== 1 ? 's' : ''} compromised
                 </div>
               </div>

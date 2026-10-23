@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Pilot geographic data extraction script for UNREACHABLE.
 
 Parses OpenStreetMap PBF data using pyosmium, filters features within the
@@ -23,7 +24,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-import osmium
+try:
+    import osmium
+except ImportError:
+    osmium = None
+
 
 # Configure logging
 logging.basicConfig(
@@ -110,7 +115,11 @@ def parse_int_lanes(lanes_str: Optional[str]) -> Optional[int]:
     return None
 
 
-class PilotExtractor(osmium.SimpleHandler):
+PilotBaseHandler = osmium.SimpleHandler if osmium else object
+
+
+class PilotExtractor(PilotBaseHandler):
+
     """Pyosmium handler to extract roads, buildings, places, and emergency facilities."""
 
     def __init__(self):

@@ -21,6 +21,9 @@ import {
   MapPin,
   HelpCircle,
   Info,
+  Flame,
+  Stethoscope,
+  UserCheck,
 } from 'lucide-react';
 
 interface RoutesPageProps {
@@ -445,7 +448,7 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
     if (outside) {
       return (
         <b className="pl" style={{ background: 'rgba(217, 119, 6, 0.15)', color: '#d97706', border: '1px solid #fde68a' }}>
-          ⚠ Outside pilot corridor
+          Outside pilot corridor
         </b>
       );
     }
@@ -453,14 +456,14 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
       case 'accessible':
       case 'feasible':
       case 'ok':
-        return <b className="pl c-ok">● Verified accessible</b>;
+        return <b className="pl c-ok">Verified accessible</b>;
       case 'constrained':
-        return <b className="pl c-constrained">▲ Constrained margin</b>;
+        return <b className="pl c-constrained">Constrained margin</b>;
       case 'infeasible':
       case 'inaccessible':
-        return <b className="pl c-infeasible">✕ Confirmed blocked</b>;
+        return <b className="pl c-infeasible">Confirmed blocked</b>;
       default:
-        return <b className="pl c-unknown">? Unknown width</b>;
+        return <b className="pl c-unknown">Unknown width</b>;
     }
   };
 
@@ -518,9 +521,9 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
         {/* Controls Column */}
         <div>
           {/* Emergency Centre Selection */}
-          <div className="fld" style={{ background: 'var(--glass)', padding: '14px', borderRadius: '10px', border: '1px solid var(--line)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <label style={{ margin: 0, fontWeight: 800, fontSize: '13px' }}>
+          <div className="fld" style={{ background: 'var(--glass)', padding: '18px 20px', borderRadius: '12px', border: '1.5px solid var(--line)', marginBottom: '28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+              <label style={{ margin: 0, fontWeight: 800, fontSize: '16px', color: 'var(--ink)', letterSpacing: '-0.2px' }}>
                 1. Emergency Dispatch Origin Facility
               </label>
               {selectedStationId && (
@@ -531,10 +534,10 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                     setMultiRouteResult(null);
                   }}
                   className="btn sm"
-                  style={{ fontSize: '11px', padding: '2px 8px', height: '24px' }}
+                  style={{ fontSize: '13px', padding: '4px 12px', height: '30px', fontWeight: 600 }}
                   title="Deselect to test 'No origin selected' state"
                 >
-                  <RotateCcw size={12} style={{ marginRight: 4 }} />
+                  <RotateCcw size={14} style={{ marginRight: 6 }} />
                   Clear Origin
                 </button>
               )}
@@ -542,37 +545,42 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
 
             {/* Category Filter Buttons */}
             {datasetMode === 'pilot' && (
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
                 {[
-                  { key: 'all', label: 'All (422)' },
-                  { key: 'fire_station', label: '🔥 Fire Stations (5)' },
-                  { key: 'hospital', label: '🏥 Hospitals (199)' },
-                  { key: 'clinic', label: '🩺 Clinics (189)' },
-                  { key: 'doctors', label: '👨‍⚕️ Doctors (29)' },
+                  { key: 'all', label: 'All (422)', icon: null },
+                  { key: 'fire_station', label: 'Fire Stations (5)', icon: <Flame size={14} style={{ color: '#ef4444' }} /> },
+                  { key: 'hospital', label: 'Hospitals (199)', icon: <Building size={14} style={{ color: '#3b82f6' }} /> },
+                  { key: 'clinic', label: 'Clinics (189)', icon: <Stethoscope size={14} style={{ color: '#10b981' }} /> },
+                  { key: 'doctors', label: 'Doctors (29)', icon: <UserCheck size={14} style={{ color: '#06b6d4' }} /> },
                 ].map((cat) => (
                   <button
                     key={cat.key}
                     type="button"
                     onClick={() => setFacilityCategory(cat.key)}
                     style={{
-                      fontSize: '11px',
+                      fontSize: '13px',
                       fontWeight: 700,
-                      padding: '3px 8px',
-                      borderRadius: '6px',
-                      border: facilityCategory === cat.key ? '1.5px solid var(--ink)' : '1px solid var(--line)',
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      border: facilityCategory === cat.key ? '2px solid var(--ink)' : '1px solid var(--line)',
                       background: facilityCategory === cat.key ? 'var(--ink)' : 'var(--surface)',
                       color: facilityCategory === cat.key ? 'var(--bg)' : 'var(--ink)',
                       cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      transition: 'all 0.15s ease',
                     }}
                   >
-                    {cat.label}
+                    {cat.icon}
+                    <span>{cat.label}</span>
                   </button>
                 ))}
               </div>
             )}
 
             {/* Facility Search Input */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
               <input
                 type="text"
                 placeholder="Filter facility name or locality..."
@@ -580,12 +588,12 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                 onChange={(e) => setFacilitySearch(e.target.value)}
                 style={{
                   flex: 1,
-                  padding: '6px 10px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--line)',
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  border: '1.5px solid var(--line)',
                   background: 'var(--surface)',
                   color: 'var(--ink)',
-                  fontSize: '12px',
+                  fontSize: '14px',
                 }}
               />
             </div>
@@ -597,12 +605,12 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
               onChange={(e) => setSelectedStationId(e.target.value)}
               style={{
                 width: '100%',
-                padding: '8px 10px',
+                padding: '11px 14px',
                 borderRadius: '8px',
                 border: '1.5px solid var(--line)',
                 background: 'var(--surface)',
                 color: 'var(--ink)',
-                fontSize: '12px',
+                fontSize: '14px',
                 fontWeight: 600,
               }}
             >
@@ -622,24 +630,24 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
             {selectedStation ? (
               <div
                 style={{
-                  marginTop: '10px',
-                  padding: '10px 12px',
+                  marginTop: '14px',
+                  padding: '14px 16px',
                   background: 'var(--surface)',
-                  border: '1px solid var(--line)',
-                  borderRadius: '8px',
-                  fontSize: '12px',
+                  border: '1.5px solid var(--line)',
+                  borderRadius: '10px',
+                  fontSize: '14px',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
-                  <div style={{ fontWeight: 800, color: 'var(--ink)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                  <div style={{ fontWeight: 800, color: 'var(--ink)', fontSize: '15px' }}>
                     {selectedStation.properties?.name || selectedStationId}
                   </div>
                   <span
                     style={{
-                      fontSize: '10px',
+                      fontSize: '12px',
                       fontWeight: 800,
-                      padding: '2px 6px',
-                      borderRadius: '4px',
+                      padding: '3px 8px',
+                      borderRadius: '6px',
                       background:
                         selectedStation.properties?.facility_type === 'fire_station'
                           ? 'rgba(220, 38, 38, 0.15)'
@@ -652,21 +660,21 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                     {(selectedStation.properties?.facility_type || 'Station').toUpperCase()}
                   </span>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '4px 8px', marginTop: '6px', fontSize: '11px', color: 'var(--mute)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px 12px', marginTop: '10px', fontSize: '13px', color: 'var(--mute)' }}>
                   <div>
                     Coordinates:{' '}
-                    <b>
+                    <b style={{ color: 'var(--ink)' }}>
                       {selectedStation.geometry?.coordinates
                         ? `${selectedStation.geometry.coordinates[1].toFixed(4)}, ${selectedStation.geometry.coordinates[0].toFixed(4)}`
                         : 'Mapped'}
                     </b>
                   </div>
                   <div>
-                    Network Node: <b>Road-attached junction</b>
+                    Network Node: <b style={{ color: 'var(--ink)' }}>Road-attached junction</b>
                   </div>
                   {selectedStation.properties?.operator && (
                     <div style={{ gridColumn: 'span 2' }}>
-                      Operator: <b>{selectedStation.properties.operator}</b>
+                      Operator: <b style={{ color: 'var(--ink)' }}>{selectedStation.properties.operator}</b>
                     </div>
                   )}
                 </div>
@@ -674,24 +682,28 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
             ) : (
               <div
                 style={{
-                  marginTop: '10px',
-                  padding: '8px 12px',
+                  marginTop: '14px',
+                  padding: '12px 14px',
                   background: 'rgba(217, 119, 6, 0.08)',
-                  border: '1px dashed #d97706',
+                  border: '1.5px dashed #d97706',
                   borderRadius: '8px',
-                  fontSize: '11px',
+                  fontSize: '13px',
                   color: '#d97706',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
                 }}
               >
-                ⚠ No dispatch origin facility is selected. Select an emergency centre above.
+                <AlertTriangle size={16} />
+                <span>No dispatch origin facility is selected. Select an emergency centre above.</span>
               </div>
             )}
           </div>
 
           {/* Destination Search & Vehicle Profile */}
-          <div className="fld" ref={searchContainerRef} style={{ position: 'relative', marginTop: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <label htmlFor="destination-search-input" style={{ margin: 0, fontWeight: 800, fontSize: '13px' }}>
+          <div className="fld" ref={searchContainerRef} style={{ position: 'relative', background: 'var(--glass)', padding: '18px 20px', borderRadius: '12px', border: '1.5px solid var(--line)', marginBottom: '28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <label htmlFor="destination-search-input" style={{ margin: 0, fontWeight: 800, fontSize: '16px', color: 'var(--ink)', letterSpacing: '-0.2px' }}>
                 2. Destination Location (Search or Select)
               </label>
               {(destinationSearch || destinationCoords) && (
@@ -707,16 +719,16 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                     setMultiRouteResult(null);
                   }}
                   className="btn sm"
-                  style={{ fontSize: '11px', padding: '2px 8px', height: '24px' }}
+                  style={{ fontSize: '13px', padding: '4px 12px', height: '30px', fontWeight: 600 }}
                   title="Clear destination to test 'No destination selected' state"
                 >
-                  <RotateCcw size={12} style={{ marginRight: 4 }} />
+                  <RotateCcw size={14} style={{ marginRight: 6 }} />
                   Clear Destination
                 </button>
               )}
             </div>
 
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
                 <input
                   id="destination-search-input"
@@ -745,20 +757,20 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                   placeholder="Search destination buildings, hospitals, streets, addresses, landmarks..."
                   style={{
                     width: '100%',
-                    padding: '10px 12px 10px 36px',
+                    padding: '12px 14px 12px 42px',
                     borderRadius: '8px',
                     border: '1.5px solid var(--line)',
                     background: 'var(--surface)',
                     color: 'var(--ink)',
-                    fontSize: '13px',
+                    fontSize: '15px',
                   }}
                 />
                 <Search
                   style={{
                     position: 'absolute',
-                    left: 12,
-                    width: 16,
-                    height: 16,
+                    left: 14,
+                    width: 18,
+                    height: 18,
                     color: 'var(--mute)',
                     pointerEvents: 'none',
                   }}
@@ -767,9 +779,9 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                   <Loader2
                     style={{
                       position: 'absolute',
-                      right: 12,
-                      width: 16,
-                      height: 16,
+                      right: 14,
+                      width: 18,
+                      height: 18,
                       color: 'var(--mute)',
                       animation: 'spin 1s linear infinite',
                     }}
@@ -779,7 +791,7 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
               <button
                 type="button"
                 id="calculate-routes-action-btn"
-                className="btn sm pri"
+                className="btn pri"
                 onClick={() => {
                   setIsDropdownOpen(false);
                   if (searchResults.length > 0 && !destinationCoords && !destinationBuildingId && !destinationRoadId) {
@@ -789,10 +801,10 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                   }
                 }}
                 style={{
-                  height: '38px',
-                  padding: '0 16px',
+                  height: '46px',
+                  padding: '0 20px',
                   fontWeight: 800,
-                  fontSize: '12px',
+                  fontSize: '14px',
                   background: 'var(--ink)',
                   color: 'var(--bg)',
                   borderRadius: '8px',
@@ -803,11 +815,77 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
               >
                 Calculate Routes
               </button>
+
+              {/* Search Dropdown Results positioned directly below search input row */}
+              {isDropdownOpen && searchResults.length > 0 && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 6px)',
+                    left: 0,
+                    right: 0,
+                    background: 'var(--surface)',
+                    backdropFilter: 'blur(16px)',
+                    border: '1.5px solid var(--line)',
+                    borderRadius: '10px',
+                    boxShadow: '0 14px 36px rgba(0,0,0,0.5)',
+                    maxHeight: '280px',
+                    overflowY: 'auto',
+                    zIndex: 9999,
+                  }}
+                >
+                  {searchResults.map((item) => (
+                    <button
+                      key={`${item.id}-${item.name}`}
+                      type="button"
+                      onClick={() => handleSelectSearchResult(item)}
+                      style={{
+                        width: '100%',
+                        padding: '12px 16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        border: 'none',
+                        borderBottom: '1px solid var(--line)',
+                        background: 'transparent',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        transition: 'background 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.background = 'rgba(255, 255, 255, 0.05)';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.background = 'transparent';
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
+                        <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--ink)' }}>{item.name}</span>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: 800,
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            background: item.inside_pilot_area === false ? 'rgba(217, 119, 6, 0.15)' : 'rgba(37, 99, 235, 0.12)',
+                            color: item.inside_pilot_area === false ? '#d97706' : '#2563eb',
+                          }}
+                        >
+                          {item.inside_pilot_area === false ? 'OUTSIDE PILOT' : item.feature_type.toUpperCase()}
+                        </span>
+                      </div>
+                      {item.details && (
+                        <span style={{ fontSize: '12px', color: 'var(--mute)', marginTop: '3px' }}>{item.details}</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Quick destination suggestion chips */}
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px' }}>
-              <span style={{ fontSize: '11px', color: 'var(--mute)', alignSelf: 'center' }}>Quick:</span>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '14px', alignItems: 'center' }}>
+              <span style={{ fontSize: '13px', color: 'var(--mute)', fontWeight: 600 }}>Quick:</span>
               {quickDestinations.map((qd: any) => (
                 <button
                   key={qd.name}
@@ -833,97 +911,44 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                   }}
                   className="chip"
                   style={{
-                    fontSize: '11px',
-                    padding: '2px 8px',
-                    border: destinationName === qd.name ? '1px solid #ffd60a' : '1px solid var(--line)',
-                    background: destinationName === qd.name ? 'rgba(255, 214, 10, 0.15)' : 'transparent',
+                    fontSize: '13px',
+                    height: '32px',
+                    padding: '0 12px',
+                    border: destinationName === qd.name ? '2px solid #ffd60a' : '1px solid var(--line)',
+                    background: destinationName === qd.name ? 'rgba(255, 214, 10, 0.2)' : 'transparent',
+                    color: destinationName === qd.name ? 'var(--ink)' : 'var(--mute)',
+                    fontWeight: destinationName === qd.name ? 800 : 500,
                   }}
                 >
                   {qd.name}
                 </button>
               ))}
             </div>
-
-            {/* Search Dropdown Results */}
-            {isDropdownOpen && searchResults.length > 0 && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '100%',
-                  left: 0,
-                  right: 0,
-                  marginTop: '4px',
-                  background: 'var(--surface)',
-                  border: '1.5px solid var(--line)',
-                  borderRadius: '8px',
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
-                  maxHeight: '260px',
-                  overflowY: 'auto',
-                  zIndex: 999,
-                }}
-              >
-                {searchResults.map((item) => (
-                  <button
-                    key={`${item.id}-${item.name}`}
-                    type="button"
-                    onClick={() => handleSelectSearchResult(item)}
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start',
-                      border: 'none',
-                      borderBottom: '1px solid var(--line)',
-                      background: 'transparent',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink)' }}>{item.name}</span>
-                      <span
-                        style={{
-                          fontSize: '9px',
-                          fontWeight: 800,
-                          padding: '1px 5px',
-                          borderRadius: '4px',
-                          background: item.inside_pilot_area === false ? 'rgba(217, 119, 6, 0.15)' : 'rgba(37, 99, 235, 0.12)',
-                          color: item.inside_pilot_area === false ? '#d97706' : '#2563eb',
-                        }}
-                      >
-                        {item.inside_pilot_area === false ? 'OUTSIDE PILOT' : item.feature_type.toUpperCase()}
-                      </span>
-                    </div>
-                    {item.details && (
-                      <span style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '2px' }}>{item.details}</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Vehicle Profile Selector & Requested Alternatives */}
-          <div className="fld" style={{ marginTop: '16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label style={{ margin: 0, fontWeight: 800, fontSize: '13px' }}>3. Emergency Apparatus Profile</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '11px', color: 'var(--mute)' }}>Routes:</span>
+          <div className="fld" style={{ background: 'var(--glass)', padding: '18px 20px', borderRadius: '12px', border: '1.5px solid var(--line)', marginBottom: '28px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <label style={{ margin: 0, fontWeight: 800, fontSize: '16px', color: 'var(--ink)', letterSpacing: '-0.2px' }}>
+                3. Emergency Apparatus Profile
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '13px', color: 'var(--mute)', fontWeight: 600 }}>Routes:</span>
                 {[2, 3, 4].map((k) => (
                   <button
                     key={k}
                     type="button"
                     onClick={() => setRequestedK(k)}
                     style={{
-                      fontSize: '11px',
+                      fontSize: '13px',
                       fontWeight: 700,
-                      padding: '2px 7px',
-                      borderRadius: '4px',
-                      border: requestedK === k ? '1.5px solid var(--ink)' : '1px solid var(--line)',
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      border: requestedK === k ? '2px solid var(--ink)' : '1px solid var(--line)',
                       background: requestedK === k ? 'var(--ink)' : 'var(--surface)',
                       color: requestedK === k ? 'var(--bg)' : 'var(--ink)',
                       cursor: 'pointer',
+                      transition: 'all 0.15s ease',
                     }}
                   >
                     {k}
@@ -932,27 +957,27 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
               </div>
             </div>
 
-            <div className="chips" role="group" aria-label="Vehicle selection" style={{ marginTop: '8px' }}>
+            <div className="chips" role="group" aria-label="Vehicle selection" style={{ marginTop: '10px', gap: '10px' }}>
               {Object.entries(VEHICLE_OPTIONS).map(([k, v]) => (
                 <button
                   key={k}
                   className={`chip ${selectedVehKey === k ? 'on' : ''}`}
                   onClick={() => setSelectedVehKey(k)}
                   aria-pressed={selectedVehKey === k}
-                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', height: '38px', padding: '0 16px', fontWeight: 600 }}
                 >
                   <span>{v.n}</span>
-                  <span style={{ fontSize: '10px', opacity: 0.8 }}>(≥{v.w}m)</span>
+                  <span style={{ fontSize: '12px', opacity: 0.85 }}>(≥{v.w}m)</span>
                 </button>
               ))}
             </div>
-            <div style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '4px' }}>
-              Physical clearance constraint: <b>{currentVeh.w}m minimum usable corridor width</b> ({currentVeh.desc})
+            <div style={{ fontSize: '13px', color: 'var(--mute)', marginTop: '10px', lineHeight: 1.5 }}>
+              Physical clearance constraint: <b style={{ color: 'var(--ink)' }}>{currentVeh.w}m minimum usable corridor width</b> ({currentVeh.desc})
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '12px', marginTop: '20px', marginBottom: '28px', flexWrap: 'wrap' }}>
             <button
               className="btn pri"
               onClick={runRouteAnalysis}
@@ -1155,18 +1180,18 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
 
           {/* UI State 4 & 9: Multiple Routes Found & Selected Route Details */}
           {multiRouteResult && multiRouteResult.routes && multiRouteResult.routes.length > 0 && (
-            <div style={{ marginTop: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <h3 style={{ margin: 0, fontSize: '15px' }}>
+            <div style={{ marginTop: '22px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 800 }}>
                   Alternative Route Comparison ({multiRouteResult.routes.length} paths)
                 </h3>
-                <span style={{ fontSize: '11px', color: 'var(--mute)' }}>
+                <span style={{ fontSize: '13px', color: 'var(--mute)' }}>
                   Click route to highlight on map
                 </span>
               </div>
 
               {/* Alternative Route Cards Stack */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {multiRouteResult.routes.map((rt) => {
                   const isSelected = rt.route_id === (selectedRouteId || multiRouteResult.routes[0].route_id);
                   return (
@@ -1174,29 +1199,29 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                       key={rt.route_id}
                       onClick={() => setSelectedRouteId(rt.route_id)}
                       style={{
-                        padding: '12px',
+                        padding: '14px 16px',
                         background: isSelected ? 'var(--surface)' : 'var(--glass)',
-                        border: isSelected ? `2px solid ${rt.color}` : '1.5px solid var(--line)',
-                        borderRadius: '8px',
+                        border: isSelected ? `2.5px solid ${rt.color}` : '1.5px solid var(--line)',
+                        borderRadius: '10px',
                         cursor: 'pointer',
-                        boxShadow: isSelected ? `0 0 12px ${rt.color}25` : 'none',
+                        boxShadow: isSelected ? `0 0 16px ${rt.color}35` : 'none',
                         transition: 'all 0.15s ease',
                       }}
                     >
                       {/* Header with Swatch & Status Badge */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                           <span
                             style={{
-                              width: '14px',
-                              height: '14px',
-                              borderRadius: '4px',
+                              width: '18px',
+                              height: '18px',
+                              borderRadius: '5px',
                               background: rt.color,
                               flexShrink: 0,
                               display: 'inline-block',
                             }}
                           />
-                          <span style={{ fontWeight: 800, fontSize: '13px', color: 'var(--ink)' }}>
+                          <span style={{ fontWeight: 800, fontSize: '16px', color: 'var(--ink)' }}>
                             {rt.name}
                           </span>
                         </div>
@@ -1208,13 +1233,13 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                         style={{
                           display: 'grid',
                           gridTemplateColumns: 'repeat(3, 1fr)',
-                          gap: '6px',
-                          marginTop: '8px',
+                          gap: '10px',
+                          marginTop: '12px',
                           textAlign: 'center',
-                          fontSize: '11px',
+                          fontSize: '14px',
                         }}
                       >
-                        <div style={{ padding: '4px 6px', background: 'var(--bg)', borderRadius: '4px', border: '1px solid var(--line)' }}>
+                        <div style={{ padding: '8px 10px', background: 'var(--bg)', borderRadius: '6px', border: '1px solid var(--line)' }}>
                           <span style={{ color: 'var(--mute)' }}>Distance: </span>
                           <b>
                             {rt.total_distance_m >= 1000
@@ -1222,11 +1247,11 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                               : `${Math.round(rt.total_distance_m)} m`}
                           </b>
                         </div>
-                        <div style={{ padding: '4px 6px', background: 'var(--bg)', borderRadius: '4px', border: '1px solid var(--line)' }}>
+                        <div style={{ padding: '8px 10px', background: 'var(--bg)', borderRadius: '6px', border: '1px solid var(--line)' }}>
                           <span style={{ color: 'var(--mute)' }}>Corridors: </span>
                           <b>{rt.segment_count} segments</b>
                         </div>
-                        <div style={{ padding: '4px 6px', background: 'var(--bg)', borderRadius: '4px', border: '1px solid var(--line)' }}>
+                        <div style={{ padding: '8px 10px', background: 'var(--bg)', borderRadius: '6px', border: '1px solid var(--line)' }}>
                           <span style={{ color: 'var(--mute)' }}>Clearance: </span>
                           <b style={{ color: rt.is_recommended ? '#168a5c' : '#d7263d' }}>
                             {rt.is_recommended ? 'Passable' : 'Conditional'}
@@ -1236,20 +1261,20 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
 
                       {/* Restrictions / Limitations */}
                       {rt.known_restrictions && rt.known_restrictions.length > 0 && (
-                        <div style={{ marginTop: '6px', fontSize: '11px', color: '#e8710a' }}>
+                        <div style={{ marginTop: '10px', fontSize: '14px', color: '#e8710a', fontWeight: 600 }}>
                           <b>Known Constraints:</b> {rt.known_restrictions.join('; ')}
                         </div>
                       )}
 
                       {/* Unknown evidence alert */}
                       {rt.unknown_evidence_segments && rt.unknown_evidence_segments.length > 0 && (
-                        <div style={{ marginTop: '4px', fontSize: '11px', color: '#7d837a' }}>
+                        <div style={{ marginTop: '8px', fontSize: '14px', color: 'var(--mute)', fontWeight: 600 }}>
                           <b>Unsurveyed Segments:</b> {rt.unknown_evidence_segments.length} corridors lack measured width
                         </div>
                       )}
 
                       {/* Explanation */}
-                      <div style={{ marginTop: '6px', fontSize: '11px', color: 'var(--mute)', lineHeight: 1.3 }}>
+                      <div style={{ marginTop: '10px', fontSize: '14px', color: 'var(--mute)', lineHeight: 1.55 }}>
                         {rt.explanation}
                       </div>
                     </div>
@@ -1261,45 +1286,46 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
               {multiRouteResult.routes.every((r) => r.classification === 'unknown') && (
                 <div
                   style={{
-                    marginTop: '12px',
-                    padding: '10px 12px',
-                    background: 'rgba(100, 116, 139, 0.08)',
-                    border: '1px solid #cbd5e1',
+                    marginTop: '16px',
+                    padding: '14px 16px',
+                    background: 'rgba(100, 116, 139, 0.1)',
+                    border: '1.5px solid #94a3b8',
                     borderRadius: '8px',
-                    fontSize: '12px',
+                    fontSize: '14px',
+                    lineHeight: 1.55,
                     color: 'var(--ink)',
                   }}
                 >
-                  <b>Cadastral Ground Truth Limitation:</b> All candidate alternative routes traverse unmeasured road corridors. UNREACHABLE honestly flags these as unverified unknown widths rather than falsely claiming verified safety.
+                  <b style={{ color: 'var(--ink)' }}>Cadastral Ground Truth Limitation:</b> All candidate alternative routes traverse unmeasured road corridors. UNREACHABLE honestly flags these as unverified unknown widths rather than falsely claiming verified safety.
                 </div>
               )}
 
               {/* Building Emergency Access & Ingress Caveat */}
               {(destinationBuildingId || multiRouteResult.destination_type === 'building') && (
-                <div style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ marginTop: '18px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div
                     style={{
-                      background: 'rgba(255, 214, 10, 0.05)',
+                      background: 'rgba(255, 214, 10, 0.08)',
                       border: '1.5px solid #ffd60a',
                       borderRadius: '8px',
-                      padding: '12px 14px',
-                      fontSize: '12px',
+                      padding: '16px 18px',
+                      fontSize: '14px',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--ink)', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Building size={14} style={{ color: '#d97706' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                      <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--ink)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Building size={18} style={{ color: '#d97706' }} />
                         Building Emergency Assessment
                       </span>
                       <a
                         href={`#/b/${destinationBuildingId || multiRouteResult.destination_id}`}
-                        style={{ fontSize: '11px', fontWeight: 700, color: '#2563eb', textDecoration: 'underline' }}
+                        style={{ fontSize: '14px', fontWeight: 700, color: '#2563eb', textDecoration: 'underline' }}
                       >
                         Inspect Full Assessment Report →
                       </a>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px 12px', marginBottom: '8px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px 16px', marginBottom: '12px', fontSize: '14px' }}>
                       <div>
                         <span style={{ color: 'var(--mute)' }}>Approach Road: </span>
                         <b style={{ color: 'var(--ink)' }}>
@@ -1331,7 +1357,7 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                     </div>
 
                     {bldgAssessment?.missing_evidence && bldgAssessment.missing_evidence.length > 0 && (
-                      <div style={{ borderTop: '1px solid var(--line)', paddingTop: '6px', fontSize: '11px', color: 'var(--mute)' }}>
+                      <div style={{ borderTop: '1px solid var(--line)', paddingTop: '8px', fontSize: '13px', color: 'var(--mute)' }}>
                         <b>Missing Field Evidence:</b>{' '}
                         <span>{bldgAssessment.missing_evidence.join(' • ')}</span>
                       </div>
@@ -1341,17 +1367,17 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                   {/* Road vs Entrance Ingress Caveat */}
                   <div
                     style={{
-                      padding: '12px 14px',
-                      background: 'rgba(217, 119, 6, 0.08)',
+                      padding: '16px 18px',
+                      background: 'rgba(217, 119, 6, 0.1)',
                       border: '1.5px solid #d97706',
                       borderRadius: '8px',
-                      fontSize: '12px',
-                      lineHeight: '1.4',
+                      fontSize: '14px',
+                      lineHeight: '1.55',
                       color: 'var(--ink)',
                     }}
                   >
-                    <div style={{ fontWeight: 800, color: '#d97706', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <ShieldAlert size={15} />
+                    <div style={{ fontWeight: 800, color: '#d97706', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '15px' }}>
+                      <ShieldAlert size={20} />
                       <span>Critical Ingress Caveat: Public Road Reachability ≠ Property Entrance Ingress</span>
                     </div>
                     <div>
@@ -1363,17 +1389,17 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
 
               {/* Turn-by-Turn Steps for Selected Alternative Route */}
               {activeRoute && activeRoute.steps && activeRoute.steps.length > 0 && (
-                <div style={{ marginTop: '16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <h4 style={{ margin: 0, fontSize: '13px' }}>
+                <div style={{ marginTop: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 800 }}>
                       Selected: {activeRoute.name} ({activeRoute.steps.length} segments)
                     </h4>
-                    <span style={{ fontSize: '11px', color: 'var(--mute)' }}>
+                    <span style={{ fontSize: '14px', color: 'var(--mute)', fontWeight: 600 }}>
                       Highlighted on map ({activeRoute.color})
                     </span>
                   </div>
 
-                  <div style={{ maxHeight: '220px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px', paddingRight: '4px' }}>
+                  <div style={{ maxHeight: '340px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingRight: '4px' }}>
                     {activeRoute.steps.slice(0, 50).map((st) => (
                       <div
                         key={`${st.step_index}-${st.road_id}`}
@@ -1381,19 +1407,19 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          gap: '8px',
-                          padding: '6px 10px',
+                          gap: '14px',
+                          padding: '12px 16px',
                           background: 'var(--glass)',
-                          borderRadius: '6px',
-                          border: '1px solid var(--line)',
-                          fontSize: '12px',
+                          borderRadius: '8px',
+                          border: '1.5px solid var(--line)',
+                          fontSize: '15px',
                         }}
                       >
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: 700, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <div style={{ fontWeight: 800, fontSize: '15px', color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             Step {st.step_index}: {st.road_name || st.road_id}
                           </div>
-                          <div style={{ fontSize: '10px', color: 'var(--mute)' }}>
+                          <div style={{ fontSize: '13px', color: 'var(--mute)', marginTop: '3px' }}>
                             Length: {st.segment_length_m}m · {st.reason}
                           </div>
                         </div>
@@ -1401,7 +1427,7 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
                       </div>
                     ))}
                     {activeRoute.steps.length > 50 && (
-                      <div style={{ textAlign: 'center', fontSize: '11px', color: 'var(--mute)', padding: '4px' }}>
+                      <div style={{ textAlign: 'center', fontSize: '14px', color: 'var(--mute)', padding: '8px' }}>
                         + {activeRoute.steps.length - 50} additional road segments traversed along road network
                       </div>
                     )}
@@ -1410,6 +1436,7 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
               )}
             </div>
           )}
+
         </div>
 
         {/* Map Preview Column */}
@@ -1474,42 +1501,43 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
           {/* Map Color Legend with Route Identity AND Accessibility Indicators */}
           <div
             style={{
-              marginTop: '12px',
-              padding: '12px',
+              marginTop: '16px',
+              padding: '14px 16px',
               background: 'var(--glass)',
-              border: '1px solid var(--line)',
-              borderRadius: '8px',
-              fontSize: '11px',
+              border: '1.5px solid var(--line)',
+              borderRadius: '10px',
+              fontSize: '13px',
             }}
           >
-            <div style={{ fontWeight: 800, marginBottom: '6px', color: 'var(--ink)' }}>
+            <div style={{ fontWeight: 800, fontSize: '14px', marginBottom: '8px', color: 'var(--ink)' }}>
               Map Legend: Alternative Route Colours & Accessibility Status
             </div>
 
             {/* Route Identity Colours */}
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '8px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ width: 16, height: 4, background: '#2563eb', borderRadius: 2 }} />
-                <span>Route 1: Primary (Blue)</span>
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '10px', fontSize: '13px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: 18, height: 6, background: '#2563eb', borderRadius: 3 }} />
+                <span><b>Route 1:</b> Primary (Blue)</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ width: 16, height: 4, background: '#9333ea', borderRadius: 2 }} />
-                <span>Route 2: Alternative A (Purple)</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: 18, height: 6, background: '#9333ea', borderRadius: 3 }} />
+                <span><b>Route 2:</b> Alternative A (Purple)</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ width: 16, height: 4, background: '#0d9488', borderRadius: 2 }} />
-                <span>Route 3: Alternative B (Teal)</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: 18, height: 6, background: '#0d9488', borderRadius: 3 }} />
+                <span><b>Route 3:</b> Alternative B (Teal)</span>
               </div>
             </div>
 
             {/* Separate Accessibility Status Indicators */}
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', borderTop: '1px solid var(--line)', paddingTop: '6px' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', borderTop: '1px solid var(--line)', paddingTop: '10px' }}>
               <b className="pl c-ok">● Verified accessible (Green)</b>
               <b className="pl c-constrained">▲ Constrained margin (Amber)</b>
               <b className="pl c-infeasible">✕ Confirmed blocked (Red)</b>
               <b className="pl c-unknown">? Unknown width / Unsurveyed (Grey)</b>
             </div>
           </div>
+
         </div>
       </div>
     </section>
