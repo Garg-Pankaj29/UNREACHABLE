@@ -36,10 +36,10 @@
 | 4 | Frontend real-mode & vector basemap | done |
 | 5 | SQLite incidents, live recompute, SSE stream | done |
 
+- 2026-10-24 | Security | Added confidential data/secrets to .gitignore (untracked local incidents.sqlite); 79/79 tests OK, build OK | .gitignore, memory.md
 - 2026-10-24 | Phase 5 | Added SQLite-backed incidents (POST/GET /api/incidents), SSE /api/stream, live route recompute & unit animation; 79/79 tests OK, build OK | incident_service.py, routes.py, AccessAtlasPage.tsx, MapView.tsx, api.ts, test_incidents.py, memory.md
 - 2026-10-24 | Phase 4 | Expanded to state-wide Punjab emergency network (497 facilities across 23 districts); 75/75 tests OK, build OK | MapView.tsx, TopHeader.tsx, memory.md
 - 2026-10-24 | Phase 4 | Added clinics/doctors to visibleStations (teal '+' markers at all zooms); 75/75 tests OK, build OK | MapView.tsx, memory.md
-- 2026-10-24 | Phase 4 | Fixed zoom overlap (bottom: 204px) and stopped LOD auto-zoom-out; 75/75 tests OK, build OK | MapView.tsx, AccessAtlasPage.tsx, memory.md
 
 ## 7. Rules for agents
 - Additive changes only; keep demo mode intact; never modify data/sample/.
