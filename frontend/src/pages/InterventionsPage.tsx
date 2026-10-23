@@ -270,10 +270,21 @@ export const InterventionsPage: React.FC<InterventionsPageProps> = ({
 
   return (
     <section className="v">
-      <h2>Interventions and issues</h2>
+      {/* Unified Header Pattern */}
+      <div className="page-header-unified">
+        <div className="page-tag">
+          <span className="dot" />
+          <span>Municipal Interventions & Audit Work Orders</span>
+        </div>
+        <h2>Interventions & Bottlenecks</h2>
+        <p className="lede">
+          Prioritize ground-truth field surveys and physical roadway widening by the number of dependent residential and commercial buildings unlocked.
+        </p>
+        <div className="accent-bar" />
+      </div>
 
       {/* KPI Numbers */}
-      <div className="nums" style={{ margin: '24px 0' }}>
+      <div className="nums" style={{ margin: '40px 0' }}>
         <div>
           <b>{openIssues.length}</b>
           <small>Open issues</small>
@@ -295,11 +306,13 @@ export const InterventionsPage: React.FC<InterventionsPageProps> = ({
       {/* Field Audit Action List (Turning Unknown into Action) */}
       <div
         style={{
-          background: 'rgba(255, 255, 255, 0.04)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          borderRadius: '8px',
-          padding: '16px',
-          margin: '0 0 24px',
+          background: 'var(--glass)',
+          border: '1.5px solid var(--line)',
+          borderRadius: '18px',
+          padding: '28px 32px',
+          margin: '40px 0',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
         }}
       >
         <div

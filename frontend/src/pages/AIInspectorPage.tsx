@@ -174,13 +174,20 @@ export const AIInspectorPage: React.FC<AIInspectorPageProps> = ({
 
   return (
     <section className="v">
-      <h2>AI Access Inspector</h2>
-      <p className="lede">
-        Transform street photographs into human-reviewable observations. A photograph alone
-        cannot certify road geometry or legal clearance without calibrated field verification.
-      </p>
+      {/* Unified Header */}
+      <div className="page-header-unified">
+        <div className="page-tag">
+          <span className="dot" />
+          <span>Multimodal Vision Auditing & Field Verification</span>
+        </div>
+        <h2>AI Street Vision Inspector</h2>
+        <p className="lede">
+          Transform street-level photographs into structured, human-reviewable observations. Identify overhead utility cable sag, parked delivery bottlenecks, and temporary corridor obstructions before creating certified issue records.
+        </p>
+        <div className="accent-bar" />
+      </div>
 
-      <div className="split" style={{ marginTop: '24px' }}>
+      <div className="split" style={{ marginTop: '36px' }}>
         {/* Left: Upload and File Management */}
         <div>
           <label

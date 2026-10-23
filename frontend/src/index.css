@@ -391,9 +391,63 @@ main#app.stage-active {
 /* Page containers */
 .v {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 0 clamp(20px, 4vw, 48px) 120px;
+  padding: 16px clamp(20px, 4vw, 48px) 130px;
+}
+
+/* Standardized Page Header Pattern across pages */
+.page-header-unified {
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.page-header-unified .page-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 99px;
+  background: var(--glass);
+  border: 1px solid var(--line);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  width: fit-content;
+}
+
+.page-header-unified .page-tag span.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tape);
+}
+
+.page-header-unified h2 {
+  font-size: clamp(30px, 3.8vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin: 0;
+  color: var(--ink);
+}
+
+.page-header-unified .lede {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--mute);
+  max-width: 88ch;
+}
+
+.page-header-unified .accent-bar {
+  height: 4px;
+  width: 64px;
+  background: var(--tape);
+  border-radius: 2px;
+  margin-top: 4px;
 }
 
 /* Hero Section */
@@ -404,11 +458,12 @@ main#app.stage-active {
   align-items: center;
   min-height: calc(100vh - 230px);
   padding-top: 12px;
+  margin-bottom: 56px;
 }
 
 h1 {
-  font-size: clamp(38px, 5.5vw, 78px);
-  line-height: 0.98;
+  font-size: clamp(38px, 5.5vw, 76px);
+  line-height: 1.05;
   letter-spacing: -0.035em;
   font-weight: 800;
 }
@@ -416,41 +471,55 @@ h1 {
 h1 span {
   display: block;
   font-weight: 300;
+  margin-top: 4px;
 }
 
 h2 {
-  font-size: clamp(26px, 3.4vw, 42px);
-  line-height: 1.05;
+  font-size: clamp(26px, 3.2vw, 38px);
+  line-height: 1.18;
   letter-spacing: -0.025em;
   font-weight: 800;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  color: var(--ink);
 }
 
 h3 {
   font-size: 20px;
   font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+h4 {
+  font-size: 16px;
+  font-weight: 700;
   letter-spacing: -0.01em;
+  line-height: 1.35;
+  color: var(--ink);
 }
 
 .tape {
-  height: 10px;
+  height: 8px;
   margin: 22px 0;
-  max-width: 320px;
+  max-width: 280px;
+  border-radius: 2px;
   background: repeating-linear-gradient(135deg, var(--tape) 0 10px, var(--ink) 10px 20px);
 }
 
 .lede {
-  max-width: 95ch;
+  max-width: 90ch;
   color: var(--mute);
-  font-size: 19px;
-  line-height: 1.6;
+  font-size: 18px;
+  line-height: 1.65;
 }
 
 .cta {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
-  margin-top: 26px;
+  margin-top: 32px;
 }
 
 /* Buttons */
@@ -527,29 +596,43 @@ h3 {
 .nums {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  margin: 36px 0;
+  margin: 48px 0;
+  background: var(--glass);
+  border: 1.5px solid var(--line);
+  border-radius: 18px;
+  padding: 24px 8px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .nums div {
-  padding: 4px 20px;
-  border-left: 1.5px solid var(--ink);
+  padding: 8px 24px;
+  border-left: 1.5px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.nums div:first-child {
+  border-left: none;
 }
 
 .nums b {
   display: block;
-  font-size: clamp(40px, 5.5vw, 76px);
+  font-size: clamp(34px, 4.2vw, 54px);
   font-weight: 800;
-  line-height: 1;
+  line-height: 1.05;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
+  color: var(--ink);
 }
 
 .nums small {
   color: var(--mute);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   display: block;
-  margin-top: 6px;
+  margin-top: 8px;
   letter-spacing: -0.01em;
 }
 
@@ -557,13 +640,15 @@ h3 {
 .two {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 40px;
+  gap: 48px;
+  margin: 48px 0;
 }
 
 .split {
   display: grid;
   grid-template-columns: minmax(400px, 520px) 1fr;
-  gap: 40px;
+  gap: 44px;
+  margin: 36px 0;
 }
 
 /* Rows and Tables */
@@ -572,27 +657,30 @@ h3 {
   grid-template-columns: 56px 1fr auto auto;
   gap: 16px;
   align-items: center;
-  padding: 14px 8px;
+  padding: 16px 12px;
   border-top: 1px solid var(--line);
   text-decoration: none;
   color: inherit;
-  transition: background 0.15s ease;
+  border-radius: 10px;
+  transition: background 0.15s ease, transform 0.15s ease;
 }
 
 a.row:hover,
 tr.cl:hover {
   background: var(--glass);
+  transform: translateX(2px);
 }
 
 .row small,
 td small {
   display: block;
   color: var(--mute);
-  font-size: 14px;
+  font-size: 13px;
+  margin-top: 2px;
 }
 
 .sc {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
@@ -602,7 +690,7 @@ td small {
   display: inline-flex;
   gap: 7px;
   align-items: center;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   border: 1.5px solid var(--c, var(--line));
   border-radius: 99px;
@@ -632,13 +720,13 @@ td small {
 
 /* Disclaimers */
 .dis {
-  margin-top: 40px;
+  margin-top: 56px;
   color: var(--mute);
-  font-size: 15px;
-  max-width: 95ch;
+  font-size: 14px;
+  max-width: 90ch;
   border-left: 4px solid var(--tape);
-  padding-left: 14px;
-  line-height: 1.65;
+  padding-left: 18px;
+  line-height: 1.7;
 }
 
 /* Form fields */
