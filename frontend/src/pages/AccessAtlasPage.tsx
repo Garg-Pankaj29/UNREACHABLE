@@ -374,6 +374,7 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
         onSelectFeature={onSelectFeature}
         onViewportChange={onViewportChange}
         fullHeight={true}
+        datasetMode={datasetMode}
       />
 
       {/* Floating Control Panel (Upper Left) */}

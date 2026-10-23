@@ -35,11 +35,11 @@
 | 3 | Backend real-mode integration & cache | done |
 | 4 | Frontend real-mode & vector basemap | done |
 
+- 2026-10-24 | Phase 4 | Fixed zoom overlap (bottom: 204px) and stopped LOD auto-zoom-out; 75/75 tests OK, build OK | MapView.tsx, AccessAtlasPage.tsx, memory.md
 - 2026-10-24 | Phase 4 | Restored OpenStreetMap TileLayer, sanitized relation bounds, auto-fit viewport; 75/75 tests OK, build OK | MapView.tsx, osm_to_geojson.py, memory.md
 - 2026-10-24 | Phase 4 | Fixed map visibility: decluttered facility markers, enhanced vector roads/buildings, centered bounds | MapView.tsx, memory.md
 - 2026-10-24 | Phase 4 | Removed external URLs, bundled local fonts, vector-only basemap, dynamic banner; build OK | MapView.tsx, DisclaimerBanner.tsx, index.css, index.html, memory.md
 - 2026-10-24 | Phase 3 | Added DATA_MODE env, /health counts, precomputed cache, test_real_data.py; 75/75 tests green in both modes, build OK | config.py, data_service.py, routes.py, test_real_data.py, memory.md
-- 2026-10-24 | Phase 2 | Implemented osm_to_geojson.py & test_osm_converter.py; tests 67/67 OK, build OK | osm_to_geojson.py, test_osm_converter.py, neighbourhood.geojson, memory.md
 
 ## 7. Rules for agents
 - Additive changes only; keep demo mode intact; never modify data/sample/.

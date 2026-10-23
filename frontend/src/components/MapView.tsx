@@ -52,6 +52,7 @@ interface MapViewProps {
   zoom?: number;
   fullHeight?: boolean;
   showLegend?: boolean;
+  datasetMode?: 'pilot' | 'sample';
 }
 
 // Default center: Chandigarh University / Gharuan / Kharar pilot corridor
@@ -241,12 +242,14 @@ function MapViewportManager({
   resetCount,
   routeGeometry,
   alternativeRoutes,
+  datasetMode,
 }: {
   features: GeoJSONFeature[];
   selectedFeature: GeoJSONFeature | null;
   resetCount: number;
   routeGeometry?: { type: string; coordinates: [number, number][] } | null;
   alternativeRoutes?: AlternativeRoute[];
+  datasetMode?: string;
 }) {
   const map = useMap();
   const initialFitDone = useRef(false);
@@ -310,15 +313,24 @@ function MapViewportManager({
     }
   }, [features, map]);
 
-  // Initial fit when data loads, and refit on mode change
-  const lastCount = useRef(0);
+  // Initial fit only once when data first loads
   useEffect(() => {
-    if (features.length > 0 && Math.abs(features.length - lastCount.current) > 3) {
+    if (!initialFitDone.current && features.length > 0) {
       fitToFeatures();
-      lastCount.current = features.length;
       initialFitDone.current = true;
     }
-  }, [features, fitToFeatures]);
+  }, [features.length > 0, fitToFeatures]);
+
+  // Refit when dataset mode explicitly toggles
+  const prevMode = useRef(datasetMode);
+  useEffect(() => {
+    if (datasetMode && prevMode.current && prevMode.current !== datasetMode) {
+      fitToFeatures();
+      prevMode.current = datasetMode;
+    } else if (datasetMode) {
+      prevMode.current = datasetMode;
+    }
+  }, [datasetMode, fitToFeatures]);
 
   // Reset trigger
   useEffect(() => {
@@ -450,6 +462,7 @@ export const MapView: React.FC<MapViewProps> = ({
   zoom,
   fullHeight = false,
   showLegend = true,
+  datasetMode,
 }) => {
   const [tileError, setTileError] = useState(false);
   const [resetCount, setResetCount] = useState(0);
@@ -708,12 +721,12 @@ export const MapView: React.FC<MapViewProps> = ({
       }`}
       style={{ background: 'var(--bg)' }}
     >
-      {/* Reset Center control placed cleanly above zoom controls */}
+      {/* Reset Center control placed cleanly above zoom controls with comfortable clearance */}
       {fullHeight && (
         <div
           className="absolute z-[800]"
           style={{
-            bottom: '158px',
+            bottom: '204px',
             right: '16px',
           }}
         >
@@ -771,6 +784,7 @@ export const MapView: React.FC<MapViewProps> = ({
           resetCount={resetCount}
           routeGeometry={routeGeometry}
           alternativeRoutes={alternativeRoutes}
+          datasetMode={datasetMode}
         />
 
         <TileLayer
