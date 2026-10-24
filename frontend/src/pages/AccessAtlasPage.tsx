@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Search, X, Loader2, ShieldAlert, Sparkles, AlertTriangle } from 'lucide-react';
 import { GeoJSONFeature, IssueRecord, VehicleProfile, BuildingAccessResponse, RouteResponse } from '../types';
-import { MapView } from '../components/MapView';
+import { MapView, getRoadAccessStatus } from '../components/MapView';
 import { VEHICLE_OPTIONS } from '../services/store';
 import { api, SearchResultItem } from '../services/api';
 
@@ -146,16 +146,65 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
     }
   }, [selectedFeature?.properties?.id, selectedFeature?.id, selectedFeature?.properties?.feature_type, selectedVehKey, datasetMode, routeRefreshNonce]);
 
+  useEffect(() => {
+    if (!selectedFeature) {
+      setUnitPosition(null);
+    }
+  }, [selectedFeature]);
+
+  // Memoized midpoint coordinates for selected road
+  const roadMid = useMemo<[number, number] | null>(() => {
+    if (selectedFeature?.properties?.feature_type !== 'road') return null;
+    const geom = selectedFeature.geometry;
+    if (geom?.type === 'LineString' && Array.isArray(geom.coordinates) && geom.coordinates.length > 0) {
+      const m = geom.coordinates[Math.floor(geom.coordinates.length / 2)];
+      return [m[0], m[1]]; // [lon, lat]
+    }
+    return null;
+  }, [selectedFeature]);
+
   // 3. Road Segment Route Evaluation with live recompute
   useEffect(() => {
     const isRoad = selectedFeature?.properties?.feature_type === 'road';
     const rId = selectedFeature?.properties?.id || (selectedFeature?.id as string);
     if (isRoad && rId) {
       let isMounted = true;
+
+      let originStationId = 'station-01';
+      if (datasetMode === 'pilot' && stations.length > 0) {
+        if (roadMid) {
+          // Find closest facility with valid coordinates
+          let minDist = Infinity;
+          let closestId: string | undefined = undefined;
+          stations.forEach((s) => {
+            const sc = s.geometry?.coordinates;
+            if (Array.isArray(sc) && sc.length >= 2) {
+              const dx = sc[0] - roadMid[0];
+              const dy = sc[1] - roadMid[1];
+              const distSq = dx * dx + dy * dy;
+              if (distSq < minDist) {
+                minDist = distSq;
+                closestId = (s.properties?.id || s.id) as string | undefined;
+              }
+            }
+          });
+          originStationId = closestId || 'osm_emergency_way_1216904632';
+        } else {
+          originStationId =
+            stations.find((s) => (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase().includes('fire'))?.properties?.id ||
+            stations[0]?.properties?.id ||
+            'osm_emergency_way_1216904632';
+        }
+      }
+
       api
-        .fetchRoute('station-01', undefined, selectedVehKey, rId, undefined, undefined, datasetMode)
+        .fetchRoute(originStationId, undefined, selectedVehKey, rId, undefined, undefined, datasetMode)
         .then((res) => {
-          if (isMounted) setActiveRoadRoute(res);
+            if (res) {
+              setActiveRoadRoute(res);
+            } else {
+              setActiveRoadRoute(null);
+            }
         })
         .catch(() => {
           if (isMounted) setActiveRoadRoute(null);
@@ -166,7 +215,7 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
     } else {
       setActiveRoadRoute(null);
     }
-  }, [selectedFeature?.properties?.id, selectedFeature?.id, selectedFeature?.properties?.feature_type, selectedVehKey, datasetMode, routeRefreshNonce]);
+  }, [selectedFeature?.properties?.id, selectedFeature?.id, selectedFeature?.properties?.feature_type, selectedVehKey, datasetMode, routeRefreshNonce, stations, roadMid]);
 
   const [layers, setLayers] = useState({
     roads: true,
@@ -419,9 +468,23 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
     typicalEquipment: 'Standard emergency equipment',
   };
 
-  const getPill = (status?: string, isOutside?: boolean) => {
+  const getPill = (status?: string, isOutside?: boolean, isRoadFeature?: boolean, roadProps?: any) => {
     if (isOutside) {
       return <b className="pl" style={{ background: 'rgba(217, 119, 6, 0.15)', color: '#d97706', border: '1px solid #fde68a' }}>Outside pilot coverage</b>;
+    }
+    if (isRoadFeature && roadProps) {
+      const roadStatus = getRoadAccessStatus(roadProps, currentVeh.w, blockedRoadIds);
+      if (roadStatus === 'inaccessible') {
+        const isBlocked = blockedRoadIds.includes(roadProps.id) || roadProps.is_blocked || roadProps.incident_active;
+        return <b className="pl c-infeasible" style={{ background: 'rgba(215, 38, 61, 0.2)', color: '#d7263d', border: '1px solid #d7263d' }}>{isBlocked ? 'Blocked (Incident)' : 'Inaccessible for ' + currentVeh.n}</b>;
+      }
+      if (roadStatus === 'constrained') {
+        return <b className="pl c-constrained" style={{ background: 'rgba(232, 113, 10, 0.2)', color: '#e8710a', border: '1px solid #e8710a' }}>Constrained Passage</b>;
+      }
+      if (roadStatus === 'feasible') {
+        return <b className="pl c-ok" style={{ background: 'rgba(22, 138, 92, 0.2)', color: '#168a5c', border: '1px solid #168a5c' }}>Feasible Passage</b>;
+      }
+      return <b className="pl c-unknown" style={{ background: 'rgba(100, 116, 139, 0.2)', color: '#94a3b8', border: '1px solid #64748b' }}>Unknown (Unmeasured)</b>;
     }
     switch (status) {
       case 'feasible':
@@ -445,9 +508,15 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
 
   const activeRouteGeometry = isBuilding
     ? (bldgAssessment?.route?.geometry_geojson || null)
-    : isRoad
-    ? (activeRoadRoute?.geometry_geojson || null)
+    : isRoad && activeRoadRoute?.geometry_geojson
+    ? (activeRoadRoute.geometry_geojson || null)
     : null;
+
+  const activeRouteClassification = isBuilding
+    ? bldgAssessment?.classification
+    : isRoad
+    ? activeRoadRoute?.classification
+    : undefined;
 
   return (
     <div className="stage">
@@ -467,7 +536,28 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
         fullHeight={true}
         datasetMode={datasetMode}
         routeGeometry={activeRouteGeometry}
-        unitPosition={unitPosition}
+        routeClassification={activeRouteClassification}
+        destinationCoords={
+          isBuilding
+            ? (bldgAssessment?.route?.geometry_geojson?.coordinates
+                ? bldgAssessment.route.geometry_geojson.coordinates[
+                    bldgAssessment.route.geometry_geojson.coordinates.length - 1
+                  ]
+                : (selectedFeature?.geometry?.type === 'Point'
+                ? (selectedFeature.geometry.coordinates as [number, number])
+                : null))
+            : isRoad && roadMid
+            ? roadMid
+            : null
+        }
+        destinationName={
+          isBuilding
+            ? props?.name || props?.id || 'Target Building'
+            : isRoad
+            ? props?.name || props?.id || 'Selected Road Segment'
+            : undefined
+        }
+        unitPosition={activeRouteGeometry ? unitPosition : null}
         blockedRoadIds={blockedRoadIds}
       />
 
@@ -807,7 +897,7 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
             </button>
           </div>
 
-          <div className="pan-status">{getPill(props.access_status, isOutsidePilot)}</div>
+          <div className="pan-status">{getPill(props.access_status, isOutsidePilot, isRoad, props)}</div>
 
           {/* Outside pilot dataset notice banner */}
           {isOutsidePilot && (
@@ -1034,6 +1124,18 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
                   <span className="pan-prop-label">{currentVeh.n} Clearance</span>
                   <span className="pan-prop-val">Requires ≥ {currentVeh.w} m</span>
                 </div>
+                <div className="pan-prop-row">
+                  <span className="pan-prop-label">Access Verdict</span>
+                  <span className="pan-prop-val" style={{ fontWeight: 800 }}>
+                    {(() => {
+                      const st = getRoadAccessStatus(props, currentVeh.w, blockedRoadIds);
+                      if (st === 'feasible') return <span style={{ color: '#168a5c' }}>Feasible (Passable)</span>;
+                      if (st === 'constrained') return <span style={{ color: '#e8710a' }}>Constrained (Tight)</span>;
+                      if (st === 'inaccessible') return <span style={{ color: '#d7263d' }}>Inaccessible / Blocked</span>;
+                      return <span style={{ color: '#94a3b8' }}>Unmeasured (Unknown)</span>;
+                    })()}
+                  </span>
+                </div>
               </div>
 
               {props.obstruction && (
@@ -1042,9 +1144,9 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
                 </div>
               )}
 
-              {props.access_status === 'unknown' && (
+              {getRoadAccessStatus(props, currentVeh.w, blockedRoadIds) === 'unknown' && (
                 <p style={{ fontSize: '12px', color: 'var(--mute)', margin: '8px 0' }}>
-                  Width is missing, so this segment is Unknown, not inaccessible.
+                  Width is missing from municipal survey data; classified as Unknown, not assumed blocked.
                 </p>
               )}
 

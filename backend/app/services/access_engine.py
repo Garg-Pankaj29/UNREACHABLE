@@ -888,6 +888,12 @@ class AccessEngine:
                         blocked_rids.append(edge.road_id)
                         reasons.extend(asmt.limiting_factors)
 
+            blocked_coords: List[List[float]] = []
+            for edge in unconstrained_path:
+                if not blocked_coords:
+                    blocked_coords.append([round(edge.coordinates[0][0], 6), round(edge.coordinates[0][1], 6)])
+                blocked_coords.append([round(edge.coordinates[1][0], 6), round(edge.coordinates[1][1], 6)])
+
             return RouteResponse(
                 origin_id=request.origin_station_id,
                 origin_name=origin_name,
@@ -899,6 +905,7 @@ class AccessEngine:
                 route_found=False,
                 total_distance_m=0.0,
                 segments_traversed=[],
+                geometry_geojson={"type": "LineString", "coordinates": blocked_coords} if blocked_coords else None,
                 steps=[],
                 segment_assessments=[],
                 limiting_segments=blocked_rids,

@@ -33,9 +33,10 @@
 | 5 | SQLite incidents, live recompute, SSE stream | done |
 | 6 | StaticFiles SPA, start_demo.sh, offline guardrails, tagged demo-final | done |
 
+- 2026-10-24 | Emergency Route & Pointer Fix | Dedicated emergencyRoutePane z-550, origin/destination pins, halted stray unit tracking loop, offline GPS architecture in explain.md; 79/79 tests OK, build OK | MapView.tsx, AccessAtlasPage.tsx, incident_service.py, explain.md, memory.md
+- 2026-10-24 | Road Fix | Vehicle-aware dynamic road styling (Feasible/Constrained/Inaccessible/Unknown); road click highlight fixed; 79/79 tests OK, build OK | MapView.tsx, AccessAtlasPage.tsx, api.ts, memory.md
 - 2026-10-24 | Phase 6 | StaticFiles SPA mount, scripts/start_demo.sh, docs/DEMO_CHECKLIST.md, tagged demo-final; 79/79 tests OK, build OK | main.py, start_demo.sh, DEMO_CHECKLIST.md, memory.md
 - 2026-10-24 | Phase 5 | SQLite-backed incidents (POST/GET /api/incidents), SSE /api/stream, live route recompute & unit animation; 79/79 tests OK, build OK | incident_service.py, routes.py, AccessAtlasPage.tsx, MapView.tsx, api.ts, test_incidents.py, memory.md
-- 2026-10-24 | Phase 4 | Expanded Punjab emergency network (497 facilities across 23 districts); teal clinics; 75/75 tests OK, build OK | MapView.tsx, TopHeader.tsx, memory.md
 
 ## 6. Rules for agents
 - Additive changes only; keep demo mode intact; never modify data/sample/.

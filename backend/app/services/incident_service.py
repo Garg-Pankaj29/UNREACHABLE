@@ -164,6 +164,11 @@ class IncidentService:
         except Exception as exc:
             logger.debug("Access engine cache reset error: %s", exc)
 
+    def clear_active_route(self):
+        """Clears current active route line and halts simulated unit animation."""
+        self._active_route_coords = None
+        self._unit_progress = 0.0
+
     def set_active_route(self, coordinates: List[Tuple[float, float]], vehicle_id: str = "fire", unit_id: str = "UNIT-101"):
         """Sets the current active route line for simulated unit animation."""
         if coordinates and len(coordinates) >= 2:
@@ -176,16 +181,14 @@ class IncidentService:
         """Computes current interpolated position of simulated unit along the route."""
         coords = self._active_route_coords
         if not coords or len(coords) < 2:
-            # Fallback to default demo route coordinates if none set yet
-            coords = [
-                (76.5750, 30.7686),
-                (76.5780, 30.7695),
-                (76.5820, 30.7710),
-                (76.5860, 30.7730),
-            ]
+            return None
 
-        # Advance progress
-        self._unit_progress = (self._unit_progress + 0.05) % 1.0
+        # Advance progress; stop once route is finished
+        self._unit_progress += 0.04
+        if self._unit_progress >= 1.0:
+            self._active_route_coords = None
+            self._unit_progress = 0.0
+            return None
 
         # Linear interpolation along polyline
         n_segments = len(coords) - 1

@@ -217,8 +217,10 @@ export const api = {
       `route_${origin}_${destinationBuilding || ''}_${destinationRoad || ''}_${vehicle}.json`,
       `route_${origin}_${destinationBuilding || ''}__${vehicle}.json`,
       `route_${origin}_${destinationBuilding || ''}_${vehicle}.json`,
-      `route_station-01_bldg-201_fire.json`,
     ];
+    if (origin === 'station-01' && (!destinationBuilding || destinationBuilding === 'bldg-201') && !destinationRoad) {
+      candidates.push('route_station-01_bldg-201_fire.json');
+    }
 
     return fetchWithFallback<RouteResponse>(
       `${API_BASE_URL}/routing/route?${params.toString()}`,

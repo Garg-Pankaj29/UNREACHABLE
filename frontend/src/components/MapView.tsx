@@ -36,6 +36,7 @@ interface MapViewProps {
     feasible?: boolean;
     constrained?: boolean;
     infeasible?: boolean;
+    inaccessible?: boolean;
     unknown?: boolean;
   };
   searchQuery?: string;
@@ -288,6 +289,15 @@ function MapViewportManager({
   const map = useMap();
   const initialFitDone = useRef(false);
 
+  // Ensure dedicated route pane exists above standard overlays
+  useEffect(() => {
+    if (map && !map.getPane('emergencyRoutePane')) {
+      const pane = map.createPane('emergencyRoutePane');
+      pane.style.zIndex = '550';
+      pane.style.pointerEvents = 'none';
+    }
+  }, [map]);
+
   // Invalidate size on mount and window resize
   useEffect(() => {
     map.invalidateSize();
@@ -353,7 +363,7 @@ function MapViewportManager({
       fitToFeatures();
       initialFitDone.current = true;
     }
-  }, [features.length > 0, fitToFeatures]);
+  }, [features.length > 0]); // Stable boolean trigger so feature changes do NOT re-zoom
 
   // Refit when dataset mode explicitly toggles
   const prevMode = useRef(datasetMode);
@@ -474,6 +484,74 @@ function MapEventsWatcher({
   return null;
 }
 
+// Helper to determine road accessibility dynamically for the active vehicle
+export function getRoadAccessStatus(
+  props: any,
+  reqW: number = 3.5,
+  blockedRoadIds: string[] = []
+): 'feasible' | 'constrained' | 'inaccessible' | 'unknown' {
+  const isIncidentBlocked =
+    blockedRoadIds.includes(props.id) || props.is_blocked || props.incident_active;
+  if (isIncidentBlocked) return 'inaccessible';
+
+  const accessTag = props.access || props.tags?.access;
+  const vehicleTag = props.vehicle || props.tags?.vehicle;
+  const hasRestriction =
+    accessTag === 'no' ||
+    accessTag === 'private' ||
+    vehicleTag === 'no' ||
+    vehicleTag === 'private';
+  const hasObstruction = Boolean(
+    props.obstruction &&
+      String(props.obstruction).trim() &&
+      String(props.obstruction).toLowerCase() !== 'null'
+  );
+  const roadClass = (props.road_class || props.highway || '').toLowerCase();
+  const isPedestrianOnly = [
+    'footway',
+    'pedestrian',
+    'path',
+    'cycleway',
+    'steps',
+    'bridleway',
+  ].includes(roadClass);
+
+  if (
+    hasRestriction ||
+    hasObstruction ||
+    isPedestrianOnly ||
+    props.access_status === 'infeasible' ||
+    props.access_status === 'inaccessible'
+  ) {
+    return 'inaccessible';
+  }
+
+  const width = props.width_m;
+  if (width !== null && width !== undefined && !isNaN(Number(width))) {
+    const w = Number(width);
+    if (w < reqW) return 'inaccessible';
+    if (w < reqW + 0.4) return 'constrained';
+    return 'feasible';
+  }
+
+  // Physical road classification hierarchy when width is unmeasured
+  if (['motorway', 'motorway_link', 'trunk', 'trunk_link', 'primary', 'primary_link'].includes(roadClass)) {
+    return 'feasible'; // Major state/national highways always meet clearance
+  }
+  if (['secondary', 'secondary_link', 'tertiary', 'tertiary_link'].includes(roadClass)) {
+    return 'feasible'; // Urban collectors have wide clearance (≥ 5.0m)
+  }
+  if (['residential', 'living_street'].includes(roadClass)) {
+    // Heavy fire engine (≥3.5m) is constrained by tight residential lanes; QRVs & ambulances fit
+    return reqW >= 3.5 ? 'constrained' : 'feasible';
+  }
+
+  if (props.access_status === 'constrained') return 'constrained';
+  if (props.access_status === 'feasible' || props.access_status === 'ok') return 'feasible';
+
+  return 'unknown';
+}
+
 export const MapView: React.FC<MapViewProps> = ({
   buildings,
   roads,
@@ -512,14 +590,17 @@ export const MapView: React.FC<MapViewProps> = ({
   const mapCenter = center || (isPilotMode ? DEFAULT_PILOT_CENTER : DEFAULT_CENTER);
   const mapZoom = zoom || (isPilotMode ? 8 : DEFAULT_ZOOM);
 
+  const currentReqW = selectedVehicle?.minClearanceWidthM ?? selectedVehicle?.min_clearance_width_m ?? 3.5;
+
   // Filter features based on status
   const visibleRoads = layers.roads
     ? roads.filter((r) => {
         const props = r.properties || {};
-        const st = props.access_status || 'unknown';
-        return st === 'feasible' || st === 'ok'
-          ? statusFilters.ok ?? statusFilters.feasible ?? true
-          : statusFilters[st as keyof typeof statusFilters] ?? true;
+        const st = getRoadAccessStatus(props, currentReqW, blockedRoadIds);
+        if (st === 'feasible') return statusFilters.feasible ?? statusFilters.ok ?? true;
+        if (st === 'constrained') return statusFilters.constrained ?? true;
+        if (st === 'inaccessible') return statusFilters.inaccessible ?? true;
+        return statusFilters.unknown ?? true;
       })
     : [];
 
@@ -619,63 +700,48 @@ export const MapView: React.FC<MapViewProps> = ({
   // Refined GIS Road styling: clean stroke widths, clear contrast, restrained
   const getRoadStyle = (feature: any): PathOptions => {
     const props = feature.properties || {};
-    const status = props.access_status;
-    const width = props.width_m;
     const isSelected = selectedFeature?.properties?.id === props.id;
     const isTraversed = awareRoadIds.includes(props.id);
+    const reqW = selectedVehicle?.minClearanceWidthM ?? selectedVehicle?.min_clearance_width_m ?? 3.5;
+    const isIncidentBlocked = blockedRoadIds.includes(props.id) || props.is_blocked || props.incident_active;
 
-    const reqW = selectedVehicle?.minClearanceWidthM ?? selectedVehicle?.min_clearance_width_m;
+    const accessStatus = getRoadAccessStatus(props, reqW, blockedRoadIds);
 
-    const accessTag = props.access || props.tags?.access;
-    const vehicleTag = props.vehicle || props.tags?.vehicle;
-    const hasRestriction = accessTag === 'no' || accessTag === 'private' || vehicleTag === 'no' || vehicleTag === 'private';
-    const hasObstruction = Boolean(props.obstruction && String(props.obstruction).trim() && String(props.obstruction).toLowerCase() !== 'null');
-
-    // Vector-only basemap requires crisp, continuous road lines with solid visual presence
-    let color = '#64748b'; // solid visible road corridor
-    let dashArray: string | undefined = undefined; // Solid line so streets are continuous!
+    let color = '#64748b';
+    let dashArray: string | undefined = undefined;
     let weight = isTraversed ? 5.5 : 3.5;
     let opacity = isTraversed ? 1.0 : 0.85;
 
-    const isIncidentBlocked = blockedRoadIds.includes(props.id) || props.is_blocked || props.incident_active;
-
-    if (isIncidentBlocked) {
-      color = '#d7263d'; // red — confirmed incident block
-      weight = 5.5;
-      dashArray = '6, 6';
+    if (accessStatus === 'inaccessible') {
+      color = '#d7263d'; // red — confirmed inaccessible or blocked
+      weight = isIncidentBlocked ? 5.5 : 4.0;
+      dashArray = isIncidentBlocked ? '6, 6' : undefined;
       opacity = 1.0;
-    } else if (hasRestriction || hasObstruction || status === 'infeasible' || status === 'inaccessible') {
-      color = '#d7263d'; // red — confirmed inaccessible
+    } else if (accessStatus === 'constrained') {
+      color = '#e8710a'; // amber — constrained margin
       weight = 4.0;
-    } else if (width !== null && width !== undefined && reqW !== undefined) {
-      if (width < reqW) {
-        color = '#d7263d'; // red — confirmed inaccessible
-        weight = 4.0;
-      } else if (width < reqW + 0.4) {
-        color = '#e8710a'; // amber — constrained
-        weight = 4.0;
-      } else {
-        color = '#168a5c'; // green — confirmed feasible
-        weight = 4.0;
-      }
-    } else if (status === 'constrained') {
-      color = '#e8710a'; // amber — constrained
-      weight = 4.0;
-    } else if (status === 'feasible' || status === 'ok' || status === 'accessible') {
-      color = '#168a5c'; // green — confirmed feasible
+    } else if (accessStatus === 'feasible') {
+      color = '#168a5c'; // green — verified feasible
       weight = 4.0;
     } else {
-      // Unmeasured / unknown status: solid visible slate road
+      // Unmeasured / unknown status: slate grey
       color = '#64748b';
       weight = 3.5;
       opacity = 0.85;
     }
 
     if (isSelected) {
-      color = '#ffd60a'; // highlight accent
-      weight = 6.5;
-      opacity = 1.0;
-      dashArray = undefined;
+      if (isIncidentBlocked) {
+        color = '#ef4444'; // Red hazard for blocked road even when selected
+        weight = 7.0;
+        opacity = 1.0;
+        dashArray = '6, 6';
+      } else {
+        color = '#ffd60a'; // highlight accent for selected road
+        weight = 6.5;
+        opacity = 1.0;
+        dashArray = undefined;
+      }
     }
 
     return {
@@ -739,14 +805,18 @@ export const MapView: React.FC<MapViewProps> = ({
     });
 
     const isOutsidePilot = props.inside_pilot_area === false;
+    const roadStatus = props.feature_type === 'road'
+      ? getRoadAccessStatus(props, currentReqW, blockedRoadIds)
+      : props.access_status;
+
     const statusBadge = isOutsidePilot
       ? '<span style="color:#d97706; font-weight:700;">Outside Pilot Boundary</span>'
-      : props.access_status === 'feasible' || props.access_status === 'ok'
-      ? '<span style="color:#168a5c; font-weight:700;">Verified accessible</span>'
-      : props.access_status === 'constrained'
-      ? '<span style="color:#e8710a; font-weight:700;">Constrained</span>'
-      : props.access_status === 'infeasible'
-      ? '<span style="color:#d7263d; font-weight:700;">Potentially inaccessible</span>'
+      : roadStatus === 'feasible' || roadStatus === 'ok'
+      ? '<span style="color:#168a5c; font-weight:700;">Verified Feasible</span>'
+      : roadStatus === 'constrained'
+      ? '<span style="color:#e8710a; font-weight:700;">Constrained Margin</span>'
+      : roadStatus === 'inaccessible' || roadStatus === 'infeasible'
+      ? '<span style="color:#d7263d; font-weight:700;">Inaccessible / Blocked</span>'
       : '<span style="color:#7d837a; font-weight:700;">Unknown (Unsurveyed)</span>';
 
     const coverageWarningHtml = isOutsidePilot
@@ -911,6 +981,7 @@ export const MapView: React.FC<MapViewProps> = ({
                 <Polyline
                   positions={latlngs}
                   pathOptions={{
+                    pane: 'emergencyRoutePane',
                     color: isSelected ? '#090d16' : '#1e293b',
                     weight: isSelected ? 10 : 6,
                     opacity: isSelected ? 0.85 : 0.45,
@@ -925,6 +996,7 @@ export const MapView: React.FC<MapViewProps> = ({
                     click: () => onSelectRoute?.(route.route_id),
                   }}
                   pathOptions={{
+                    pane: 'emergencyRoutePane',
                     color: route.color,
                     weight: isSelected ? 6 : 3.5,
                     opacity: isSelected ? 1.0 : 0.65,
@@ -972,14 +1044,15 @@ export const MapView: React.FC<MapViewProps> = ({
           })
         ) : routeGeometry && routeGeometry.coordinates && routeGeometry.coordinates.length > 1 ? (
           <>
-            {/* Dark casing shadow for visual contrast */}
+            {/* Background high-contrast white casing */}
             <Polyline
               key={`route-casing-${routeGeometry.coordinates.length}`}
               positions={routeGeometry.coordinates.map((c: [number, number]) => [c[1], c[0]])}
               pathOptions={{
-                color: '#090d16',
-                weight: 8,
-                opacity: 0.7,
+                pane: 'emergencyRoutePane',
+                color: '#ffffff',
+                weight: 10,
+                opacity: 0.95,
                 lineCap: 'round',
                 lineJoin: 'round',
               }}
@@ -989,16 +1062,21 @@ export const MapView: React.FC<MapViewProps> = ({
               key={`route-line-${routeGeometry.coordinates.length}-${routeClassification}`}
               positions={routeGeometry.coordinates.map((c: [number, number]) => [c[1], c[0]])}
               pathOptions={{
+                pane: 'emergencyRoutePane',
                 color:
                   routeClassification === 'accessible' || routeClassification === 'feasible' || routeClassification === 'ok'
-                    ? '#168a5c' // Green
+                    ? '#10b981' // Vibrant Emerald Green
                     : routeClassification === 'constrained'
-                    ? '#e8710a' // Amber
+                    ? '#f59e0b' // Vibrant Amber Orange
                     : routeClassification === 'inaccessible' || routeClassification === 'infeasible'
-                    ? '#d7263d' // Red
+                    ? '#ef4444' // Vibrant Crimson Red
                     : '#0284c7', // Active blue
-                weight: 5,
-                opacity: 0.95,
+                weight: 6,
+                opacity: 1.0,
+                dashArray:
+                  routeClassification === 'inaccessible' || routeClassification === 'infeasible'
+                    ? '8, 8'
+                    : undefined,
                 lineCap: 'round',
                 lineJoin: 'round',
               }}
@@ -1063,11 +1141,40 @@ export const MapView: React.FC<MapViewProps> = ({
           );
         })}
 
-        {/* Route Target Destination Marker */}
-        {destinationCoords && destinationCoords.length >= 2 && (
+        {/* Route Origin Dispatch Facility Marker */}
+        {routeGeometry && routeGeometry.coordinates && routeGeometry.coordinates.length > 1 && (
           <Marker
-            position={[destinationCoords[1], destinationCoords[0]]}
+            position={[routeGeometry.coordinates[0][1], routeGeometry.coordinates[0][0]]}
+            icon={createStationIcon(true, 'fire_station')}
+            zIndexOffset={1600}
+          >
+            <Popup>
+              <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif' }}>
+                <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#10b981', fontWeight: 800 }}>
+                  Dispatch Origin
+                </div>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink)' }}>
+                  Emergency Deployment Station
+                </div>
+              </div>
+            </Popup>
+          </Marker>
+        )}
+
+        {/* Route Target Destination Marker */}
+        {((destinationCoords && destinationCoords.length >= 2) ||
+          (routeGeometry && routeGeometry.coordinates && routeGeometry.coordinates.length > 1)) && (
+          <Marker
+            position={
+              destinationCoords && destinationCoords.length >= 2
+                ? [destinationCoords[1], destinationCoords[0]]
+                : [
+                    routeGeometry!.coordinates[routeGeometry!.coordinates.length - 1][1],
+                    routeGeometry!.coordinates[routeGeometry!.coordinates.length - 1][0],
+                  ]
+            }
             icon={createDestinationIcon(destinationName || 'Destination')}
+            zIndexOffset={1800}
           >
             <Popup>
               <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif' }}>
@@ -1075,38 +1182,43 @@ export const MapView: React.FC<MapViewProps> = ({
                   Route Destination
                 </div>
                 <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--ink)' }}>
-                  {destinationName || 'Destination Location'}
+                  {destinationName || 'Destination Target'}
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '2px' }}>
-                  Coordinates: {destinationCoords[1].toFixed(4)}, {destinationCoords[0].toFixed(4)}
-                </div>
+                {destinationCoords && (
+                  <div style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '2px' }}>
+                    Coordinates: {destinationCoords[1].toFixed(4)}, {destinationCoords[0].toFixed(4)}
+                  </div>
+                )}
               </div>
             </Popup>
           </Marker>
         )}
 
-        {/* Real-time Simulated Emergency Unit Marker */}
-        {unitPosition && Array.isArray(unitPosition) && unitPosition.length >= 2 && (
-          <Marker
-            position={[unitPosition[0], unitPosition[1]]}
-            icon={createUnitIcon(selectedVehicle?.id)}
-            zIndexOffset={2000}
-          >
-            <Popup>
-              <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif' }}>
-                <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#d7263d', fontWeight: 800 }}>
-                  Live Dispatched Unit
+        {/* Real-time Simulated Emergency Unit Marker — strictly shown only when active route exists */}
+        {Boolean(routeGeometry || (alternativeRoutes && alternativeRoutes.length > 0)) &&
+          unitPosition &&
+          Array.isArray(unitPosition) &&
+          unitPosition.length >= 2 && (
+            <Marker
+              position={[unitPosition[0], unitPosition[1]]}
+              icon={createUnitIcon(selectedVehicle?.id)}
+              zIndexOffset={2000}
+            >
+              <Popup>
+                <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif' }}>
+                  <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#d7263d', fontWeight: 800 }}>
+                    Live Dispatched Unit
+                  </div>
+                  <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--ink)' }}>
+                    {selectedVehicle?.name || 'Emergency Unit'}
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '2px' }}>
+                    Simulated GPS: {unitPosition[0].toFixed(4)}, {unitPosition[1].toFixed(4)}
+                  </div>
                 </div>
-                <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--ink)' }}>
-                  {selectedVehicle?.name || 'Emergency Unit'}
-                </div>
-                <div style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '2px' }}>
-                  Simulated GPS: {unitPosition[0].toFixed(4)}, {unitPosition[1].toFixed(4)}
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        )}
+              </Popup>
+            </Marker>
+          )}
 
         {/* Road Hazard Issue Markers */}
         {layers.issues &&
