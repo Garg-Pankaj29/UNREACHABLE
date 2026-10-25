@@ -16,7 +16,7 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
   const [selectedIssueId, setSelectedIssueId] = useState<string>(
     initialIssueId || issues[0]?.id || 'I-01'
   );
-  const [fixApplied, setFixApplied] = useState<boolean>(true);
+  const [fixApplied, setFixApplied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [simResult, setSimResult] = useState<SimulateResponse | null>(null);
@@ -153,41 +153,44 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
 
   return (
     <section className="v" style={{ maxWidth: '1440px' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', marginBottom: '20px' }}>
-        <div>
-          <h2 style={{ fontSize: '32px', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
-            Bottleneck Impact Simulation
-          </h2>
-          <p className="lede" style={{ fontSize: '17px', margin: 0, color: 'var(--mute)' }}>
-            Select an identified urban bottleneck in the Chandigarh University sector, then project which
-            building footprints gain emergency ingress upon physical clearance or widening.
-          </p>
+      {/* Unified Header */}
+      <div className="page-header-unified">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+          <div className="page-tag">
+            <span className="dot" />
+            <span>Topological Intervention & Counterfactual Simulation</span>
+          </div>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <span
+              style={{
+                background: 'var(--tape, #ffd60a)',
+                color: '#1c1f1b',
+                fontWeight: 800,
+                fontSize: '12px',
+                padding: '5px 14px',
+                borderRadius: '99px',
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+              }}
+            >
+              In-Memory Engine
+            </span>
+            <button
+              className="btn"
+              onClick={handleReset}
+              disabled={loading}
+              style={{ fontSize: '13px', padding: '6px 16px', height: '36px' }}
+            >
+              Reset Baseline
+            </button>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <span
-            style={{
-              background: 'var(--tape, #ffd60a)',
-              color: '#1c1f1b',
-              fontWeight: 800,
-              fontSize: '13px',
-              padding: '6px 14px',
-              borderRadius: '99px',
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-            }}
-          >
-            In-Memory Simulation
-          </span>
-          <button
-            className="btn"
-            onClick={handleReset}
-            disabled={loading}
-            style={{ fontSize: '14px', padding: '6px 16px' }}
-          >
-            Reset Baseline
-          </button>
-        </div>
+
+        <h2>Bottleneck Impact Simulation</h2>
+        <p className="lede">
+          Project counterfactual scenarios by clearing obstructions or widening bottlenecks in the street network. Witness instant cascade effects on dependent buildings across multiple vehicle clearance profiles.
+        </p>
+        <div className="accent-bar" />
       </div>
 
       {/* Simulation Error Alert */}
@@ -197,9 +200,9 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
           style={{
             background: 'var(--glass)',
             border: '1.5px solid var(--sig)',
-            borderRadius: '12px',
-            padding: '14px 18px',
-            margin: '16px 0',
+            borderRadius: '14px',
+            padding: '16px 20px',
+            margin: '24px 0',
             color: 'var(--sig)',
             fontSize: '15px',
             display: 'flex',
@@ -222,9 +225,9 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
       )}
 
       {/* Bottlenecks Selector Bar */}
-      <div style={{ background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '16px', padding: '16px 20px', margin: '20px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '12px' }}>
-          <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+      <div style={{ background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '18px', padding: '24px 28px', margin: '36px 0', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+          <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             Choose Target Bottleneck to Remediate:
           </span>
           <span style={{ fontSize: '13px', color: 'var(--mute)' }}>
@@ -261,16 +264,18 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '20px',
+          gap: '24px',
           flexWrap: 'wrap',
           background: 'var(--glass)',
           border: '1.5px solid var(--line)',
-          borderRadius: '16px',
-          padding: '16px 20px',
-          margin: '20px 0',
+          borderRadius: '18px',
+          padding: '24px 28px',
+          margin: '36px 0',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
         }}
       >
-        <div className="sw" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div className="sw" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <button
             className={fixApplied ? 'on' : ''}
             onClick={() => setFixApplied((v) => !v)}
@@ -284,7 +289,7 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
             <b style={{ fontSize: '16px', display: 'block', color: 'var(--ink)' }}>
               {fixApplied ? 'Hypothetical remedy active' : 'Apply hypothetical remedy'}
             </b>
-            <span style={{ fontSize: '13px', color: 'var(--mute)' }}>
+            <span style={{ fontSize: '14px', color: 'var(--mute)' }}>
               {selectedIssue?.fixW
                 ? `Simulates corridor widening to ${selectedIssue.fixW}m and clearing bottlenecks on ${selectedIssue.edge}`
                 : `Simulates removing physical obstructions on ${selectedIssue?.edge}`}
@@ -292,8 +297,8 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--ink)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             Apparatus:
           </span>
           {[
@@ -306,7 +311,7 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
               className={`chip ${selectedVehicle === v.key ? 'on' : ''}`}
               onClick={() => setSelectedVehicle(v.key)}
               style={{
-                padding: '6px 14px',
+                padding: '8px 16px',
                 fontSize: '13px',
                 fontWeight: selectedVehicle === v.key ? 700 : 500,
               }}
@@ -324,14 +329,14 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
           style={{
             background: rescuedBuildings.length > 0 ? 'rgba(42, 157, 143, 0.12)' : 'rgba(232, 113, 10, 0.08)',
             border: `2px solid ${rescuedBuildings.length > 0 ? '#2a9d8f' : '#e8710a'}`,
-            borderRadius: '16px',
-            padding: '16px 22px',
-            margin: '22px 0',
+            borderRadius: '18px',
+            padding: '22px 28px',
+            margin: '36px 0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '14px',
+            gap: '16px',
           }}
         >
           <div>
@@ -386,21 +391,21 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
         className="cmp"
         style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '32px',
-          marginTop: '24px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
+          gap: '36px',
+          marginTop: '40px',
         }}
       >
         {/* Before */}
-        <div style={{ background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '18px', padding: '18px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <div style={{ background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '20px', padding: '24px 26px', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800 }}>Baseline State (Before Remedy)</h3>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--mute)', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--mute)', textTransform: 'uppercase', padding: '3px 8px', borderRadius: '6px', background: 'var(--bg)', border: '1px solid var(--line)' }}>
               Current Physical Obstacles
             </span>
           </div>
 
-          <div style={{ border: '1px solid var(--line)', borderRadius: '14px', overflow: 'hidden', background: 'var(--bg)' }}>
+          <div style={{ border: '1.5px solid var(--line)', borderRadius: '14px', overflow: 'hidden', background: 'var(--bg)' }}>
             <SvgMap
               nohit={true}
               vehicleId={selectedVehicle}
@@ -409,7 +414,7 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
             />
           </div>
 
-          <div style={{ marginTop: '14px', display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '14px', fontWeight: 600 }}>
+          <div style={{ marginTop: '16px', display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '13px', fontWeight: 600 }}>
             <span style={{ color: '#2a9d8f' }}>● {simResult?.before?.accessible ?? 0} Accessible</span>
             <span style={{ color: '#e8710a' }}>▲ {simResult?.before?.constrained ?? 0} Constrained</span>
             <span style={{ color: '#d7263d' }}>✕ {simResult?.before?.inaccessible ?? 0} Inaccessible</span>
@@ -418,15 +423,15 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
         </div>
 
         {/* After */}
-        <div style={{ background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '18px', padding: '18px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <div style={{ background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '20px', padding: '24px 26px', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800 }}>Simulated State (After Remedy)</h3>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: fixApplied ? '#2a9d8f' : 'var(--mute)', textTransform: 'uppercase' }}>
-              {fixApplied ? 'Remedy Applied' : 'Awaiting Remedy'}
+            <span style={{ fontSize: '12px', fontWeight: 700, color: fixApplied ? '#2a9d8f' : 'var(--mute)', textTransform: 'uppercase', padding: '3px 8px', borderRadius: '6px', background: 'var(--bg)', border: '1px solid var(--line)' }}>
+              {fixApplied ? 'Remedy Active' : 'Awaiting Remedy'}
             </span>
           </div>
 
-          <div style={{ border: '1px solid var(--line)', borderRadius: '14px', overflow: 'hidden', background: 'var(--bg)' }}>
+          <div style={{ border: '1.5px solid var(--line)', borderRadius: '14px', overflow: 'hidden', background: 'var(--bg)' }}>
             <SvgMap
               nohit={true}
               vehicleId={selectedVehicle}

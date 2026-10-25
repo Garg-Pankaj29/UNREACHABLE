@@ -83,12 +83,14 @@ class AccessEngine:
 
     def get_graph(self, force_reload: bool = False) -> RoadGraph:
         """Retrieves or builds the topological road graph from current GeoJSON data."""
-        if self._graph is not None and not force_reload:
+        current_mode = self.data_service.get_data_mode() if hasattr(self.data_service, "get_data_mode") else None
+        if self._graph is not None and not force_reload and getattr(self, "_cached_graph_mode", None) == current_mode:
             return self._graph
 
         roads_fc = self.data_service.get_road_features()
         features = roads_fc.get("features", [])
         self._graph = RoadGraph.from_geojson_features(features)
+        self._cached_graph_mode = current_mode
         return self._graph
 
     def get_pilot_graph(self, force_reload: bool = False) -> Optional[RoadGraph]:
@@ -175,6 +177,15 @@ class AccessEngine:
             except (ValueError, TypeError):
                 width_m = None
 
+        # Check in-memory vision/cadastre width override
+        try:
+            from app.services.vision_service import vision_service
+            override = vision_service.get_road_override(road_id)
+            if override and "width_m" in override:
+                width_m = override["width_m"]
+        except Exception:
+            pass
+
         limiting_factors: List[str] = []
 
         # Check Access restrictions from OSM tags (emergency vehicles have right-of-way on private roads)
@@ -218,6 +229,28 @@ class AccessEngine:
 
         if access_tag == "private" or vehicle_tag == "private":
             limiting_factors.append("Private access corridor: emergency right-of-way applicable")
+
+        # Incident Overlay Evaluation
+        try:
+            from app.services.incident_service import incident_service
+            if incident_service.is_road_blocked(road_id):
+                limiting_factors.append("Active emergency incident: road physically blocked")
+                return SegmentAssessment(
+                    road_id=road_id,
+                    name=name,
+                    road_class=road_class,
+                    width_m=width_m,
+                    required_width_m=vehicle.min_clearance_width_m,
+                    surface=surface,
+                    obstruction="Active emergency incident: road physically blocked",
+                    status=AccessClassification.INACCESSIBLE,
+                    is_passable=False,
+                    length_m=round(length_m, 1),
+                    limiting_factors=limiting_factors,
+                    notes="Road is closed by an active emergency incident block.",
+                )
+        except Exception:
+            pass
 
         # 1. Obstruction & Physical Barrier Evaluation
         barrier = props.get("barrier")
@@ -554,6 +587,12 @@ class AccessEngine:
                     origin_st = f
                     break
 
+            if not origin_st and request.origin_station_id in ("station-01", None):
+                for f in features:
+                    if f.get("properties", {}).get("feature_type") == "station":
+                        origin_st = f
+                        break
+
             if not origin_st:
                 raise KeyError(f"Origin station not found: {request.origin_station_id}")
 
@@ -809,6 +848,16 @@ class AccessEngine:
                 "coordinates": route_coords,
             }
 
+            try:
+                from app.services.incident_service import incident_service
+                incident_service.set_active_route(
+                    [(c[0], c[1]) for c in route_coords],
+                    vehicle_id=request.vehicle_id,
+                    unit_id=f"UNIT-{request.origin_station_id.split('-')[-1] if request.origin_station_id else '101'}",
+                )
+            except Exception:
+                pass
+
             return RouteResponse(
                 origin_id=request.origin_station_id,
                 origin_name=origin_name,
@@ -848,6 +897,12 @@ class AccessEngine:
                         blocked_rids.append(edge.road_id)
                         reasons.extend(asmt.limiting_factors)
 
+            blocked_coords: List[List[float]] = []
+            for edge in unconstrained_path:
+                if not blocked_coords:
+                    blocked_coords.append([round(edge.coordinates[0][0], 6), round(edge.coordinates[0][1], 6)])
+                blocked_coords.append([round(edge.coordinates[1][0], 6), round(edge.coordinates[1][1], 6)])
+
             return RouteResponse(
                 origin_id=request.origin_station_id,
                 origin_name=origin_name,
@@ -857,8 +912,9 @@ class AccessEngine:
                 vehicle=vehicle,
                 classification=AccessClassification.INACCESSIBLE,
                 route_found=False,
-                total_distance_m=0.0,
+                total_distance_m=round(sum(e.length_m for e in unconstrained_path), 1) if unconstrained_path else 0.0,
                 segments_traversed=[],
+                geometry_geojson={"type": "LineString", "coordinates": blocked_coords} if blocked_coords else None,
                 steps=[],
                 segment_assessments=[],
                 limiting_segments=blocked_rids,

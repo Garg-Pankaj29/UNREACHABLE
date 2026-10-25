@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   AlternativeRoute,
   BuildingAccessResponse,
@@ -24,6 +24,8 @@ import {
   Flame,
   Stethoscope,
   UserCheck,
+  ChevronDown,
+  X,
 } from 'lucide-react';
 
 interface RoutesPageProps {
@@ -55,6 +57,9 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
 
   const [facilityCategory, setFacilityCategory] = useState<string>('all');
   const [facilitySearch, setFacilitySearch] = useState<string>('');
+  const [isFacilityDropdownOpen, setIsFacilityDropdownOpen] = useState<boolean>(false);
+  const facilityContainerRef = useRef<HTMLDivElement>(null);
+  const facilityInputRef = useRef<HTMLInputElement>(null);
 
   // Destination state
   const [destinationSearch, setDestinationSearch] = useState<string>(
@@ -99,6 +104,29 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
   const isUserTyping = useRef(false);
   const currentVeh = VEHICLE_OPTIONS[selectedVehKey] || VEHICLE_OPTIONS.fire;
   const selectedStation = stations.find((s) => (s.properties?.id || s.id) === selectedStationId);
+
+  // Dynamically compute real counts from stations prop
+  const facilityCounts = useMemo(() => {
+    let fire = 0;
+    let hospital = 0;
+    let clinic = 0;
+    let doctors = 0;
+    stations.forEach((st) => {
+      const p = st.properties || {};
+      const t = (p.facility_type || p.station_type || '').toLowerCase();
+      if (t === 'fire_station' || t === 'fire') fire++;
+      else if (t === 'hospital') hospital++;
+      else if (t === 'clinic') clinic++;
+      else if (t === 'doctors') doctors++;
+    });
+    return {
+      all: stations.length,
+      fire_station: fire,
+      hospital: hospital,
+      clinic: clinic,
+      doctors: doctors,
+    };
+  }, [stations]);
 
   // Filter facilities by category and search query
   const filteredStations = stations.filter((st) => {
@@ -337,12 +365,15 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
     };
   }, [destinationSearch, datasetMode, buildings, roads]);
 
-  // Click outside to close search dropdown
+  // Click outside to close search dropdowns
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
         isUserTyping.current = false;
         setIsDropdownOpen(false);
+      }
+      if (facilityContainerRef.current && !facilityContainerRef.current.contains(e.target as Node)) {
+        setIsFacilityDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -492,36 +523,40 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
 
   return (
     <section className="v">
-      {/* Title & Dataset Badge */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-        <div>
-          <h2 style={{ margin: 0 }}>Emergency Real-Road Routing & Multiple Colour-Coded Routes</h2>
-          <p className="lede" style={{ margin: '4px 0 0' }}>
-            Select emergency dispatch centre, destination, and vehicle to evaluate multiple distinct alternative routes with simultaneous colour-coded visualization.
-          </p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      {/* Unified Title & Dataset Badge */}
+      <div className="page-header-unified">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+          <div className="page-tag">
+            <span className="dot" />
+            <span>Multi-Criteria Corridors & Clearance Routing</span>
+          </div>
           <span
             style={{
-              fontSize: '11px',
-              fontWeight: 800,
-              padding: '3px 8px',
-              borderRadius: '6px',
-              background: datasetMode === 'pilot' ? 'rgba(22, 138, 92, 0.15)' : 'rgba(100, 116, 139, 0.15)',
-              color: datasetMode === 'pilot' ? '#168a5c' : '#64748b',
-              border: `1px solid ${datasetMode === 'pilot' ? '#86efac' : '#cbd5e1'}`,
+              fontSize: '12px',
+              fontWeight: 700,
+              padding: '4px 12px',
+              borderRadius: '99px',
+              background: datasetMode === 'pilot' ? 'rgba(22, 138, 92, 0.12)' : 'var(--glass)',
+              color: datasetMode === 'pilot' ? 'var(--ok)' : 'var(--mute)',
+              border: `1.5px solid ${datasetMode === 'pilot' ? 'var(--ok)' : 'var(--line)'}`,
             }}
           >
-            {datasetMode === 'pilot' ? '● Real Pilot Network (41,373 Roads • 422 Centres)' : 'Demo Network (6 Roads)'}
+            {datasetMode === 'pilot' ? `● Real Pilot Network (41,373 Roads • ${stations.length || 497} Centres)` : 'Demo Network (6 Roads)'}
           </span>
         </div>
+
+        <h2>Emergency Route Clearance & Alternatives</h2>
+        <p className="lede">
+          Evaluate multi-path ingress options from dispatch centres to target buildings. Corridors are tested against real vehicle envelopes with instant identification of choke points and turning radius barriers.
+        </p>
+        <div className="accent-bar" />
       </div>
 
-      <div className="split" style={{ marginTop: '20px' }}>
+      <div className="split" style={{ marginTop: '36px' }}>
         {/* Controls Column */}
         <div>
           {/* Emergency Centre Selection */}
-          <div className="fld" style={{ background: 'var(--glass)', padding: '18px 20px', borderRadius: '12px', border: '1.5px solid var(--line)', marginBottom: '28px' }}>
+          <div className="fld" style={{ background: 'var(--glass)', padding: '24px 26px', borderRadius: '16px', border: '1.5px solid var(--line)', marginBottom: '32px', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
               <label style={{ margin: 0, fontWeight: 800, fontSize: '16px', color: 'var(--ink)', letterSpacing: '-0.2px' }}>
                 1. Emergency Dispatch Origin Facility
@@ -547,11 +582,11 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
             {datasetMode === 'pilot' && (
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
                 {[
-                  { key: 'all', label: 'All (422)', icon: null },
-                  { key: 'fire_station', label: 'Fire Stations (5)', icon: <Flame size={14} style={{ color: '#ef4444' }} /> },
-                  { key: 'hospital', label: 'Hospitals (199)', icon: <Building size={14} style={{ color: '#3b82f6' }} /> },
-                  { key: 'clinic', label: 'Clinics (189)', icon: <Stethoscope size={14} style={{ color: '#10b981' }} /> },
-                  { key: 'doctors', label: 'Doctors (29)', icon: <UserCheck size={14} style={{ color: '#06b6d4' }} /> },
+                  { key: 'all', label: `All (${facilityCounts.all})`, icon: null },
+                  { key: 'fire_station', label: `Fire Stations (${facilityCounts.fire_station})`, icon: <Flame size={14} style={{ color: '#ef4444' }} /> },
+                  { key: 'hospital', label: `Hospitals (${facilityCounts.hospital})`, icon: <Building size={14} style={{ color: '#3b82f6' }} /> },
+                  { key: 'clinic', label: `Clinics (${facilityCounts.clinic})`, icon: <Stethoscope size={14} style={{ color: '#10b981' }} /> },
+                  { key: 'doctors', label: `Doctors (${facilityCounts.doctors})`, icon: <UserCheck size={14} style={{ color: '#06b6d4' }} /> },
                 ].map((cat) => (
                   <button
                     key={cat.key}
@@ -579,52 +614,242 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
               </div>
             )}
 
-            {/* Facility Search Input */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-              <input
-                type="text"
-                placeholder="Filter facility name or locality..."
-                value={facilitySearch}
-                onChange={(e) => setFacilitySearch(e.target.value)}
+            {/* Unified Searchable Facility Combobox Dropdown */}
+            <div ref={facilityContainerRef} style={{ position: 'relative', width: '100%', zIndex: isFacilityDropdownOpen ? 900 : 1 }}>
+              <div
                 style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: '8px',
-                  border: '1.5px solid var(--line)',
-                  background: 'var(--surface)',
-                  color: 'var(--ink)',
-                  fontSize: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: 'var(--bg)',
+                  border: isFacilityDropdownOpen ? '2px solid var(--ink)' : '1.5px solid var(--line)',
+                  borderRadius: '10px',
+                  padding: '4px 12px',
+                  boxShadow: isFacilityDropdownOpen ? '0 4px 16px rgba(0,0,0,0.18)' : 'none',
+                  transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
                 }}
-              />
-            </div>
+              >
+                <Search size={16} style={{ color: 'var(--mute)', marginRight: '10px', flexShrink: 0 }} />
+                <input
+                  ref={facilityInputRef}
+                  type="text"
+                  placeholder={
+                    selectedStation
+                      ? `Selected: ${selectedStation.properties?.name || selectedStationId}`
+                      : 'Search or scroll to select emergency facility...'
+                  }
+                  value={facilitySearch}
+                  onFocus={() => setIsFacilityDropdownOpen(true)}
+                  onChange={(e) => {
+                    setFacilitySearch(e.target.value);
+                    setIsFacilityDropdownOpen(true);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                      setIsFacilityDropdownOpen(false);
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    border: 'none',
+                    outline: 'none',
+                    background: 'transparent',
+                    color: 'var(--ink)',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    padding: '8px 0',
+                    height: 'auto',
+                  }}
+                />
+                {facilitySearch && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFacilitySearch('');
+                      facilityInputRef.current?.focus();
+                    }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'var(--mute)',
+                      cursor: 'pointer',
+                      padding: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      borderRadius: '50%',
+                    }}
+                    title="Clear filter text"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIsFacilityDropdownOpen((prev) => !prev)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--mute)',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    marginLeft: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  title="Toggle facility list"
+                >
+                  <ChevronDown
+                    size={18}
+                    style={{
+                      transform: isFacilityDropdownOpen ? 'rotate(180deg)' : 'none',
+                      transition: 'transform 0.2s ease',
+                    }}
+                  />
+                </button>
+              </div>
 
-            {/* Facility Select Dropdown */}
-            <select
-              id="origin-facility-select"
-              value={selectedStationId || ''}
-              onChange={(e) => setSelectedStationId(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '11px 14px',
-                borderRadius: '8px',
-                border: '1.5px solid var(--line)',
-                background: 'var(--surface)',
-                color: 'var(--ink)',
-                fontSize: '14px',
-                fontWeight: 600,
-              }}
-            >
-              <option value="">-- No Emergency Centre Selected --</option>
-              {filteredStations.map((st) => {
-                const p = st.properties || {};
-                const facType = p.facility_type || p.station_type || 'Facility';
-                return (
-                  <option key={p.id || (st.id as string)} value={p.id || (st.id as string)}>
-                    [{facType.replace('_', ' ').toUpperCase()}] {p.name || p.id}
-                  </option>
-                );
-              })}
-            </select>
+              {/* Scrollable Dropdown List - solid opaque background & high z-index to prevent overlapping see-through */}
+              {isFacilityDropdownOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 6px)',
+                    left: 0,
+                    right: 0,
+                    background: 'var(--bg)',
+                    border: '2px solid var(--ink)',
+                    borderRadius: '12px',
+                    boxShadow: '0 16px 40px rgba(0,0,0,0.35)',
+                    maxHeight: '260px',
+                    overflowY: 'auto',
+                    zIndex: 9999,
+                    padding: '6px',
+                  }}
+                >
+                  {/* Option to clear selection */}
+                  <div
+                    onClick={() => {
+                      setSelectedStationId('');
+                      setIsFacilityDropdownOpen(false);
+                      setFacilitySearch('');
+                    }}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: 'var(--mute)',
+                      background: !selectedStationId ? 'rgba(125, 131, 122, 0.15)' : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      borderBottom: '1px solid var(--line)',
+                      marginBottom: '4px',
+                    }}
+                  >
+                    <span>-- No Emergency Centre Selected --</span>
+                    {!selectedStationId && <CheckCircle size={15} style={{ color: 'var(--ok)' }} />}
+                  </div>
+
+                  {filteredStations.length === 0 ? (
+                    <div style={{ padding: '16px', textAlign: 'center', color: 'var(--mute)', fontSize: '13px' }}>
+                      No facilities matching "{facilitySearch}" in this category
+                    </div>
+                  ) : (
+                    filteredStations.map((st) => {
+                      const p = st.properties || {};
+                      const stId = p.id || (st.id as string);
+                      const isSelected = selectedStationId === stId;
+                      const facType = (p.facility_type || p.station_type || 'facility').toLowerCase();
+
+                      // Solid, high-contrast badge colors
+                      let badgeBg = '#475569';
+                      let badgeColor = '#ffffff';
+                      if (facType === 'fire_station' || facType === 'fire') {
+                        badgeBg = '#dc2626';
+                        badgeColor = '#ffffff';
+                      } else if (facType === 'hospital') {
+                        badgeBg = '#2563eb';
+                        badgeColor = '#ffffff';
+                      } else if (facType === 'clinic') {
+                        badgeBg = '#0d9488';
+                        badgeColor = '#ffffff';
+                      } else if (facType === 'doctors') {
+                        badgeBg = '#0284c7';
+                        badgeColor = '#ffffff';
+                      }
+
+                      return (
+                        <div
+                          key={stId}
+                          onClick={() => {
+                            setSelectedStationId(stId);
+                            setFacilitySearch('');
+                            setIsFacilityDropdownOpen(false);
+                          }}
+                          style={{
+                            padding: '9px 12px',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            background: isSelected ? 'var(--ink)' : 'transparent',
+                            color: isSelected ? 'var(--bg)' : 'var(--ink)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '10px',
+                            marginBottom: '2px',
+                            transition: 'background 0.1s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isSelected) {
+                              e.currentTarget.style.background = 'rgba(125, 131, 122, 0.12)';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isSelected) {
+                              e.currentTarget.style.background = 'transparent';
+                            }
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+                            <span
+                              style={{
+                                fontSize: '10px',
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                                padding: '2px 7px',
+                                borderRadius: '4px',
+                                background: isSelected ? '#ffd60a' : badgeBg,
+                                color: isSelected ? '#1c1f1b' : badgeColor,
+                                flexShrink: 0,
+                                letterSpacing: '0.04em',
+                              }}
+                            >
+                              {facType.replace('_', ' ')}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: '13px',
+                                fontWeight: isSelected ? 800 : 600,
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              {p.name || stId}
+                            </span>
+                          </div>
+                          {isSelected && (
+                            <CheckCircle size={16} style={{ color: isSelected ? 'var(--bg)' : 'var(--ok)', flexShrink: 0 }} />
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Selected Facility Details Card */}
             {selectedStation ? (

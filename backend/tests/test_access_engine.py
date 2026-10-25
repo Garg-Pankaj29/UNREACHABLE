@@ -2,6 +2,7 @@
 import unittest
 from typing import Any, Dict, List
 
+from app.core.config import SAMPLE_DATA_PATH
 from app.models.routing import (
     AccessClassification,
     RouteRequest,
@@ -34,7 +35,7 @@ class TestAccessEngine(unittest.TestCase):
 
     def setUp(self):
         # Default engine using the reference sample dataset
-        self.engine = AccessEngine()
+        self.engine = AccessEngine(DataService(SAMPLE_DATA_PATH))
 
     def test_01_route_satisfying_configured_constraints(self):
         """1. A route satisfying configured constraints is classified as accessible."""

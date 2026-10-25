@@ -217,8 +217,10 @@ export const api = {
       `route_${origin}_${destinationBuilding || ''}_${destinationRoad || ''}_${vehicle}.json`,
       `route_${origin}_${destinationBuilding || ''}__${vehicle}.json`,
       `route_${origin}_${destinationBuilding || ''}_${vehicle}.json`,
-      `route_station-01_bldg-201_fire.json`,
     ];
+    if (origin === 'station-01' && (!destinationBuilding || destinationBuilding === 'bldg-201') && !destinationRoad) {
+      candidates.push('route_station-01_bldg-201_fire.json');
+    }
 
     return fetchWithFallback<RouteResponse>(
       `${API_BASE_URL}/routing/route?${params.toString()}`,
@@ -418,7 +420,68 @@ export const api = {
       candidates
     );
   },
+
+  getIncidents: async (): Promise<{ incidents: any[]; blocked_roads: string[]; count: number }> => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/incidents`);
+      return await handleResponse(res, '/incidents');
+    } catch {
+      return { incidents: [], blocked_roads: [], count: 0 };
+    }
+  },
+
+  setIncident: async (
+    roadId: string,
+    action: 'block' | 'clear' = 'block',
+    reason: string = 'Manual emergency closure'
+  ): Promise<{ status: string; action: string; road_id: string; blocked_roads: string[] }> => {
+    const res = await fetch(`${API_BASE_URL}/incidents`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ road_id: roadId, action, reason }),
+    });
+    return handleResponse(res, '/incidents');
+  },
+
+  getStreamUrl: (): string => {
+    return `${API_BASE_URL}/stream`;
+  },
+
+  inspectVisionImage: async (
+    imageBase64: string,
+    roadId?: string,
+    vehicleId?: string
+  ): Promise<any> => {
+    const res = await fetch(`${API_BASE_URL}/vision/inspect`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image_base64: imageBase64,
+        road_id: roadId || null,
+        vehicle_id: vehicleId || 'fire',
+      }),
+    });
+    return handleResponse(res, '/vision/inspect');
+  },
+
+  certifyRoadWidth: async (
+    roadId: string,
+    verifiedWidthM: number,
+    notes?: string
+  ): Promise<any> => {
+    const res = await fetch(`${API_BASE_URL}/roads/${encodeURIComponent(roadId)}/certify-width`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        verified_width_m: verifiedWidthM,
+        notes: notes || 'Verified via street photography AI inspection',
+      }),
+    });
+    return handleResponse(res, `/roads/${roadId}/certify-width`);
+  },
 };
+
+export const apiService = api;
 
 export interface WorkOrderItem {
   road_id: string;

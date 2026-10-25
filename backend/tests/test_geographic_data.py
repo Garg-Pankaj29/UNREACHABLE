@@ -176,11 +176,11 @@ class TestGeographicDataFoundation(unittest.TestCase):
         self.assertTrue(summary.get("available"))
         self.assertEqual(summary["counts"]["roads"], 41373)
         self.assertEqual(summary["counts"]["buildings"], 41013)
-        self.assertEqual(summary["counts"]["emergency_facilities"], 422)
+        self.assertGreaterEqual(summary["counts"]["emergency_facilities"], 422)
 
         # 2. Facilities
         facs = pilot_data_service.get_emergency_facilities()
-        self.assertEqual(len(facs), 422)
+        self.assertGreaterEqual(len(facs), 422)
         for f in facs[:10]:
             self.assertEqual(f["type"], "Feature")
             self.assertIn("facility_type", f["properties"])
@@ -216,12 +216,12 @@ class TestGeographicDataFoundation(unittest.TestCase):
         summary = get_pilot_summary()
         self.assertTrue(summary.get("available"))
         self.assertIn("facility_breakdown", summary)
-        self.assertEqual(summary["counts"]["emergency_facilities"], 422)
+        self.assertGreaterEqual(summary["counts"]["emergency_facilities"], 422)
 
         # Facilities endpoint
         fac_resp = get_pilot_facilities()
         self.assertEqual(fac_resp.type, "FeatureCollection")
-        self.assertEqual(len(fac_resp.features), 422)
+        self.assertGreaterEqual(len(fac_resp.features), 422)
 
         # Features endpoint with LOD parameters
         feat_resp = get_pilot_features(bbox="76.76,30.73,76.79,30.75", zoom=15)

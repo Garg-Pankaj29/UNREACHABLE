@@ -319,7 +319,6 @@ export const SvgMap: React.FC<SvgMapProps> = ({
     <svg
       className={className}
       viewBox={viewBox}
-      xmlns="http://www.w3.org/2000/svg"
       style={{
         display: 'block',
         width: '100%',

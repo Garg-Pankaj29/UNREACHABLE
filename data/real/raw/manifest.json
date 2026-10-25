@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-10-23T18:40:47.553777+00:00",
+  "bbox": [
+    30.76,
+    76.56,
+    30.78,
+    76.59
+  ],
+  "counts": {
+    "roads": 234,
+    "buildings": 52,
+    "barriers": 1,
+    "stations": 1,
+    "power_lines": 2,
+    "maxwidth": 0,
+    "maxheight": 0,
+    "width": 0,
+    "total_elements": 290
+  }
+}

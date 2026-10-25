@@ -20,7 +20,11 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
     <header className="top" role="banner">
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <a className="brand" href="#/" title="UNREACHABLE Emergency Access Intelligence">
-          <i aria-hidden="true" />
+          <img
+            src="/logo.jpeg"
+            alt="UNREACHABLE Logo"
+            className="brand-logo"
+          />
           <span>UNREACHABLE</span>
         </a>
         {datasetMode === 'pilot' ? (
@@ -37,7 +41,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
               color: '#168a5c',
               cursor: onToggleDataset ? 'pointer' : 'default',
             }}
-            title="Real Pilot: Chandigarh-Mohali-Gharuan (Click to toggle Demo dataset)"
+            title="Real Pilot: Punjab & Chandigarh State-wide Network (Click to toggle Demo dataset)"
           >
             <span
               style={{
@@ -49,7 +53,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
                 boxShadow: '0 0 6px #168a5c',
               }}
             />
-            <span>Real Pilot: Chandigarh (82k+ features)</span>
+            <span>Real Pilot: Punjab & Chandigarh</span>
           </button>
         ) : (
           <button

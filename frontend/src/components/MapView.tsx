@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   MapContainer,
   TileLayer,
@@ -12,7 +12,7 @@ import {
 } from 'react-leaflet';
 import L, { LatLngExpression, PathOptions } from 'leaflet';
 import { AlternativeRoute, GeoJSONFeature, IssueRecord, RouteViolation, VehicleProfile } from '../types';
-import { RefreshCw, AlertTriangle } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 interface MapViewProps {
   buildings: GeoJSONFeature[];
@@ -36,6 +36,7 @@ interface MapViewProps {
     feasible?: boolean;
     constrained?: boolean;
     infeasible?: boolean;
+    inaccessible?: boolean;
     unknown?: boolean;
   };
   searchQuery?: string;
@@ -52,10 +53,13 @@ interface MapViewProps {
   zoom?: number;
   fullHeight?: boolean;
   showLegend?: boolean;
+  datasetMode?: 'pilot' | 'sample';
+  unitPosition?: [number, number] | null;
+  blockedRoadIds?: string[];
 }
 
-// Default center: Chandigarh city center
-const DEFAULT_PILOT_CENTER: LatLngExpression = [30.7333, 76.7794];
+// Default center: Punjab & Chandigarh State-wide Emergency Network
+const DEFAULT_PILOT_CENTER: LatLngExpression = [31.05, 75.75];
 const DEFAULT_CENTER: LatLngExpression = [30.7686, 76.5750];
 const DEFAULT_ZOOM = 13;
 
@@ -66,36 +70,43 @@ const createStationIcon = (isSelected: boolean, facilityType?: string) => {
   let label = '+';
   let title = 'Emergency Response Base';
   let badgeColor = '#ffffff';
+  let size = 20;
 
   const ft = (facilityType || '').toLowerCase();
   if (ft === 'hospital') {
-    bg = '#1d4ed8'; // Blue
-    border = '#93c5fd';
+    bg = '#2563eb'; // Blue
+    border = '#bfdbfe';
     label = 'H';
     title = 'Hospital';
+    size = 20;
   } else if (ft === 'fire_station' || ft === 'fire') {
     bg = '#dc2626'; // Red
-    border = '#fca5a5';
-    label = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3.5z"/></svg>';
+    border = '#fecaca';
+    label = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3.5z"/></svg>';
     title = 'Fire Station';
+    size = 24;
   } else if (ft === 'clinic') {
     bg = '#0d9488'; // Teal
     border = '#99f6e4';
     label = '+';
     title = 'Medical Clinic';
+    size = 18;
   } else if (ft === 'doctors') {
     bg = '#0284c7'; // Sky
     border = '#bae6fd';
     label = 'Dr';
     title = 'Health Clinic / Doctor';
+    size = 18;
   } else if (ft === 'place' || ft === 'landmark' || ft === 'location') {
     bg = '#d97706'; // Amber
     border = '#fde68a';
-    label = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
+    label = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
     title = 'Search Location / Landmark';
+    size = 20;
   }
 
   if (isSelected) {
+    size = 28;
     border = '#ffd60a';
     if (ft !== 'place' && ft !== 'landmark' && ft !== 'location') {
       bg = '#ffd60a';
@@ -106,32 +117,34 @@ const createStationIcon = (isSelected: boolean, facilityType?: string) => {
     }
   }
 
+  const half = Math.round(size / 2);
+
   return L.divIcon({
     className: `custom-station-marker custom-facility-${ft || 'base'}`,
     html: `
       <div style="
         background: ${bg};
         color: ${badgeColor};
-        width: 28px;
-        height: 28px;
-        border-radius: 8px;
+        width: ${size}px;
+        height: ${size}px;
+        border-radius: ${size > 20 ? '7px' : '5px'};
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px solid ${border};
-        box-shadow: ${isSelected ? '0 0 12px rgba(255, 214, 10, 0.85)' : '0 4px 12px rgba(0,0,0,0.35)'};
+        border: ${isSelected ? '2.5px' : '1.5px'} solid ${border};
+        box-shadow: ${isSelected ? '0 0 14px rgba(255, 214, 10, 0.9)' : '0 2px 6px rgba(0,0,0,0.3)'};
         cursor: pointer;
         font-family: system-ui, sans-serif;
         font-weight: 800;
-        font-size: ${label.length > 1 ? '11px' : '13px'};
+        font-size: ${size < 18 ? '10px' : label.length > 1 ? '11px' : '12px'};
         transition: transform 0.15s ease;
       " title="${title}">
         <span>${label}</span>
       </div>
     `,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-    popupAnchor: [0, -16],
+    iconSize: [size, size],
+    iconAnchor: [half, half],
+    popupAnchor: [0, -half - 2],
   });
 };
 
@@ -225,6 +238,38 @@ const createViolationIcon = () =>
     popupAnchor: [0, -14],
   });
 
+// Animated simulated emergency unit marker
+const createUnitIcon = (vehId: string = 'fire') => {
+  const isAmb = vehId === 'amb';
+  const bg = isAmb ? '#0284c7' : '#d7263d';
+  return L.divIcon({
+    className: 'custom-unit-marker',
+    html: `
+      <div style="
+        background: ${bg};
+        color: #ffffff;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2.5px solid #ffffff;
+        box-shadow: 0 0 14px ${bg}, 0 4px 10px rgba(0,0,0,0.5);
+        cursor: pointer;
+        animation: pulse 1.5s infinite;
+      " title="Simulated Emergency Unit">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 19 21 12 17 5 21 12 2"/>
+        </svg>
+      </div>
+    `,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor: [0, -18],
+  });
+};
+
 
 function MapViewportManager({
   features,
@@ -232,15 +277,26 @@ function MapViewportManager({
   resetCount,
   routeGeometry,
   alternativeRoutes,
+  datasetMode,
 }: {
   features: GeoJSONFeature[];
   selectedFeature: GeoJSONFeature | null;
   resetCount: number;
   routeGeometry?: { type: string; coordinates: [number, number][] } | null;
   alternativeRoutes?: AlternativeRoute[];
+  datasetMode?: string;
 }) {
   const map = useMap();
   const initialFitDone = useRef(false);
+
+  // Ensure dedicated route pane exists above standard overlays
+  useEffect(() => {
+    if (map && !map.getPane('emergencyRoutePane')) {
+      const pane = map.createPane('emergencyRoutePane');
+      pane.style.zIndex = '550';
+      pane.style.pointerEvents = 'none';
+    }
+  }, [map]);
 
   // Invalidate size on mount and window resize
   useEffect(() => {
@@ -267,16 +323,23 @@ function MapViewportManager({
         const geom = f.geometry;
         if (!geom) return;
         if (geom.type === 'Point' && Array.isArray(geom.coordinates)) {
-          bounds.extend([geom.coordinates[1], geom.coordinates[0]]);
+          const [lon, lat] = geom.coordinates;
+          if (lon && lat && Math.abs(lat) > 1 && Math.abs(lon) > 1) {
+            bounds.extend([lat, lon]);
+          }
         } else if (geom.type === 'LineString' && Array.isArray(geom.coordinates)) {
           geom.coordinates.forEach((c: any) => {
-            if (Array.isArray(c) && c.length >= 2) bounds.extend([c[1], c[0]]);
+            if (Array.isArray(c) && c.length >= 2 && c[0] && c[1] && Math.abs(c[1]) > 1 && Math.abs(c[0]) > 1) {
+              bounds.extend([c[1], c[0]]);
+            }
           });
         } else if (geom.type === 'Polygon' && Array.isArray(geom.coordinates)) {
           geom.coordinates.forEach((ring: any) => {
             if (Array.isArray(ring)) {
               ring.forEach((c: any) => {
-                if (Array.isArray(c) && c.length >= 2) bounds.extend([c[1], c[0]]);
+                if (Array.isArray(c) && c.length >= 2 && c[0] && c[1] && Math.abs(c[1]) > 1 && Math.abs(c[0]) > 1) {
+                  bounds.extend([c[1], c[0]]);
+                }
               });
             }
           });
@@ -284,11 +347,9 @@ function MapViewportManager({
       });
 
       if (bounds.isValid()) {
-        const isMobile = window.innerWidth <= 768;
         map.fitBounds(bounds, {
-          paddingTopLeft: isMobile ? [16, 90] : [320, 80],
-          paddingBottomRight: isMobile ? [16, 120] : [60, 90],
-          maxZoom: 17,
+          padding: [28, 28],
+          maxZoom: 16,
         });
       }
     } catch (err) {
@@ -296,13 +357,24 @@ function MapViewportManager({
     }
   }, [features, map]);
 
-  // Initial fit when data loads
+  // Initial fit only once when data first loads
   useEffect(() => {
     if (!initialFitDone.current && features.length > 0) {
       fitToFeatures();
       initialFitDone.current = true;
     }
-  }, [features, fitToFeatures]);
+  }, [features.length > 0]); // Stable boolean trigger so feature changes do NOT re-zoom
+
+  // Refit when dataset mode explicitly toggles
+  const prevMode = useRef(datasetMode);
+  useEffect(() => {
+    if (datasetMode && prevMode.current && prevMode.current !== datasetMode) {
+      fitToFeatures();
+      prevMode.current = datasetMode;
+    } else if (datasetMode) {
+      prevMode.current = datasetMode;
+    }
+  }, [datasetMode, fitToFeatures]);
 
   // Reset trigger
   useEffect(() => {
@@ -388,17 +460,21 @@ function MapViewportManager({
 
 function MapEventsWatcher({
   onViewportChange,
+  onZoomChange,
 }: {
   onViewportChange?: (bbox: string, zoom: number) => void;
+  onZoomChange?: (zoom: number) => void;
 }) {
   const map = useMapEvents({
     moveend: () => {
+      onZoomChange?.(map.getZoom());
       if (!onViewportChange) return;
       const b = map.getBounds();
       const bboxStr = `${b.getWest().toFixed(4)},${b.getSouth().toFixed(4)},${b.getEast().toFixed(4)},${b.getNorth().toFixed(4)}`;
       onViewportChange(bboxStr, map.getZoom());
     },
     zoomend: () => {
+      onZoomChange?.(map.getZoom());
       if (!onViewportChange) return;
       const b = map.getBounds();
       const bboxStr = `${b.getWest().toFixed(4)},${b.getSouth().toFixed(4)},${b.getEast().toFixed(4)},${b.getNorth().toFixed(4)}`;
@@ -406,6 +482,74 @@ function MapEventsWatcher({
     },
   });
   return null;
+}
+
+// Helper to determine road accessibility dynamically for the active vehicle
+export function getRoadAccessStatus(
+  props: any,
+  reqW: number = 3.5,
+  blockedRoadIds: string[] = []
+): 'feasible' | 'constrained' | 'inaccessible' | 'unknown' {
+  const isIncidentBlocked =
+    blockedRoadIds.includes(props.id) || props.is_blocked || props.incident_active;
+  if (isIncidentBlocked) return 'inaccessible';
+
+  const accessTag = props.access || props.tags?.access;
+  const vehicleTag = props.vehicle || props.tags?.vehicle;
+  const hasRestriction =
+    accessTag === 'no' ||
+    accessTag === 'private' ||
+    vehicleTag === 'no' ||
+    vehicleTag === 'private';
+  const hasObstruction = Boolean(
+    props.obstruction &&
+      String(props.obstruction).trim() &&
+      String(props.obstruction).toLowerCase() !== 'null'
+  );
+  const roadClass = (props.road_class || props.highway || '').toLowerCase();
+  const isPedestrianOnly = [
+    'footway',
+    'pedestrian',
+    'path',
+    'cycleway',
+    'steps',
+    'bridleway',
+  ].includes(roadClass);
+
+  if (
+    hasRestriction ||
+    hasObstruction ||
+    isPedestrianOnly ||
+    props.access_status === 'infeasible' ||
+    props.access_status === 'inaccessible'
+  ) {
+    return 'inaccessible';
+  }
+
+  const width = props.width_m;
+  if (width !== null && width !== undefined && !isNaN(Number(width))) {
+    const w = Number(width);
+    if (w < reqW) return 'inaccessible';
+    if (w < reqW + 0.4) return 'constrained';
+    return 'feasible';
+  }
+
+  // Physical road classification hierarchy when width is unmeasured
+  if (['motorway', 'motorway_link', 'trunk', 'trunk_link', 'primary', 'primary_link'].includes(roadClass)) {
+    return 'feasible'; // Major state/national highways always meet clearance
+  }
+  if (['secondary', 'secondary_link', 'tertiary', 'tertiary_link'].includes(roadClass)) {
+    return 'feasible'; // Urban collectors have wide clearance (≥ 5.0m)
+  }
+  if (['residential', 'living_street'].includes(roadClass)) {
+    // Heavy fire engine (≥3.5m) is constrained by tight residential lanes; QRVs & ambulances fit
+    return reqW >= 3.5 ? 'constrained' : 'feasible';
+  }
+
+  if (props.access_status === 'constrained') return 'constrained';
+  if (props.access_status === 'feasible' || props.access_status === 'ok') return 'feasible';
+
+  return 'unknown';
 }
 
 export const MapView: React.FC<MapViewProps> = ({
@@ -434,22 +578,29 @@ export const MapView: React.FC<MapViewProps> = ({
   zoom,
   fullHeight = false,
   showLegend = true,
+  datasetMode,
+  unitPosition,
+  blockedRoadIds = [],
 }) => {
   const [tileError, setTileError] = useState(false);
   const [resetCount, setResetCount] = useState(0);
+  const [currentZoom, setCurrentZoom] = useState<number>(zoom || DEFAULT_ZOOM);
 
   const isPilotMode = stations.length > 5 || roads.length > 50;
   const mapCenter = center || (isPilotMode ? DEFAULT_PILOT_CENTER : DEFAULT_CENTER);
-  const mapZoom = zoom || (isPilotMode ? 13 : DEFAULT_ZOOM);
+  const mapZoom = zoom || (isPilotMode ? 8 : DEFAULT_ZOOM);
+
+  const currentReqW = selectedVehicle?.minClearanceWidthM ?? selectedVehicle?.min_clearance_width_m ?? 3.5;
 
   // Filter features based on status
   const visibleRoads = layers.roads
     ? roads.filter((r) => {
         const props = r.properties || {};
-        const st = props.access_status || 'unknown';
-        return st === 'feasible' || st === 'ok'
-          ? statusFilters.ok ?? statusFilters.feasible ?? true
-          : statusFilters[st as keyof typeof statusFilters] ?? true;
+        const st = getRoadAccessStatus(props, currentReqW, blockedRoadIds);
+        if (st === 'feasible') return statusFilters.feasible ?? statusFilters.ok ?? true;
+        if (st === 'constrained') return statusFilters.constrained ?? true;
+        if (st === 'inaccessible') return statusFilters.inaccessible ?? true;
+        return statusFilters.unknown ?? true;
       })
     : [];
 
@@ -463,61 +614,134 @@ export const MapView: React.FC<MapViewProps> = ({
       })
     : [];
 
-  const visibleStations = layers.stations ? stations : [];
+  const visibleStations = useMemo(() => {
+    if (!layers.stations) return [];
+    // At neighborhood zoom (>= 14) or for compact datasets, show all facilities
+    if (stations.length <= 40 || currentZoom >= 14) return stations;
+
+    const selectedId = selectedFeature?.properties?.id || selectedFeature?.id;
+    const prioritized: GeoJSONFeature[] = [];
+    const seen = new Set<string>();
+
+    // 1. Always prioritize all fire stations (primary emergency dispatch origins)
+    stations.forEach((s) => {
+      const ft = (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase();
+      if (ft === 'fire_station' || ft === 'fire') {
+        const id = s.properties?.id || s.id;
+        if (id) {
+          seen.add(id);
+          prioritized.push(s);
+        }
+      }
+    });
+
+    // 2. Always include selected station
+    if (selectedId) {
+      const sel = stations.find((s) => (s.properties?.id || s.id) === selectedId);
+      if (sel && !seen.has(selectedId)) {
+        seen.add(selectedId);
+        prioritized.push(sel);
+      }
+    }
+
+    // 3. Balanced sample of major hospitals across the region (up to 40)
+    const hospitals = stations.filter((s) => {
+      const ft = (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase();
+      return ft === 'hospital';
+    });
+    const hStep = Math.max(1, Math.floor(hospitals.length / 40));
+    for (let i = 0; i < hospitals.length; i += hStep) {
+      const h = hospitals[i];
+      const id = h.properties?.id || h.id;
+      if (id && !seen.has(id)) {
+        seen.add(id);
+        prioritized.push(h);
+      }
+    }
+
+    // 4. Prominently include medical clinics across the sectors (up to 40)
+    const clinics = stations.filter((s) => {
+      const ft = (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase();
+      return ft === 'clinic';
+    });
+    const cStep = Math.max(1, Math.floor(clinics.length / 40));
+    for (let i = 0; i < clinics.length; i += cStep) {
+      const c = clinics[i];
+      const id = c.properties?.id || c.id;
+      if (id && !seen.has(id)) {
+        seen.add(id);
+        prioritized.push(c);
+      }
+    }
+
+    // 5. Doctors and health dispensaries across the sectors (up to 20)
+    const doctors = stations.filter((s) => {
+      const ft = (s.properties?.facility_type || s.properties?.station_type || '').toLowerCase();
+      return ft === 'doctors' || ft === 'dispensary';
+    });
+    const dStep = Math.max(1, Math.floor(doctors.length / 20));
+    for (let i = 0; i < doctors.length; i += dStep) {
+      const d = doctors[i];
+      const id = d.properties?.id || d.id;
+      if (id && !seen.has(id)) {
+        seen.add(id);
+        prioritized.push(d);
+      }
+    }
+
+    return prioritized;
+  }, [layers.stations, stations, selectedFeature, currentZoom]);
 
   // All active features for bounding box calculation
-  const allFeatures = [...visibleBuildings, ...visibleRoads, ...visibleStations];
+  const allFeatures = useMemo(() => {
+    return [...visibleStations, ...visibleRoads, ...visibleBuildings];
+  }, [visibleRoads, visibleBuildings, visibleStations]);
 
   // Refined GIS Road styling: clean stroke widths, clear contrast, restrained
   const getRoadStyle = (feature: any): PathOptions => {
     const props = feature.properties || {};
-    const status = props.access_status;
-    const width = props.width_m;
     const isSelected = selectedFeature?.properties?.id === props.id;
     const isTraversed = awareRoadIds.includes(props.id);
+    const reqW = selectedVehicle?.minClearanceWidthM ?? selectedVehicle?.min_clearance_width_m ?? 3.5;
+    const isIncidentBlocked = blockedRoadIds.includes(props.id) || props.is_blocked || props.incident_active;
 
-    const reqW = selectedVehicle?.minClearanceWidthM ?? selectedVehicle?.min_clearance_width_m;
+    const accessStatus = getRoadAccessStatus(props, reqW, blockedRoadIds);
 
-    const accessTag = props.access || props.tags?.access;
-    const vehicleTag = props.vehicle || props.tags?.vehicle;
-    const hasRestriction = accessTag === 'no' || accessTag === 'private' || vehicleTag === 'no' || vehicleTag === 'private';
-    const hasObstruction = Boolean(props.obstruction && String(props.obstruction).trim() && String(props.obstruction).toLowerCase() !== 'null');
-
-    let color = '#7d837a'; // unknown or unmeasured (Grey)
-    let dashArray: string | undefined = '4, 6';
-    let weight = isTraversed ? 5.0 : 3.5;
+    let color = '#64748b';
+    let dashArray: string | undefined = undefined;
+    let weight = isTraversed ? 5.5 : 3.5;
     let opacity = isTraversed ? 1.0 : 0.85;
 
-    if (hasRestriction || hasObstruction || status === 'infeasible' || status === 'inaccessible') {
-      color = '#d7263d'; // red — confirmed inaccessible
-      dashArray = undefined;
-    } else if (width !== null && width !== undefined && reqW !== undefined) {
-      if (width < reqW) {
-        color = '#d7263d'; // red — confirmed inaccessible
-        dashArray = undefined;
-      } else if (width < reqW + 0.4) {
-        color = '#e8710a'; // amber — constrained
-        dashArray = '5, 5';
-      } else {
-        color = '#168a5c'; // green — confirmed feasible
-        dashArray = undefined;
-      }
-    } else if (status === 'constrained') {
-      color = '#e8710a'; // amber — constrained
-      dashArray = '5, 5';
-    } else if (status === 'feasible' || status === 'ok' || status === 'accessible') {
-      color = '#168a5c'; // green — confirmed feasible
-      dashArray = undefined;
+    if (accessStatus === 'inaccessible') {
+      color = '#d7263d'; // red — confirmed inaccessible or blocked
+      weight = isIncidentBlocked ? 5.5 : 4.0;
+      dashArray = isIncidentBlocked ? '6, 6' : undefined;
+      opacity = 1.0;
+    } else if (accessStatus === 'constrained') {
+      color = '#e8710a'; // amber — constrained margin
+      weight = 4.0;
+    } else if (accessStatus === 'feasible') {
+      color = '#168a5c'; // green — verified feasible
+      weight = 4.0;
     } else {
-      color = '#7d837a'; // grey — unknown or insufficient evidence
-      dashArray = '4, 6';
+      // Unmeasured / unknown status: slate grey
+      color = '#64748b';
+      weight = 3.5;
+      opacity = 0.85;
     }
 
     if (isSelected) {
-      color = '#ffd60a'; // highlight accent
-      weight = 6.0;
-      opacity = 1.0;
-      dashArray = undefined;
+      if (isIncidentBlocked) {
+        color = '#ef4444'; // Red hazard for blocked road even when selected
+        weight = 7.0;
+        opacity = 1.0;
+        dashArray = '6, 6';
+      } else {
+        color = '#ffd60a'; // highlight accent for selected road
+        weight = 6.5;
+        opacity = 1.0;
+        dashArray = undefined;
+      }
     }
 
     return {
@@ -536,8 +760,8 @@ export const MapView: React.FC<MapViewProps> = ({
     const status = props.access_status;
     const isSelected = selectedFeature?.properties?.id === props.id;
 
-    let fillColor = '#7d837a';
-    let borderColor = '#5d635a';
+    let fillColor = '#475569';
+    let borderColor = '#64748b';
 
     if (status === 'feasible' || status === 'ok') {
       fillColor = '#168a5c';
@@ -552,10 +776,10 @@ export const MapView: React.FC<MapViewProps> = ({
 
     return {
       fillColor,
-      fillOpacity: isSelected ? 0.40 : 0.22,
+      fillOpacity: isSelected ? 0.60 : 0.35,
       color: isSelected ? '#ffd60a' : borderColor,
-      weight: isSelected ? 2.5 : 1.5,
-      opacity: isSelected ? 1 : 0.85,
+      weight: isSelected ? 2.5 : 1.2,
+      opacity: isSelected ? 1 : 0.8,
     };
   };
 
@@ -581,14 +805,18 @@ export const MapView: React.FC<MapViewProps> = ({
     });
 
     const isOutsidePilot = props.inside_pilot_area === false;
+    const roadStatus = props.feature_type === 'road'
+      ? getRoadAccessStatus(props, currentReqW, blockedRoadIds)
+      : props.access_status;
+
     const statusBadge = isOutsidePilot
       ? '<span style="color:#d97706; font-weight:700;">Outside Pilot Boundary</span>'
-      : props.access_status === 'feasible' || props.access_status === 'ok'
-      ? '<span style="color:#168a5c; font-weight:700;">Verified accessible</span>'
-      : props.access_status === 'constrained'
-      ? '<span style="color:#e8710a; font-weight:700;">Constrained</span>'
-      : props.access_status === 'infeasible'
-      ? '<span style="color:#d7263d; font-weight:700;">Potentially inaccessible</span>'
+      : roadStatus === 'feasible' || roadStatus === 'ok'
+      ? '<span style="color:#168a5c; font-weight:700;">Verified Feasible</span>'
+      : roadStatus === 'constrained'
+      ? '<span style="color:#e8710a; font-weight:700;">Constrained Margin</span>'
+      : roadStatus === 'inaccessible' || roadStatus === 'infeasible'
+      ? '<span style="color:#d7263d; font-weight:700;">Inaccessible / Blocked</span>'
       : '<span style="color:#7d837a; font-weight:700;">Unknown (Unsurveyed)</span>';
 
     const coverageWarningHtml = isOutsidePilot
@@ -640,12 +868,12 @@ export const MapView: React.FC<MapViewProps> = ({
       }`}
       style={{ background: 'var(--bg)' }}
     >
-      {/* Reset Center control placed cleanly above zoom controls */}
+      {/* Reset Center control placed cleanly above zoom controls with comfortable clearance */}
       {fullHeight && (
         <div
           className="absolute z-[800]"
           style={{
-            bottom: '158px',
+            bottom: '204px',
             right: '16px',
           }}
         >
@@ -680,12 +908,10 @@ export const MapView: React.FC<MapViewProps> = ({
           style={{
             background: 'var(--glass)',
             border: '1px solid var(--line)',
-            color: 'var(--ink)',
-            backdropFilter: 'blur(10px)',
+            color: 'var(--mute)',
           }}
         >
-          <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-          <span>Base map offline; vector GeoJSON layers rendered directly.</span>
+          <span>Basemap tiles unavailable (operating in offline fallback mode)</span>
         </div>
       )}
 
@@ -698,18 +924,20 @@ export const MapView: React.FC<MapViewProps> = ({
         className="w-full h-full"
       >
         <ZoomControl position="bottomright" />
-        <MapEventsWatcher onViewportChange={onViewportChange} />
+        <MapEventsWatcher onViewportChange={onViewportChange} onZoomChange={setCurrentZoom} />
         <MapViewportManager
           features={allFeatures}
           selectedFeature={selectedFeature}
           resetCount={resetCount}
           routeGeometry={routeGeometry}
           alternativeRoutes={alternativeRoutes}
+          datasetMode={datasetMode}
         />
 
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={19}
           eventHandlers={{
             tileerror: () => setTileError(true),
             load: () => setTileError(false),
@@ -753,6 +981,7 @@ export const MapView: React.FC<MapViewProps> = ({
                 <Polyline
                   positions={latlngs}
                   pathOptions={{
+                    pane: 'emergencyRoutePane',
                     color: isSelected ? '#090d16' : '#1e293b',
                     weight: isSelected ? 10 : 6,
                     opacity: isSelected ? 0.85 : 0.45,
@@ -767,6 +996,7 @@ export const MapView: React.FC<MapViewProps> = ({
                     click: () => onSelectRoute?.(route.route_id),
                   }}
                   pathOptions={{
+                    pane: 'emergencyRoutePane',
                     color: route.color,
                     weight: isSelected ? 6 : 3.5,
                     opacity: isSelected ? 1.0 : 0.65,
@@ -814,14 +1044,15 @@ export const MapView: React.FC<MapViewProps> = ({
           })
         ) : routeGeometry && routeGeometry.coordinates && routeGeometry.coordinates.length > 1 ? (
           <>
-            {/* Dark casing shadow for visual contrast */}
+            {/* Background high-contrast white casing */}
             <Polyline
               key={`route-casing-${routeGeometry.coordinates.length}`}
               positions={routeGeometry.coordinates.map((c: [number, number]) => [c[1], c[0]])}
               pathOptions={{
-                color: '#090d16',
-                weight: 8,
-                opacity: 0.7,
+                pane: 'emergencyRoutePane',
+                color: '#ffffff',
+                weight: 10,
+                opacity: 0.95,
                 lineCap: 'round',
                 lineJoin: 'round',
               }}
@@ -831,16 +1062,21 @@ export const MapView: React.FC<MapViewProps> = ({
               key={`route-line-${routeGeometry.coordinates.length}-${routeClassification}`}
               positions={routeGeometry.coordinates.map((c: [number, number]) => [c[1], c[0]])}
               pathOptions={{
+                pane: 'emergencyRoutePane',
                 color:
                   routeClassification === 'accessible' || routeClassification === 'feasible' || routeClassification === 'ok'
-                    ? '#168a5c' // Green
+                    ? '#10b981' // Vibrant Emerald Green
                     : routeClassification === 'constrained'
-                    ? '#e8710a' // Amber
+                    ? '#f59e0b' // Vibrant Amber Orange
                     : routeClassification === 'inaccessible' || routeClassification === 'infeasible'
-                    ? '#d7263d' // Red
+                    ? '#ef4444' // Vibrant Crimson Red
                     : '#0284c7', // Active blue
-                weight: 5,
-                opacity: 0.95,
+                weight: 6,
+                opacity: 1.0,
+                dashArray:
+                  routeClassification === 'inaccessible' || routeClassification === 'infeasible'
+                    ? '8, 8'
+                    : undefined,
                 lineCap: 'round',
                 lineJoin: 'round',
               }}
@@ -905,11 +1141,40 @@ export const MapView: React.FC<MapViewProps> = ({
           );
         })}
 
-        {/* Route Target Destination Marker */}
-        {destinationCoords && destinationCoords.length >= 2 && (
+        {/* Route Origin Dispatch Facility Marker */}
+        {routeGeometry && routeGeometry.coordinates && routeGeometry.coordinates.length > 1 && (
           <Marker
-            position={[destinationCoords[1], destinationCoords[0]]}
+            position={[routeGeometry.coordinates[0][1], routeGeometry.coordinates[0][0]]}
+            icon={createStationIcon(true, 'fire_station')}
+            zIndexOffset={1600}
+          >
+            <Popup>
+              <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif' }}>
+                <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#10b981', fontWeight: 800 }}>
+                  Dispatch Origin
+                </div>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink)' }}>
+                  Emergency Deployment Station
+                </div>
+              </div>
+            </Popup>
+          </Marker>
+        )}
+
+        {/* Route Target Destination Marker */}
+        {((destinationCoords && destinationCoords.length >= 2) ||
+          (routeGeometry && routeGeometry.coordinates && routeGeometry.coordinates.length > 1)) && (
+          <Marker
+            position={
+              destinationCoords && destinationCoords.length >= 2
+                ? [destinationCoords[1], destinationCoords[0]]
+                : [
+                    routeGeometry!.coordinates[routeGeometry!.coordinates.length - 1][1],
+                    routeGeometry!.coordinates[routeGeometry!.coordinates.length - 1][0],
+                  ]
+            }
             icon={createDestinationIcon(destinationName || 'Destination')}
+            zIndexOffset={1800}
           >
             <Popup>
               <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif' }}>
@@ -917,15 +1182,43 @@ export const MapView: React.FC<MapViewProps> = ({
                   Route Destination
                 </div>
                 <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--ink)' }}>
-                  {destinationName || 'Destination Location'}
+                  {destinationName || 'Destination Target'}
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '2px' }}>
-                  Coordinates: {destinationCoords[1].toFixed(4)}, {destinationCoords[0].toFixed(4)}
-                </div>
+                {destinationCoords && (
+                  <div style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '2px' }}>
+                    Coordinates: {destinationCoords[1].toFixed(4)}, {destinationCoords[0].toFixed(4)}
+                  </div>
+                )}
               </div>
             </Popup>
           </Marker>
         )}
+
+        {/* Real-time Simulated Emergency Unit Marker — strictly shown only when active route exists */}
+        {Boolean(routeGeometry || (alternativeRoutes && alternativeRoutes.length > 0)) &&
+          unitPosition &&
+          Array.isArray(unitPosition) &&
+          unitPosition.length >= 2 && (
+            <Marker
+              position={[unitPosition[0], unitPosition[1]]}
+              icon={createUnitIcon(selectedVehicle?.id)}
+              zIndexOffset={2000}
+            >
+              <Popup>
+                <div style={{ fontFamily: 'Bricolage Grotesque, system-ui, sans-serif' }}>
+                  <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#d7263d', fontWeight: 800 }}>
+                    Live Dispatched Unit
+                  </div>
+                  <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--ink)' }}>
+                    {selectedVehicle?.name || 'Emergency Unit'}
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--mute)', marginTop: '2px' }}>
+                    Simulated GPS: {unitPosition[0].toFixed(4)}, {unitPosition[1].toFixed(4)}
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          )}
 
         {/* Road Hazard Issue Markers */}
         {layers.issues &&

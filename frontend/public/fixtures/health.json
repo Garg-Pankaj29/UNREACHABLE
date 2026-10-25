@@ -1,7 +1,14 @@
 {
-  "status": "ok",
-  "app": "UNREACHABLE",
+  "status": "healthy",
   "version": "0.1.0",
-  "dataset": "Ward 142 (Synthetic)",
-  "dataset_status": "loaded"
+  "service": "UNREACHABLE-backend",
+  "dataset_loaded": true,
+  "sample_file_path": "neighbourhood.geojson",
+  "data_mode": "real",
+  "counts": {
+    "roads": 530,
+    "buildings": 52,
+    "stations": 1,
+    "total": 583
+  }
 }

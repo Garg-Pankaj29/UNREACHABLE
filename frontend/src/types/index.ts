@@ -321,4 +321,36 @@ export interface MultiRouteResponse {
   disclaimer: string;
 }
 
+export interface VisionObservationItem {
+  id: number;
+  title: string;
+  description: string;
+  confidence: number;
+  category: string;
+  status: 'ok' | 'no' | '';
+}
+
+export interface VisionInspectResponse {
+  source: string;
+  model: string;
+  carriageway_width_est_m?: number | null;
+  overhead_clearance_est_m?: number | null;
+  passable_for_fire?: boolean | null;
+  passable_for_ambulance?: boolean | null;
+  observations: VisionObservationItem[];
+  raw_reasoning?: string;
+  disclaimer: string;
+}
+
+export interface CertifyRoadResponse {
+  status: string;
+  road_id: string;
+  road_name: string;
+  old_width_m?: number | null;
+  new_width_m: number;
+  notes?: string;
+  message: string;
+}
+
+
 

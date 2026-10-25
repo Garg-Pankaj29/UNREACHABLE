@@ -1,9 +1,10 @@
-"""Tests for AI Explain service and guardrail validation."""
+import os
 import unittest
 from unittest.mock import patch
 
 from app.api.routes import post_explain
 from app.models.schemas import ExplainRequest
+from app.services.data_service import data_service
 from app.services.explain_service import (
     explain_service,
     extract_all_numbers,
@@ -14,6 +15,20 @@ from app.services.explain_service import (
 
 class TestExplainService(unittest.TestCase):
     """Unit tests verifying local LLM explain service, guardrails, and deterministic fallbacks."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._orig_mode = os.environ.get("DATA_MODE")
+        os.environ["DATA_MODE"] = "demo"
+        data_service._cache = None
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls._orig_mode is not None:
+            os.environ["DATA_MODE"] = cls._orig_mode
+        else:
+            os.environ.pop("DATA_MODE", None)
+        data_service._cache = None
 
     def test_facts_extraction_contains_required_fields(self):
         """Verify build_facts compiles classification, limiting roads, widths, distance, and evidence status."""

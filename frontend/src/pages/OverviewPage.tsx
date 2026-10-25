@@ -108,12 +108,16 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
       {/* Hero */}
       <div className="hero">
         <div>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '5px 14px', borderRadius: '99px', background: 'var(--glass)', border: '1px solid var(--line)', marginBottom: '18px', fontSize: '13px', fontWeight: 600, color: 'var(--ink)' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--tape)' }} />
+            Autonomous Emergency Access Intelligence
+          </div>
           <h1>
             Every second matters.
             <span>Every road must be reachable.</span>
           </h1>
           <div className="tape" aria-hidden="true" />
-          <p className="lede">
+          <p className="lede" style={{ marginBottom: '24px' }}>
             UNREACHABLE reveals which building footprints emergency vehicles may struggle
             to reach due to narrow lanes, physical bottlenecks, and restricted entrances.
             Watch the vehicles moving in the background: each unit travels through the street grid
@@ -131,8 +135,8 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
                 background: 'var(--tape, #ffd60a)',
                 color: '#1c1f1b',
                 fontWeight: 800,
-                fontSize: '16px',
-                height: '48px',
+                fontSize: '15px',
+                height: '46px',
                 padding: '0 24px',
                 boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
                 border: '1.5px solid rgba(0,0,0,0.15)',
@@ -141,10 +145,13 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
               <Zap size={18} className="fill-current text-current" aria-hidden="true" />
               <span>Presenter Demo</span>
             </a>
+            <a className="btn" href="#/map" style={{ height: '46px', padding: '0 22px' }}>
+              Explore Access Atlas →
+            </a>
           </div>
         </div>
 
-        <a className="prev" href="#/map" aria-label="Open Access Atlas">
+        <a className="prev" href="#/map" aria-label="Open Access Atlas" style={{ boxShadow: '0 12px 32px rgba(0,0,0,0.1)' }}>
           <SvgMap nohit={true} vehicleId={selectedVehicle} />
           <span>Open Access Atlas</span>
         </a>
@@ -154,17 +161,19 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
       <div
         className="vehicle-gap-strip"
         style={{
-          margin: '24px 0',
+          margin: '48px 0',
           background: 'var(--glass)',
           border: '1.5px solid var(--line)',
-          borderRadius: '16px',
-          padding: '20px 22px',
+          borderRadius: '18px',
+          padding: '28px 32px',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h2 style={{ margin: 0, fontSize: '20px', letterSpacing: '-0.01em' }}>Vehicle Gap Scorecard</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 800, letterSpacing: '-0.02em' }}>Vehicle Clearance Scorecard</h3>
               <span
                 title={FORMULA_TOOLTIP}
                 style={{
@@ -172,8 +181,8 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '18px',
-                  height: '18px',
+                  width: '20px',
+                  height: '20px',
                   borderRadius: '50%',
                   background: 'var(--line)',
                   fontSize: '11px',
@@ -184,26 +193,26 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
                 ⓘ
               </span>
             </div>
-            <p className="lede" style={{ fontSize: '14px', margin: '4px 0 0 0' }}>
-              One memorable number per apparatus. Click a column to filter citywide KPIs and vulnerability analysis.
+            <p className="lede" style={{ fontSize: '15px', margin: '6px 0 0 0', lineHeight: 1.5 }}>
+              Deterministic pass/fail ratio per apparatus profile. Select a vehicle to filter citywide metrics and vulnerability topology.
             </p>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span
               style={{
-                fontSize: '11px',
+                fontSize: '12px',
                 textTransform: 'uppercase',
-                fontWeight: 800,
+                fontWeight: 700,
                 color: 'var(--mute)',
-                background: 'rgba(255,255,255,0.06)',
+                background: 'var(--glass)',
                 border: '1px solid var(--line)',
-                padding: '4px 10px',
-                borderRadius: '20px',
+                padding: '5px 12px',
+                borderRadius: '99px',
                 letterSpacing: '0.04em',
               }}
             >
-              Synthetic demo data
+              Synthetic Sector Data
             </span>
           </div>
         </div>
@@ -212,9 +221,8 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '14px',
-            marginTop: '16px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '18px',
           }}
         >
           {VEHICLE_CONFIG.map((cfg) => {
@@ -364,38 +372,39 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
 
 
       {/* Top 5 Single Points of Failure Card */}
-      <div style={{ margin: '24px 0', background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '16px', padding: '20px 24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+      <div style={{ margin: '48px 0', background: 'var(--glass)', border: '1.5px solid var(--line)', borderRadius: '18px', padding: '28px 32px', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '18px' }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '22px' }}>Top 5 Single Points of Failure</h2>
-            <p className="lede" style={{ fontSize: '15px', margin: '4px 0 0 0' }}>
+            <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 800, letterSpacing: '-0.02em' }}>Top 5 Single Points of Failure</h3>
+            <p className="lede" style={{ fontSize: '15px', margin: '6px 0 0 0', lineHeight: 1.5 }}>
               Critical corridors ranked by number of buildings whose access deteriorates if blocked (evaluated for {selectedVehicle === 'fire' ? 'Fire Engine ≥3.5m' : selectedVehicle === 'amb' ? 'Ambulance ≥3.0m' : 'Rapid Response ≥2.4m'}).
             </p>
           </div>
-          <span style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 800, color: 'var(--sig)', background: 'rgba(215,38,61,0.08)', padding: '4px 10px', borderRadius: '6px' }}>
+          <span style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 800, color: 'var(--sig)', background: 'rgba(215,38,61,0.08)', border: '1px solid rgba(215,38,61,0.25)', padding: '5px 12px', borderRadius: '99px' }}>
             Vulnerability Engine
           </span>
         </div>
 
         {criticalLoading ? (
-          <p style={{ color: 'var(--mute)', fontSize: '15px', margin: '14px 0' }}>Analyzing topological single points of failure...</p>
+          <p style={{ color: 'var(--mute)', fontSize: '15px', margin: '20px 0' }}>Analyzing topological single points of failure...</p>
         ) : criticalRoads.length === 0 ? (
-          <p style={{ color: 'var(--mute)', fontSize: '15px', margin: '14px 0' }}>
+          <p style={{ color: 'var(--mute)', fontSize: '15px', margin: '20px 0' }}>
             No critical single points of failure detected for this vehicle profile.
           </p>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '12px', marginTop: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginTop: '20px' }}>
             {criticalRoads.map((cr, idx) => (
               <div
                 key={cr.road_id}
                 style={{
                   background: 'var(--bg)',
                   border: '1.5px solid var(--line)',
-                  borderRadius: '12px',
-                  padding: '14px',
+                  borderRadius: '14px',
+                  padding: '18px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
+                  minHeight: '140px',
                 }}
               >
                 <div>

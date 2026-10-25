@@ -1,6 +1,6 @@
 {
-  "origin_id": "station-01",
-  "destination_id": "bldg-201",
+  "origin_id": "station-osm-1216904632",
+  "destination_id": "bldg-osm-4393950583",
   "destination_type": "building",
   "vehicle": {
     "id": "fire",
@@ -24,41 +24,60 @@
       "entrance_doorway_access"
     ]
   },
-  "classification": "accessible",
+  "classification": "unknown",
   "route_found": true,
-  "total_distance_m": 216.7,
+  "total_distance_m": 15.5,
   "segments_traversed": [
-    "road-101"
+    "road-osm-733440064-2"
   ],
+  "geometry_geojson": {
+    "type": "LineString",
+    "coordinates": [
+      [
+        76.577081,
+        30.770454
+      ],
+      [
+        76.577243,
+        30.770454
+      ]
+    ]
+  },
+  "origin_name": "Hospital Facility 1216904632",
+  "destination_name": "Sukhna Hostel",
   "steps": [
     {
       "step_index": 1,
-      "from_node": "node_76.571881_30.767850",
-      "to_node": "node_76.574149_30.767850",
-      "road_id": "road-101",
-      "road_name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
-      "segment_length_m": 216.7,
-      "status": "accessible",
-      "reason": "Adequate clearance for Fire tender (7.5m usable width)."
+      "from_node": "node_76.577081_30.770454",
+      "to_node": "node_76.577243_30.770454",
+      "road_id": "road-osm-733440064-2",
+      "road_name": "Service Corridor 733440064",
+      "segment_length_m": 15.5,
+      "status": "unknown",
+      "reason": "Width unmeasured in cadastre; clearance unverified."
     }
   ],
   "segment_assessments": [
     {
-      "road_id": "road-101",
-      "name": "NH-05 Main University Arterial (Ludhiana-Chandigarh Hwy Access)",
-      "road_class": "Primary Access Arterial",
-      "width_m": 7.5,
+      "road_id": "road-osm-733440064-2",
+      "name": "Service Corridor 733440064",
+      "road_class": "Service",
+      "width_m": null,
       "required_width_m": 3.5,
-      "surface": "asphalt",
+      "surface": "paved",
       "obstruction": null,
-      "status": "accessible",
+      "status": "unknown",
       "is_passable": true,
-      "length_m": 216.7,
-      "limiting_factors": [],
-      "notes": "Adequate clearance for Fire tender (7.5m usable width)."
+      "length_m": 15.5,
+      "limiting_factors": [
+        "Unmeasured corridor width in cadastre: ground truth audit required"
+      ],
+      "notes": "Width unmeasured in cadastre; clearance unverified."
     }
   ],
-  "limiting_segments": [],
+  "limiting_segments": [
+    "road-osm-733440064-2"
+  ],
   "evaluated_constraints": [
     "width",
     "physical_obstruction"
@@ -70,6 +89,6 @@
     "gate_restriction",
     "entrance_doorway_access"
   ],
-  "explanation": "Verified accessible route (216.7m) via 1 corridor(s). All segments meet or exceed Fire tender physical clearance requirements.",
+  "explanation": "Route identified (15.5m across 1 segments), but contains unmeasured segment(s): road-osm-733440064-2. Access cannot be confirmed accessible without ground truth width survey.",
   "disclaimer": "DETERMINISTIC EVALUATION FOR PROTOTYPE DEMONSTRATION. ROAD ARRIVAL DOES NOT GUARANTEE ENTRANCE ACCESS."
 }

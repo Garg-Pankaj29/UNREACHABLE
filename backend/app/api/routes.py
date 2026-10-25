@@ -1,7 +1,11 @@
 """FastAPI router defining core UNREACHABLE endpoints."""
+import asyncio
+import json
 import logging
-from typing import List, Optional
+from typing import Any, AsyncGenerator, Dict, List, Optional
 from fastapi import APIRouter, HTTPException, Query, status
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
 
 from app.core.config import API_VERSION, SAMPLE_DATA_PATH
 from app.models.routing import (
@@ -21,10 +25,13 @@ from app.models.schemas import (
     ExplainResponse,
     FeatureCollectionResponse,
     HealthResponse,
+    RoadCertifyRequest,
     SearchResponse,
     SearchResultItem,
     StatsResponse,
     VehicleGapResponse,
+    VisionInspectRequest,
+    VisionInspectResponse,
 )
 from app.models.vehicle import (
     SUPPORTED_VEHICLES,
@@ -35,6 +42,7 @@ from app.services.access_engine import WorkOrderItem, access_engine
 from app.services.data_service import data_service
 from app.services.explain_service import explain_service
 from app.services.pilot_service import pilot_data_service
+from app.services.vision_service import vision_service
 
 
 logger = logging.getLogger("unreachable.api")
@@ -42,20 +50,31 @@ logger = logging.getLogger("unreachable.api")
 router = APIRouter()
 
 
+class ExtendedHealthResponse(HealthResponse):
+    """Extended health response schema including data_mode and feature counts."""
+    data_mode: str = "demo"
+    counts: Optional[dict] = None
+
+
 @router.get(
     "/health",
-    response_model=HealthResponse,
+    response_model=ExtendedHealthResponse,
     summary="Health check endpoint",
-    description="Returns backend service health status and dataset availability.",
+    description="Returns backend service health status, dataset availability, data mode, and counts.",
 )
-def get_health() -> HealthResponse:
-    """Verifies backend is operating and dataset is reachable."""
+def get_health() -> ExtendedHealthResponse:
+    """Verifies backend is operating, dataset is reachable, and reports active mode & counts."""
     is_loaded = data_service.is_loaded()
-    return HealthResponse(
+    mode = data_service.get_data_mode()
+    counts = data_service.get_counts() if is_loaded else {}
+    active_path = data_service.data_path
+    return ExtendedHealthResponse(
         status="healthy" if is_loaded else "degraded",
         version=API_VERSION,
         dataset_loaded=is_loaded,
-        sample_file_path=str(SAMPLE_DATA_PATH.name),
+        sample_file_path=str(active_path.name),
+        data_mode=mode,
+        counts=counts,
     )
 
 
@@ -491,8 +510,16 @@ def get_critical_roads(
 ) -> List[CriticalRoad]:
     """Returns top N single points of failure road segments for a given vehicle profile."""
     try:
+        from app.core.config import REAL_CACHE_DIR
+        cache_file = REAL_CACHE_DIR / f"critical_roads_{vehicle_id}.json"
+        if data_service.get_data_mode() == "real" and cache_file.exists():
+            import json
+            with open(cache_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return [CriticalRoad(**item) for item in data[:limit]]
+
         from app.services.access_engine import CRITICAL_ROADS_CACHE
-        cache_key = f"{vehicle_id}_{limit}"
+        cache_key = f"{data_service.get_data_mode()}_{vehicle_id}_{limit}"
         if cache_key in CRITICAL_ROADS_CACHE:
             return CRITICAL_ROADS_CACHE[cache_key]
 
@@ -576,6 +603,14 @@ def get_audit_work_order(
 ) -> List[WorkOrderItem]:
     """Returns prioritized audit action list of unknown/unverified road corridors."""
     try:
+        from app.core.config import REAL_CACHE_DIR
+        cache_file = REAL_CACHE_DIR / f"audit_work_order_{vehicle_id}.json"
+        if data_service.get_data_mode() == "real" and cache_file.exists():
+            import json
+            with open(cache_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return [WorkOrderItem(**item) for item in data]
+
         return access_engine.get_audit_work_order(vehicle_id=vehicle_id)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
@@ -746,5 +781,169 @@ def search_pilot_features(
     )
 
 
+# ============================================================================
+# Emergency Incident Management & Real-time Stream Endpoints (Phase 5)
+# ============================================================================
 
+from app.services.incident_service import incident_service
+
+
+class IncidentActionRequest(BaseModel):
+    road_id: str = Field(..., description="Unique road segment identifier to block or clear")
+    action: str = Field(default="block", description="Incident action: 'block' or 'clear'")
+    reason: Optional[str] = Field(default="Manual emergency closure", description="Reason or description for road blockage")
+
+
+@router.post(
+    "/incidents",
+    summary="Create or clear emergency incident road block",
+    description="Blocks or clears a road segment in the SQLite incidents registry and applies in-memory obstruction overlay.",
+)
+def post_incident(
+    payload: Optional[IncidentActionRequest] = None,
+    road_id: Optional[str] = Query(default=None),
+    action: Optional[str] = Query(default=None),
+    reason: Optional[str] = Query(default=None),
+) -> Dict[str, Any]:
+    target_road_id = (payload.road_id if payload else None) or road_id
+    if not target_road_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="road_id is required")
+
+    target_action = (payload.action if payload else None) or action or "block"
+    target_action = str(target_action).lower().strip()
+    target_reason = (payload.reason if payload else None) or reason or "Manual emergency closure"
+
+    if target_action in ("block", "blocked", "close", "closure"):
+        event = incident_service.block_road(target_road_id, reason=target_reason)
+    elif target_action in ("clear", "cleared", "unblock", "open"):
+        event = incident_service.clear_road(target_road_id)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid action '{target_action}'; must be 'block' or 'clear'",
+        )
+
+    return {
+        "status": "success",
+        "action": target_action,
+        "road_id": target_road_id,
+        "blocked_roads": incident_service.get_blocked_roads(),
+        "event": event,
+    }
+
+
+@router.get(
+    "/incidents",
+    summary="List active road blockage incidents",
+    description="Returns all active SQLite-persisted road incidents and blocked road IDs.",
+)
+def get_incidents() -> Dict[str, Any]:
+    incidents = incident_service.get_incidents()
+    blocked = incident_service.get_blocked_roads()
+    return {
+        "incidents": incidents,
+        "blocked_roads": blocked,
+        "count": len(blocked),
+    }
+
+
+@router.get(
+    "/stream",
+    summary="Server-Sent Events real-time incident and unit simulation stream",
+    description="Streams real-time road incident events and animated unit position updates along the active route.",
+)
+async def stream_events():
+    async def event_generator() -> AsyncGenerator[str, None]:
+        queue = incident_service.subscribe()
+        try:
+            # 1. Send initial connection / current state event
+            init_payload = {
+                "type": "init",
+                "incidents": incident_service.get_incidents(),
+                "blocked_roads": incident_service.get_blocked_roads(),
+            }
+            yield f"event: init\ndata: {json.dumps(init_payload)}\n\n"
+
+            # 2. Main loop: emit simulated unit position ticks and any queued incident events
+            while True:
+                # Flush all queued incident events
+                while not queue.empty():
+                    inc_event = queue.get_nowait()
+                    yield f"event: incident\ndata: {json.dumps(inc_event)}\n\n"
+
+                # Compute current unit position along active route
+                unit_pos = incident_service.get_unit_position()
+                if unit_pos:
+                    yield f"event: unit_position\ndata: {json.dumps(unit_pos)}\n\n"
+
+                # Wait before next position tick
+                await asyncio.sleep(1.0)
+        except asyncio.CancelledError:
+            pass
+        finally:
+            incident_service.unsubscribe(queue)
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+# ============================================================================
+# Vision Street Inspection & Road Width Certification Endpoints
+# ============================================================================
+
+@router.post(
+    "/vision/inspect",
+    response_model=VisionInspectResponse,
+    summary="Inspect street photograph using local vision model",
+    description="Analyzes street photos for carriageway clearance, lateral bottlenecks, and overhead obstacles.",
+)
+def post_vision_inspect(request: VisionInspectRequest) -> VisionInspectResponse:
+    """Performs visual inspection of street photo with local VLM and deterministic fallback."""
+    try:
+        res = vision_service.inspect_image(
+            image_base64=request.image_base64,
+            road_id=request.road_id,
+            vehicle_id=request.vehicle_id,
+        )
+        return VisionInspectResponse(**res)
+    except Exception as exc:
+        logger.error("Vision inspection error: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Vision inspection failed: {exc}",
+        )
+
+
+@router.post(
+    "/roads/{road_id}/certify-width",
+    summary="Certify and update road width from field survey or vision inspection",
+    description="Applies in-memory ground truth width override to road graph for immediate routing re-evaluation.",
+)
+def post_certify_road_width(road_id: str, request: RoadCertifyRequest):
+    """Applies verified width override to road in-memory without altering disk GeoJSON."""
+    try:
+        vision_service.apply_road_width_override(
+            road_id=road_id,
+            verified_width_m=request.verified_width_m,
+            notes=request.notes,
+        )
+        return {
+            "success": True,
+            "road_id": road_id,
+            "verified_width_m": request.verified_width_m,
+            "message": f"Carriageway width for {road_id} updated to {request.verified_width_m}m in-memory.",
+        }
+    except Exception as exc:
+        logger.error("Failed to certify road width: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to certify road width: {exc}",
+        )
 

@@ -1,0 +1,338 @@
+{
+  "building_id": "bldg-osm-4393913180",
+  "building_name": "Block-1",
+  "use_type": "General Facility",
+  "connected_road_id": "road-osm-733440065-7",
+  "approach_road_name": "Service Corridor 733440065",
+  "estimated_setback_m": 31.3,
+  "entrance_status": "unconfirmed_entrance",
+  "assessment_status": "partial_unverified",
+  "vehicle": {
+    "id": "fire",
+    "name": "Fire tender",
+    "category": "Heavy apparatus",
+    "min_clearance_width_m": 3.5,
+    "min_clearance_height_m": 3.5,
+    "turning_radius_m": 8.5,
+    "weight_tons": 16.0,
+    "description": "Heavy municipal water tender requiring \u2265 3.5m clearance corridor.",
+    "typical_equipment": "4,500L water tank, high-pressure pump, extension ladders, rescue gear",
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ]
+  },
+  "classification": "unknown",
+  "origin_station_id": "station-01",
+  "origin_station_name": "Sector 1 Station",
+  "origin_facility_type": "fire_station",
+  "road_access_coordinates": null,
+  "building_coordinates": [
+    76.575543,
+    30.7696596
+  ],
+  "route": {
+    "origin_id": "station-01",
+    "destination_id": "bldg-osm-4393913180",
+    "destination_type": "building",
+    "vehicle": {
+      "id": "fire",
+      "name": "Fire tender",
+      "category": "Heavy apparatus",
+      "min_clearance_width_m": 3.5,
+      "min_clearance_height_m": 3.5,
+      "turning_radius_m": 8.5,
+      "weight_tons": 16.0,
+      "description": "Heavy municipal water tender requiring \u2265 3.5m clearance corridor.",
+      "typical_equipment": "4,500L water tank, high-pressure pump, extension ladders, rescue gear",
+      "evaluated_constraints": [
+        "width",
+        "physical_obstruction"
+      ],
+      "unevaluated_constraints": [
+        "overhead_clearance",
+        "turning_radius",
+        "gross_weight_limit",
+        "gate_restriction",
+        "entrance_doorway_access"
+      ]
+    },
+    "classification": "unknown",
+    "route_found": true,
+    "total_distance_m": 164.8,
+    "segments_traversed": [
+      "road-osm-733440064-2",
+      "road-osm-1102495116",
+      "road-osm-733440059-3",
+      "road-osm-733440058",
+      "road-osm-733440065-3",
+      "road-osm-733440065-7"
+    ],
+    "geometry_geojson": {
+      "type": "LineString",
+      "coordinates": [
+        [
+          76.577081,
+          30.770454
+        ],
+        [
+          76.576738,
+          30.770463
+        ],
+        [
+          76.576632,
+          30.770473
+        ],
+        [
+          76.576402,
+          30.770451
+        ],
+        [
+          76.576406,
+          30.770291
+        ],
+        [
+          76.576401,
+          30.770067
+        ],
+        [
+          76.576253,
+          30.770077
+        ],
+        [
+          76.576245,
+          30.769918
+        ],
+        [
+          76.575984,
+          30.769935
+        ]
+      ]
+    },
+    "origin_name": "Hospital Facility 1216904632",
+    "destination_name": "Block-1",
+    "steps": [
+      {
+        "step_index": 1,
+        "from_node": "node_76.577081_30.770454",
+        "to_node": "node_76.576738_30.770463",
+        "road_id": "road-osm-733440064-2",
+        "road_name": "Service Corridor 733440064",
+        "segment_length_m": 32.7,
+        "status": "unknown",
+        "reason": "Width unmeasured in cadastre; clearance unverified."
+      },
+      {
+        "step_index": 2,
+        "from_node": "node_76.576738_30.770463",
+        "to_node": "node_76.576632_30.770473",
+        "road_id": "road-osm-733440064-2",
+        "road_name": "Service Corridor 733440064",
+        "segment_length_m": 10.2,
+        "status": "unknown",
+        "reason": "Width unmeasured in cadastre; clearance unverified."
+      },
+      {
+        "step_index": 3,
+        "from_node": "node_76.576632_30.770473",
+        "to_node": "node_76.576402_30.770451",
+        "road_id": "road-osm-1102495116",
+        "road_name": "Service Corridor 1102495116",
+        "segment_length_m": 22.1,
+        "status": "unknown",
+        "reason": "Width unmeasured in cadastre; clearance unverified."
+      },
+      {
+        "step_index": 4,
+        "from_node": "node_76.576402_30.770451",
+        "to_node": "node_76.576406_30.770291",
+        "road_id": "road-osm-733440059-3",
+        "road_name": "Service Corridor 733440059",
+        "segment_length_m": 17.9,
+        "status": "unknown",
+        "reason": "Width unmeasured in cadastre; clearance unverified."
+      },
+      {
+        "step_index": 5,
+        "from_node": "node_76.576406_30.770291",
+        "to_node": "node_76.576401_30.770067",
+        "road_id": "road-osm-733440059-3",
+        "road_name": "Service Corridor 733440059",
+        "segment_length_m": 24.9,
+        "status": "unknown",
+        "reason": "Width unmeasured in cadastre; clearance unverified."
+      },
+      {
+        "step_index": 6,
+        "from_node": "node_76.576401_30.770067",
+        "to_node": "node_76.576253_30.770077",
+        "road_id": "road-osm-733440058",
+        "road_name": "Service Corridor 733440058",
+        "segment_length_m": 14.2,
+        "status": "unknown",
+        "reason": "Width unmeasured in cadastre; clearance unverified."
+      },
+      {
+        "step_index": 7,
+        "from_node": "node_76.576253_30.770077",
+        "to_node": "node_76.576245_30.769918",
+        "road_id": "road-osm-733440065-3",
+        "road_name": "Service Corridor 733440065",
+        "segment_length_m": 17.7,
+        "status": "unknown",
+        "reason": "Width unmeasured in cadastre; clearance unverified."
+      },
+      {
+        "step_index": 8,
+        "from_node": "node_76.576245_30.769918",
+        "to_node": "node_76.575984_30.769935",
+        "road_id": "road-osm-733440065-7",
+        "road_name": "Service Corridor 733440065",
+        "segment_length_m": 25.0,
+        "status": "unknown",
+        "reason": "Width unmeasured in cadastre; clearance unverified."
+      }
+    ],
+    "segment_assessments": [
+      {
+        "road_id": "road-osm-733440064-2",
+        "name": "Service Corridor 733440064",
+        "road_class": "Service",
+        "width_m": null,
+        "required_width_m": 3.5,
+        "surface": "paved",
+        "obstruction": null,
+        "status": "unknown",
+        "is_passable": true,
+        "length_m": 32.7,
+        "limiting_factors": [
+          "Unmeasured corridor width in cadastre: ground truth audit required"
+        ],
+        "notes": "Width unmeasured in cadastre; clearance unverified."
+      },
+      {
+        "road_id": "road-osm-1102495116",
+        "name": "Service Corridor 1102495116",
+        "road_class": "Service",
+        "width_m": null,
+        "required_width_m": 3.5,
+        "surface": "paved",
+        "obstruction": null,
+        "status": "unknown",
+        "is_passable": true,
+        "length_m": 22.1,
+        "limiting_factors": [
+          "Unmeasured corridor width in cadastre: ground truth audit required"
+        ],
+        "notes": "Width unmeasured in cadastre; clearance unverified."
+      },
+      {
+        "road_id": "road-osm-733440059-3",
+        "name": "Service Corridor 733440059",
+        "road_class": "Service",
+        "width_m": null,
+        "required_width_m": 3.5,
+        "surface": "paved",
+        "obstruction": null,
+        "status": "unknown",
+        "is_passable": true,
+        "length_m": 17.9,
+        "limiting_factors": [
+          "Unmeasured corridor width in cadastre: ground truth audit required"
+        ],
+        "notes": "Width unmeasured in cadastre; clearance unverified."
+      },
+      {
+        "road_id": "road-osm-733440058",
+        "name": "Service Corridor 733440058",
+        "road_class": "Service",
+        "width_m": null,
+        "required_width_m": 3.5,
+        "surface": "paved",
+        "obstruction": null,
+        "status": "unknown",
+        "is_passable": true,
+        "length_m": 14.2,
+        "limiting_factors": [
+          "Unmeasured corridor width in cadastre: ground truth audit required"
+        ],
+        "notes": "Width unmeasured in cadastre; clearance unverified."
+      },
+      {
+        "road_id": "road-osm-733440065-3",
+        "name": "Service Corridor 733440065",
+        "road_class": "Service",
+        "width_m": null,
+        "required_width_m": 3.5,
+        "surface": "paved",
+        "obstruction": null,
+        "status": "unknown",
+        "is_passable": true,
+        "length_m": 17.7,
+        "limiting_factors": [
+          "Unmeasured corridor width in cadastre: ground truth audit required"
+        ],
+        "notes": "Width unmeasured in cadastre; clearance unverified."
+      },
+      {
+        "road_id": "road-osm-733440065-7",
+        "name": "Service Corridor 733440065",
+        "road_class": "Service",
+        "width_m": null,
+        "required_width_m": 3.5,
+        "surface": "paved",
+        "obstruction": null,
+        "status": "unknown",
+        "is_passable": true,
+        "length_m": 25.0,
+        "limiting_factors": [
+          "Unmeasured corridor width in cadastre: ground truth audit required"
+        ],
+        "notes": "Width unmeasured in cadastre; clearance unverified."
+      }
+    ],
+    "limiting_segments": [
+      "road-osm-733440064-2",
+      "road-osm-1102495116",
+      "road-osm-733440059-3",
+      "road-osm-733440058",
+      "road-osm-733440065-3",
+      "road-osm-733440065-7"
+    ],
+    "evaluated_constraints": [
+      "width",
+      "physical_obstruction"
+    ],
+    "unevaluated_constraints": [
+      "overhead_clearance",
+      "turning_radius",
+      "gross_weight_limit",
+      "gate_restriction",
+      "entrance_doorway_access"
+    ],
+    "explanation": "Route identified (164.8m across 6 segments), but contains unmeasured segment(s): road-osm-733440064-2, road-osm-1102495116, road-osm-733440059-3, road-osm-733440058, road-osm-733440065-3. Access cannot be confirmed accessible without ground truth width survey.",
+    "disclaimer": "DETERMINISTIC EVALUATION FOR PROTOTYPE DEMONSTRATION. ROAD ARRIVAL DOES NOT GUARANTEE ENTRANCE ACCESS."
+  },
+  "limitations": [
+    "road-osm-733440064-2",
+    "road-osm-1102495116",
+    "road-osm-733440059-3",
+    "road-osm-733440058",
+    "road-osm-733440065-3",
+    "road-osm-733440065-7"
+  ],
+  "missing_evidence": [
+    "Building entrance gate is unsurveyed in cadastre.",
+    "Setback distance (31.3m) from corridor requires pedestrian or hose line advance.",
+    "6 segment(s) along route have bottlenecks or unmeasured widths."
+  ],
+  "plain_language_explanation": "Corridor accessibility to bldg-osm-4393913180 is unknown due to missing width or unsurveyed data along path.",
+  "disclaimer": "MUNICIPAL CADASTRE DEMONSTRATION. ROAD NETWORK REACHABILITY DOES NOT GUARANTEE PHYSICAL BUILDING ENTRANCE INGRESS."
+}

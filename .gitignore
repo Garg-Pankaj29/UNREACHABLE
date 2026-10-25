@@ -18,11 +18,18 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
-# Environment, Credentials, and Secrets (retain examples)
+# Environment, Credentials, and Secrets (retain examples/templates)
 .env
 .env.*
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
 !.env.example
+!.env.template
 *.env
+*.env.*
 *.pem
 *.key
 *.cert
@@ -30,18 +37,40 @@ __pycache__/
 *.p12
 *.pfx
 *.pkcs*
+*.keystore
+*.jks
 id_rsa*
 id_ed25519*
+id_ecdsa*
+id_dsa*
 *credentials*.json
 *secret*.json
 token*.json
 auth*.json
 service-account*.json
+google-services.json
+GoogleService-Info.plist
+.aws/
+.gcp/
+.azure/
+.firebase/
+oauth*
+jwt*
+*.jwt
 
-# SQLite runtime locks and journals
+# Confidential Operational Data & Runtime Databases
+data/incidents.sqlite
+data/incidents.sqlite*
+*incident*.sqlite
+*incident*.db
+*.db
+*.sqlite3
 *.sqlite-wal
 *.sqlite-shm
 *.sqlite-journal
+confidential/
+secrets/
+private/
 
 # Large Raw OSM Binary Extracts (>100MB exceeds GitHub push limits)
 data/raw/*.osm.pbf
@@ -104,4 +133,5 @@ ngrok
 ngrok.yml
 
 
-
+logo.jpeg
+ui_images/

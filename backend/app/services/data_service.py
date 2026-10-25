@@ -2,7 +2,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from app.core.config import SAMPLE_DATA_PATH
 from app.models.schemas import (
@@ -19,30 +19,119 @@ logger = logging.getLogger("unreachable.data_service")
 class DataService:
     """Service to load and query sample neighbourhood GeoJSON data."""
 
-    def __init__(self, data_path: Path = SAMPLE_DATA_PATH):
-        self.data_path = data_path
+    def __init__(self, data_path: Optional[Path] = None):
+        self._custom_path = data_path
+        self._raw_cache: Optional[Dict[str, Any]] = None
+        self._raw_mode: Optional[str] = None
         self._cache: Optional[Dict[str, Any]] = None
+        self._cached_mode: Optional[str] = None
+        self._cached_blocked: Optional[Tuple[str, ...]] = None
+
+    @property
+    def data_mode(self) -> str:
+        import os
+        return os.getenv("DATA_MODE", "demo").lower()
+
+    @property
+    def data_path(self) -> Path:
+        if self._custom_path is not None:
+            return self._custom_path
+        from app.core.config import get_active_data_path
+        return get_active_data_path()
+
+    def get_data_mode(self) -> str:
+        """Returns the active data mode ('demo' or 'real')."""
+        return self.data_mode
+
+    def get_counts(self) -> Dict[str, int]:
+        """Returns feature counts grouped by type."""
+        data = self.load_data()
+        features = data.get("features", [])
+        roads = sum(1 for f in features if f.get("properties", {}).get("feature_type") == "road")
+        buildings = sum(1 for f in features if f.get("properties", {}).get("feature_type") == "building")
+        stations = sum(1 for f in features if f.get("properties", {}).get("feature_type") == "station")
+        return {
+            "roads": roads,
+            "buildings": buildings,
+            "stations": stations,
+            "total": len(features),
+        }
+
+    def _apply_incident_overlay(self, data: Dict[str, Any], blocked_roads: Set[str]) -> Dict[str, Any]:
+        """Applies active incident road blockages in-memory without altering disk GeoJSON."""
+        features = data.get("features", [])
+        overlaid_features = []
+        for f in features:
+            props = f.get("properties", {})
+            r_id = props.get("id") or f.get("id")
+            if props.get("feature_type") == "road" and r_id in blocked_roads:
+                new_f = {
+                    **f,
+                    "properties": {
+                        **props,
+                        "obstruction": "Active emergency incident: road physically blocked",
+                        "access_status": "infeasible",
+                        "is_blocked": True,
+                        "incident_active": True,
+                    }
+                }
+                overlaid_features.append(new_f)
+            else:
+                overlaid_features.append(f)
+
+        return {
+            **data,
+            "features": overlaid_features,
+        }
 
     def load_data(self) -> Dict[str, Any]:
-        """Loads and parses the GeoJSON sample dataset from repository-relative path."""
-        if self._cache is not None:
+        """Loads and parses the GeoJSON dataset from active repository path with incident overlay."""
+        current_mode = self.data_mode
+        active_path = self.data_path
+
+        if self._raw_cache is None or self._raw_mode != current_mode:
+            if not active_path.exists():
+                error_msg = f"Dataset not found at expected path: {active_path}"
+                logger.error(error_msg)
+                raise FileNotFoundError(error_msg)
+
+            try:
+                with open(active_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                logger.info("Successfully loaded GeoJSON from %s (mode=%s)", active_path, current_mode)
+                self._raw_cache = data
+                self._raw_mode = current_mode
+            except json.JSONDecodeError as exc:
+                error_msg = f"Failed to parse GeoJSON file {active_path}: {exc}"
+                logger.error(error_msg)
+                raise ValueError(error_msg) from exc
+
+        # Retrieve active blocked roads for in-memory overlay
+        blocked_tuple: Tuple[str, ...] = ()
+        blocked_set: Set[str] = set()
+        try:
+            from app.services.incident_service import incident_service
+            blocked_set = incident_service.get_blocked_roads_set()
+            blocked_tuple = tuple(sorted(blocked_set))
+        except Exception:
+            blocked_set = set()
+
+        if (
+            self._cache is not None
+            and self._cached_mode == current_mode
+            and self._cached_blocked == blocked_tuple
+        ):
             return self._cache
 
-        if not self.data_path.exists():
-            error_msg = f"Sample dataset not found at expected path: {self.data_path}"
-            logger.error(error_msg)
-            raise FileNotFoundError(error_msg)
+        if blocked_set:
+            overlaid = self._apply_incident_overlay(self._raw_cache, blocked_set)
+        else:
+            overlaid = self._raw_cache
 
-        try:
-            with open(self.data_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            logger.info("Successfully loaded sample GeoJSON from %s", self.data_path)
-            self._cache = data
-            return data
-        except json.JSONDecodeError as exc:
-            error_msg = f"Failed to parse GeoJSON file {self.data_path}: {exc}"
-            logger.error(error_msg)
-            raise ValueError(error_msg) from exc
+        self._cache = overlaid
+        self._cached_mode = current_mode
+        self._cached_blocked = blocked_tuple
+        return overlaid
 
     def is_loaded(self) -> bool:
         """Returns True if dataset file exists and parses properly."""
