@@ -25,10 +25,13 @@ from app.models.schemas import (
     ExplainResponse,
     FeatureCollectionResponse,
     HealthResponse,
+    RoadCertifyRequest,
     SearchResponse,
     SearchResultItem,
     StatsResponse,
     VehicleGapResponse,
+    VisionInspectRequest,
+    VisionInspectResponse,
 )
 from app.models.vehicle import (
     SUPPORTED_VEHICLES,
@@ -39,6 +42,7 @@ from app.services.access_engine import WorkOrderItem, access_engine
 from app.services.data_service import data_service
 from app.services.explain_service import explain_service
 from app.services.pilot_service import pilot_data_service
+from app.services.vision_service import vision_service
 
 
 logger = logging.getLogger("unreachable.api")
@@ -888,3 +892,58 @@ async def stream_events():
             "X-Accel-Buffering": "no",
         },
     )
+
+
+# ============================================================================
+# Vision Street Inspection & Road Width Certification Endpoints
+# ============================================================================
+
+@router.post(
+    "/vision/inspect",
+    response_model=VisionInspectResponse,
+    summary="Inspect street photograph using local vision model",
+    description="Analyzes street photos for carriageway clearance, lateral bottlenecks, and overhead obstacles.",
+)
+def post_vision_inspect(request: VisionInspectRequest) -> VisionInspectResponse:
+    """Performs visual inspection of street photo with local VLM and deterministic fallback."""
+    try:
+        res = vision_service.inspect_image(
+            image_base64=request.image_base64,
+            road_id=request.road_id,
+            vehicle_id=request.vehicle_id,
+        )
+        return VisionInspectResponse(**res)
+    except Exception as exc:
+        logger.error("Vision inspection error: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Vision inspection failed: {exc}",
+        )
+
+
+@router.post(
+    "/roads/{road_id}/certify-width",
+    summary="Certify and update road width from field survey or vision inspection",
+    description="Applies in-memory ground truth width override to road graph for immediate routing re-evaluation.",
+)
+def post_certify_road_width(road_id: str, request: RoadCertifyRequest):
+    """Applies verified width override to road in-memory without altering disk GeoJSON."""
+    try:
+        vision_service.apply_road_width_override(
+            road_id=road_id,
+            verified_width_m=request.verified_width_m,
+            notes=request.notes,
+        )
+        return {
+            "success": True,
+            "road_id": road_id,
+            "verified_width_m": request.verified_width_m,
+            "message": f"Carriageway width for {road_id} updated to {request.verified_width_m}m in-memory.",
+        }
+    except Exception as exc:
+        logger.error("Failed to certify road width: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to certify road width: {exc}",
+        )
+

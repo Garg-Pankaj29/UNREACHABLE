@@ -112,3 +112,33 @@ class SearchResponse(BaseModel):
     results: List[SearchResultItem]
 
 
+class VisionObservationItem(BaseModel):
+    id: int
+    t: str
+    d: str
+    c: int
+    s: str = ""
+
+
+class VisionInspectRequest(BaseModel):
+    image_base64: str
+    road_id: Optional[str] = None
+    vehicle_id: str = "fire"
+
+
+class VisionInspectResponse(BaseModel):
+    carriageway_width_est_m: float
+    passable_for_fire: bool
+    passable_for_ambulance: bool
+    overhead_clearance_est_m: Optional[float] = None
+    observations: List[VisionObservationItem]
+    summary: str
+    source: str = "local_vlm"
+
+
+class RoadCertifyRequest(BaseModel):
+    verified_width_m: float
+    notes: Optional[str] = None
+
+
+

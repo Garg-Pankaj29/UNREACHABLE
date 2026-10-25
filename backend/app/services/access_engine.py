@@ -177,6 +177,15 @@ class AccessEngine:
             except (ValueError, TypeError):
                 width_m = None
 
+        # Check in-memory vision/cadastre width override
+        try:
+            from app.services.vision_service import vision_service
+            override = vision_service.get_road_override(road_id)
+            if override and "width_m" in override:
+                width_m = override["width_m"]
+        except Exception:
+            pass
+
         limiting_factors: List[str] = []
 
         # Check Access restrictions from OSM tags (emergency vehicles have right-of-way on private roads)
@@ -903,7 +912,7 @@ class AccessEngine:
                 vehicle=vehicle,
                 classification=AccessClassification.INACCESSIBLE,
                 route_found=False,
-                total_distance_m=0.0,
+                total_distance_m=round(sum(e.length_m for e in unconstrained_path), 1) if unconstrained_path else 0.0,
                 segments_traversed=[],
                 geometry_geojson={"type": "LineString", "coordinates": blocked_coords} if blocked_coords else None,
                 steps=[],
