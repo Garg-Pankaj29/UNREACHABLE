@@ -33,12 +33,13 @@
 | 5 | SQLite incidents, live recompute, SSE stream | done |
 | 6 | StaticFiles SPA, start_demo.sh, offline guardrails, tagged demo-final | done |
 
+- 2026-10-24 | Vision VLM & Road Certify | Connected LM Studio Gemma vision model; real base64 inspection, estimated carriageway width, instant in-memory road certification, unblocked fire access with true distance; 79/79 tests OK, build OK | vision_service.py, access_engine.py, routes.py, AIInspectorPage.tsx, api.ts, memory.md
 - 2026-10-24 | Emergency Route & Pointer Fix | Dedicated emergencyRoutePane z-550, origin/destination pins, halted stray unit tracking loop, offline GPS architecture in explain.md; 79/79 tests OK, build OK | MapView.tsx, AccessAtlasPage.tsx, incident_service.py, explain.md, memory.md
 - 2026-10-24 | Road Fix | Vehicle-aware dynamic road styling (Feasible/Constrained/Inaccessible/Unknown); road click highlight fixed; 79/79 tests OK, build OK | MapView.tsx, AccessAtlasPage.tsx, api.ts, memory.md
 - 2026-10-24 | Phase 6 | StaticFiles SPA mount, scripts/start_demo.sh, docs/DEMO_CHECKLIST.md, tagged demo-final; 79/79 tests OK, build OK | main.py, start_demo.sh, DEMO_CHECKLIST.md, memory.md
-- 2026-10-24 | Phase 5 | SQLite-backed incidents (POST/GET /api/incidents), SSE /api/stream, live route recompute & unit animation; 79/79 tests OK, build OK | incident_service.py, routes.py, AccessAtlasPage.tsx, MapView.tsx, api.ts, test_incidents.py, memory.md
 
 ## 6. Rules for agents
 - Additive changes only; keep demo mode intact; never modify data/sample/.
 - Run backend tests & frontend build after each task; check last 15 lines.
 - Finish by updating memory.md (≤60 lines), then git commit. Max 10 lines reply.
+
