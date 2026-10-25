@@ -446,6 +446,39 @@ export const api = {
   getStreamUrl: (): string => {
     return `${API_BASE_URL}/stream`;
   },
+
+  inspectVisionImage: async (
+    imageBase64: string,
+    roadId?: string,
+    vehicleId?: string
+  ): Promise<any> => {
+    const res = await fetch(`${API_BASE_URL}/vision/inspect`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image_base64: imageBase64,
+        road_id: roadId || null,
+        vehicle_id: vehicleId || 'fire',
+      }),
+    });
+    return handleResponse(res, '/vision/inspect');
+  },
+
+  certifyRoadWidth: async (
+    roadId: string,
+    verifiedWidthM: number,
+    notes?: string
+  ): Promise<any> => {
+    const res = await fetch(`${API_BASE_URL}/roads/${encodeURIComponent(roadId)}/certify-width`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        verified_width_m: verifiedWidthM,
+        notes: notes || 'Verified via street photography AI inspection',
+      }),
+    });
+    return handleResponse(res, `/roads/${roadId}/certify-width`);
+  },
 };
 
 export const apiService = api;
