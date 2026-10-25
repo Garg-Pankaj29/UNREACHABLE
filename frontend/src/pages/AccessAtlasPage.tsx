@@ -225,7 +225,14 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
   });
 
   // Debounced search effect
+  const isSelectingRef = useRef<boolean>(false);
+
   useEffect(() => {
+    if (isSelectingRef.current) {
+      isSelectingRef.current = false;
+      return;
+    }
+
     const q = searchQuery.trim();
     if (q.length < 2) {
       setSearchResults([]);
@@ -356,6 +363,7 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
   }, [isDropdownOpen, onSelectFeature]);
 
   const handleSelectResult = (item: SearchResultItem) => {
+    isSelectingRef.current = true;
     const feature: GeoJSONFeature = {
       type: 'Feature',
       id: item.id,
@@ -378,6 +386,7 @@ export const AccessAtlasPage: React.FC<AccessAtlasPageProps> = ({
     };
     onSelectFeature(feature);
     setIsDropdownOpen(false);
+    setSearchResults([]);
     setSearchQuery(item.name);
   };
 

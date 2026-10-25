@@ -16,7 +16,7 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
   const [selectedIssueId, setSelectedIssueId] = useState<string>(
     initialIssueId || issues[0]?.id || 'I-01'
   );
-  const [fixApplied, setFixApplied] = useState<boolean>(true);
+  const [fixApplied, setFixApplied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [simResult, setSimResult] = useState<SimulateResponse | null>(null);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   AlternativeRoute,
   BuildingAccessResponse,
@@ -104,6 +104,29 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
   const isUserTyping = useRef(false);
   const currentVeh = VEHICLE_OPTIONS[selectedVehKey] || VEHICLE_OPTIONS.fire;
   const selectedStation = stations.find((s) => (s.properties?.id || s.id) === selectedStationId);
+
+  // Dynamically compute real counts from stations prop
+  const facilityCounts = useMemo(() => {
+    let fire = 0;
+    let hospital = 0;
+    let clinic = 0;
+    let doctors = 0;
+    stations.forEach((st) => {
+      const p = st.properties || {};
+      const t = (p.facility_type || p.station_type || '').toLowerCase();
+      if (t === 'fire_station' || t === 'fire') fire++;
+      else if (t === 'hospital') hospital++;
+      else if (t === 'clinic') clinic++;
+      else if (t === 'doctors') doctors++;
+    });
+    return {
+      all: stations.length,
+      fire_station: fire,
+      hospital: hospital,
+      clinic: clinic,
+      doctors: doctors,
+    };
+  }, [stations]);
 
   // Filter facilities by category and search query
   const filteredStations = stations.filter((st) => {
@@ -518,7 +541,7 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
               border: `1.5px solid ${datasetMode === 'pilot' ? 'var(--ok)' : 'var(--line)'}`,
             }}
           >
-            {datasetMode === 'pilot' ? '● Real Pilot Network (41,373 Roads • 422 Centres)' : 'Demo Network (6 Roads)'}
+            {datasetMode === 'pilot' ? `● Real Pilot Network (41,373 Roads • ${stations.length || 497} Centres)` : 'Demo Network (6 Roads)'}
           </span>
         </div>
 
@@ -559,11 +582,11 @@ export const RoutesPage: React.FC<RoutesPageProps> = ({
             {datasetMode === 'pilot' && (
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
                 {[
-                  { key: 'all', label: 'All (422)', icon: null },
-                  { key: 'fire_station', label: 'Fire Stations (5)', icon: <Flame size={14} style={{ color: '#ef4444' }} /> },
-                  { key: 'hospital', label: 'Hospitals (199)', icon: <Building size={14} style={{ color: '#3b82f6' }} /> },
-                  { key: 'clinic', label: 'Clinics (189)', icon: <Stethoscope size={14} style={{ color: '#10b981' }} /> },
-                  { key: 'doctors', label: 'Doctors (29)', icon: <UserCheck size={14} style={{ color: '#06b6d4' }} /> },
+                  { key: 'all', label: `All (${facilityCounts.all})`, icon: null },
+                  { key: 'fire_station', label: `Fire Stations (${facilityCounts.fire_station})`, icon: <Flame size={14} style={{ color: '#ef4444' }} /> },
+                  { key: 'hospital', label: `Hospitals (${facilityCounts.hospital})`, icon: <Building size={14} style={{ color: '#3b82f6' }} /> },
+                  { key: 'clinic', label: `Clinics (${facilityCounts.clinic})`, icon: <Stethoscope size={14} style={{ color: '#10b981' }} /> },
+                  { key: 'doctors', label: `Doctors (${facilityCounts.doctors})`, icon: <UserCheck size={14} style={{ color: '#06b6d4' }} /> },
                 ].map((cat) => (
                   <button
                     key={cat.key}
